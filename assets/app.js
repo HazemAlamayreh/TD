@@ -282,3 +282,74 @@ for(const m of DATA.modules){const a=state.attempts[m.id+':diagnostic'];if(a)syn
 save();
 
 render();
+
+/* v17: Concept-aligned Arabic assessment alternatives. No runtime translation service.
+   Arabic responses are written from the matching Arabic lesson summary; answer
+   positions and question IDs are kept stable when language is switched mid-test. */
+const ASSESSMENT_BASE_GETQS=getQs;
+function arabicConceptItem(q,index){
+ const lesson=AR_LESSONS[q.target];
+ if(!lesson)return q;
+ const topic=lesson[0],summary=lesson[1];
+ const steps=summary.split(/[.!؟]+/).map(s=>s.trim()).filter(s=>s.length>22);
+ const correct=(steps[index%Math.max(1,steps.length)]||summary).replace(/[،؛\s]+$/,'')+'.';
+ const bad=[
+  'الاعتماد على الانطباعات الشخصية دون التحقق من المعلومات أو السياق.',
+  'تطبيق الحل نفسه مع الجميع دون مراعاة الاختلافات واحتياجات العمل.',
+  'التركيز على إكمال النشاط فقط دون فحص ما تعلّمه المشاركون أو أثره.',
+  'تجاهل الأدلة والتغذية الراجعة والاكتفاء بالافتراضات الأولية.',
+  'اتخاذ قرار نهائي قبل فهم المشكلة ومناقشة البدائل.',
+  'اختيار الأسلوب الأكثر شيوعاً دون ربطه بهدف التعلم أو الأداء.'
+ ];
+ const answer=q.answer;
+ const opts=[];let k=index*3;
+ for(let i=0;i<4;i++)opts.push(i===answer?correct:bad[(k++)%bad.length]);
+ return {...q,title:topic,
+  q:index%2===0?
+   'في موقف عمل يتطلب «'+topic+'»، أي ممارسة تعكس فهماً صحيحاً للمفهوم؟':
+   'أي تصرف يتفق أكثر مع تطبيق «'+topic+'» في العمل؟',
+  opts,why:'يرتبط الاختيار الصحيح بمبادئ الدرس: '+correct,
+  arabicAlternative:true};
+}
+function localizedPair(id){
+ const base=TWO_QUESTION_BANK[id]||[];
+ return state.lang==='ar'?base.map((q,i)=>arabicConceptItem(q,i)):base;
+}
+getQs=function(m,stage){
+ const qs=ASSESSMENT_BASE_GETQS(m,stage);
+ if(state.lang!=='ar'||(stage!=='diagnostic'&&stage!=='mastery')||m.preview)return qs;
+ const counts={};
+ return qs.map(q=>{const n=counts[q.target]||0;counts[q.target]=n+1;return arabicConceptItem(q,n)});
+};
+lessonCheck=function(l){
+ const id=l[0],items=localizedPair(id);if(!items.length)return '';
+ const c=state.checks[id],answers=c&&Array.isArray(c.answers)?c.answers:[null,null];
+ const correct=items.filter((q,i)=>answers[i]===q.answer).length;
+ return '<div class="microCheck"><div class="learnlabel">'+msg('KNOWLEDGE CHECK · TWO PRACTICE QUESTIONS','مراجعة الفهم · سؤالان للتدريب')+'</div>'+
+ items.map((q,n)=>'<div class="pairCheck"><div class="pairQuestion">'+(n+1)+'/2 · '+esc(q.q)+'</div>'+
+ q.opts.map((a,i)=>'<button class="microOption '+(answers[n]===i?(i===q.answer?'correctChoice':'incorrectChoice'):'')+'" onclick="quickCheck(\''+id+'\','+n+','+i+')">'+ 'ABCD'[i]+'. '+esc(a)+'</button>').join('')+
+ (answers[n]!=null?'<div class="feedback">'+(answers[n]===q.answer?msg('Correct','صحيح'):msg('Not yet correct','الإجابة غير صحيحة'))+' · '+esc(q.why)+'</div>':'')+'</div>').join('')+
+ '<div class="pairStatus">'+(answers.every(x=>x!=null)?(correct===2?msg('Practice result: 2/2 correct','نتيجة التدريب: ٢/٢ صحيحتان'):msg('Practice result: '+correct+'/2. Review and retry.','نتيجة التدريب: '+correct+'/2. راجع الدرس وحاول مرة أخرى.')):msg('Practice only. Diagnostic completion requires both answers correct.','تدريب فقط. اجتياز التشخيص يتطلب إجابتين صحيحتين.'))+'</div></div>';
+};
+const RENDER_BEFORE_ASSESSMENT_LOCALE=render;
+render=function(){
+ if(sess&&!sess.finished&&state.lang==='ar'&&['diagnostic','mastery'].includes(sess.stage)){
+  const m=DATA.modules.find(m=>m.id===sess.mid);
+  if(m)sess.qs=getQs(m,sess.stage);
+ }else if(sess&&!sess.finished&&state.lang==='en'&&['diagnostic','mastery'].includes(sess.stage)){
+  const m=DATA.modules.find(m=>m.id===sess.mid);
+  if(m)sess.qs=getQs(m,sess.stage);
+ }
+ RENDER_BEFORE_ASSESSMENT_LOCALE();
+ if(state.lang==='ar'){
+  document.querySelectorAll('#body .microCheck .translationNotice').forEach(el=>el.remove());
+  const old=document.querySelector('#body .materialIntro .translationNotice');
+  if(old)old.textContent='الأسئلة التشخيصية وأسئلة الإتقان ومراجعة الدروس متاحة بالعربية بصياغات تطبيقية مبنية على المفاهيم نفسها. قد تبقى بعض السيناريوهات المتقدمة باللغة الإنجليزية إلى حين مراجعة ترجمتها.';
+  const isEnglishAssessment=sess&&(!['diagnostic','mastery'].includes(sess.stage)||mod().preview);
+  if(isEnglishAssessment&&document.querySelector('#body .qBox')&&!document.querySelector('#body .qBox .translationNotice')){
+   const note=document.createElement('p');note.className='translationNotice';note.textContent='هذا السيناريو متاح حالياً بالإنجليزية. لم تُراجع نسخته العربية بعد.';
+   document.querySelector('#body .qBox').prepend(note);
+  }
+ }
+};
+render();
