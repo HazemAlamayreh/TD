@@ -353,3 +353,107 @@ render=function(){
  }
 };
 render();
+
+
+/* v18: lesson completion reflects both explicit study and knowledge-check success.
+   Preserve diagnostic evidence separately; a retake cannot erase manual completion. */
+function lessonCheckPassed(id){
+ const qs=TWO_QUESTION_BANK[id]||[],a=state.checks?.[id]?.answers;
+ return qs.length===2&&Array.isArray(a)&&qs.every((q,i)=>a[i]===q.answer);
+}
+function completeLesson(id,source){
+ if(!lessonFor(id))return;
+ state.done[id]=true;
+ state.manualReviewed??={};
+ state.studiedLessons??={};
+ state.lessonVisits??={};
+ if(source==='manual'){state.manualReviewed[id]=true;state.studiedLessons[id]=true;}
+ state.lessonVisits[id]=Date.now();
+ save();
+}
+markLesson=function(id){completeLesson(id,'manual');render();};
+quickCheck=function(id,questionIndex,answer){
+ const qs=TWO_QUESTION_BANK[id];
+ if(!qs||questionIndex<0||questionIndex>=qs.length)return;
+ const previous=state.checks[id]?.answers;
+ const answers=Array.isArray(previous)?previous.slice():[null,null];
+ answers[questionIndex]=answer;
+ state.checks[id]={answers,correct:qs.every((q,i)=>answers[i]===q.answer),ts:new Date().toISOString()};
+ if(lessonCheckPassed(id))completeLesson(id,'check');
+ save();render();
+};
+const PREVIOUS_DIAGNOSTIC_COMPLETION=syncDiagnosticReview;
+syncDiagnosticReview=function(m,attempt){
+ PREVIOUS_DIAGNOSTIC_COMPLETION(m,attempt);
+ if(!m||m.preview)return;
+ for(const l of m.lessons){
+  const id=l[0];
+  if(state.manualReviewed?.[id]||lessonCheckPassed(id))state.done[id]=true;
+ }
+};
+for(const m of DATA.modules){
+ for(const l of m.lessons){
+  const id=l[0];
+  if(state.manualReviewed?.[id]||lessonCheckPassed(id))state.done[id]=true;
+ }
+}
+function detailedQuestionFeedback(q,selectedIndex){
+ const good=q.opts[q.answer],selected=q.opts[selectedIndex];
+ const concept=q.title||AR_LESSONS[q.target]?.[0]||'the lesson concept';
+ const isArabic=state.lang==='ar';
+ if(isArabic){
+  const name=AR_LESSONS[q.target]?.[0]||concept;
+  const explanation=q.arabicAlternative?q.why:'المبدأ الأساسي: '+(AR_LESSONS[q.target]?.[1]||q.why);
+  return '<strong>'+(selectedIndex===q.answer?'إجابة صحيحة':'لنراجع الفكرة')+'</strong><p><b>لماذا؟</b> '+esc(explanation)+'</p>'+
+  '<p><b>الإجابة الأنسب:</b> '+esc(good)+'</p>'+
+  (selectedIndex===q.answer?'':'<p><b>لماذا نراجع الاختيار؟</b> الخيار الذي اخترته لا يطبّق المبدأ المطلوب في هذا السياق: '+esc(selected)+'</p>')+
+  '<p><b>تذكر:</b> عند تطبيق «'+esc(name)+'»، ابحث عن سلوك واضح يناسب الموقف، وليس مجرد إكمال نشاط.</p>';
+ }
+ return '<strong>'+(selectedIndex===q.answer?'Correct — you applied the concept.':'Let’s clarify the concept.')+'</strong>'+
+ '<p><b>Why it matters:</b> '+esc(q.why||'Connect the decision to the specific learning goal and the workplace context.')+'</p>'+
+ '<p><b>Best answer:</b> '+esc(good)+'</p>'+
+ (selectedIndex===q.answer?'':'<p><b>Why your selection is less suitable:</b> '+esc(selected)+'. Compare it with the intended outcome and the evidence in the situation.</p>')+
+ '<p><b>Remember:</b> '+esc(concept)+' is demonstrated through a relevant workplace decision, not simply by completing an activity.</p>';
+}
+lessonCheck=function(l){
+ const id=l[0],items=localizedPair(id);if(!items.length)return '';
+ const answers=Array.isArray(state.checks[id]?.answers)?state.checks[id].answers:[null,null];
+ const correct=items.filter((q,i)=>answers[i]===q.answer).length;
+ return '<div class="microCheck"><div class="learnlabel">'+msg('CHECK YOUR UNDERSTANDING · TWO QUESTIONS','تحقق من فهمك · سؤالان')+'</div>'+
+ items.map((q,n)=>'<div class="pairCheck"><div class="pairQuestion">'+(n+1)+'/2 · '+esc(q.q)+'</div>'+
+ q.opts.map((o,i)=>'<button class="microOption '+(answers[n]===i?(i===q.answer?'correctChoice':'incorrectChoice'):'')+'" onclick="quickCheck(\''+id+'\','+n+','+i+')">'+ 'ABCD'[i]+'. '+esc(o)+'</button>').join('')+
+ (answers[n]!=null?'<div class="feedback">'+detailedQuestionFeedback(q,answers[n])+'</div>':'')+'</div>').join('')+
+ '<div class="pairStatus">'+(lessonCheckPassed(id)?msg('✓ Lesson completed — both answers are correct.','✓ اكتمل الدرس — الإجابتان صحيحتان.'):msg('Progress: '+correct+'/2 correct. Answer both correctly to complete the lesson, or use Mark Completed.','التقدم: '+correct+'/2 صحيح. أجب عن السؤالين بشكل صحيح لإكمال الدرس، أو استخدم زر إكمال الدرس.'))+'</div></div>';
+};
+const PREVIOUS_MATERIAL_COMPLETION=material;
+material=function(m){
+ PREVIOUS_MATERIAL_COMPLETION(m);
+ if(m.preview)return;
+ const root=document.getElementById('body');
+ root.querySelectorAll('.lesson').forEach(node=>{
+  const id=node.id?.replace(/^lesson-/,'').replace(/-/g,'.');
+  if(!id||!lessonFor(id))return;
+  const done=!!state.done[id],proof=state.lessonProof?.[id];
+  const status=node.querySelector('.lessonFooter .status');
+  if(status)status.textContent=done?
+   (lessonCheckPassed(id)?msg('✓ Done · Knowledge check passed','✓ مكتمل · اجتياز أسئلة الفهم'):state.manualReviewed?.[id]?msg('✓ Done · Marked completed','✓ مكتمل · تم تحديده يدوياً'):msg('✓ Done · Diagnostic evidence','✓ مكتمل · دليل تشخيصي')):
+   (proof?msg('Needs review · '+proof.correct+'/2 diagnostic','يحتاج مراجعة · '+proof.correct+'/2 في التشخيص'):msg('Not yet completed','لم يكتمل بعد'));
+  const button=node.querySelector('.lessonFooter button');
+  if(button){
+   button.textContent=done?msg('Completed ✓','مكتمل ✓'):msg('Mark Completed ✓','تحديد كمكتمل ✓');
+   button.disabled=done;
+   button.onclick=()=>markLesson(id);
+  }
+ });
+};
+const PREVIOUS_TEST_FEEDBACK_RENDER=render;
+render=function(){
+ PREVIOUS_TEST_FEEDBACK_RENDER();
+ if(!sess||sess.finished||sess.stage==='diagnostic')return;
+ const q=sess.qs?.[sess.pos],a=sess.answers?.[sess.pos];
+ if(!q||a==null)return;
+ const box=document.querySelector('#body .qBox .feedback');
+ if(box)box.innerHTML=detailedQuestionFeedback(q,a);
+};
+save();
+render();
