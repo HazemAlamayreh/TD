@@ -457,3 +457,46 @@ render=function(){
 };
 save();
 render();
+
+
+/* v18b: Replace exercise instructions with concrete concept demonstrations.
+   Draw on the lesson's existing scenario, answer and rationale so examples
+   remain grounded in the curriculum rather than invented source claims. */
+function workplaceExample(l){
+ const id=l[0],title=l[1],question=l[4]||'',best=l[5]?.[l[6]]||'',why=l[7]||'';
+ if(state.lang==='ar'){
+  const name=AR_LESSONS[id]?.[0]||title;
+  const summary=AR_LESSONS[id]?.[1]||'';
+  const sentence=summary.split(/[.!؟]/).map(x=>x.trim()).find(x=>x.length>28)||summary;
+  return 'مثال من واقع العمل: يواجه مسؤول تطوير المواهب في مؤسسة تحدياً يتطلب «'+name+'». بدلاً من اختيار نشاط تدريبي لمجرد التنفيذ، يتخذ قراراً مستنداً إلى هذا المبدأ: '+sentence.replace(/[،؛\s]+$/,'')+'. ثم يراجع النتيجة في سلوك الموظفين والعمل الفعلي ليتأكد من ملاءمة القرار.';
+ }
+ const premise=question.split(/(?<=\.)\s+(?=(?:What|Which|How|Who|Why|When|Where|As)\b)/)[0];
+ const usefulPremise=premise!==question&&premise.length>28&&!premise.includes('?');
+ if(usefulPremise){
+  return 'Real-life example: '+premise+' In this situation, a talent development professional would choose to '+best.charAt(0).toLowerCase()+best.slice(1).replace(/[.!?]+$/,'')+'. '+why;
+ }
+ return 'Real-life example: A talent development team is making a workplace decision about '+title.toLowerCase()+'. The team uses this approach: '+best.replace(/[.!?]+$/,'')+'. '+why;
+}
+const MATERIAL_BEFORE_REAL_EXAMPLES=material;
+material=function(m){
+ if(!m.preview){
+  for(const l of m.lessons)l[3]=workplaceExample(l);
+ }
+ MATERIAL_BEFORE_REAL_EXAMPLES(m);
+ const root=document.getElementById('body');
+ root.querySelectorAll('.learnblock.example .learnlabel').forEach(label=>{
+  label.textContent=msg('REAL-LIFE WORKPLACE EXAMPLE','مثال واقعي من بيئة العمل');
+ });
+};
+const RENDER_BEFORE_DETAILED_RESULT=render;
+render=function(){
+ RENDER_BEFORE_DETAILED_RESULT();
+ if(!sess?.finished||!['diagnostic','mastery','advanced'].includes(sess.stage))return;
+ const cards=document.querySelectorAll('#body .qBox .lesson');
+ if(cards.length!==sess.qs.length)return;
+ cards.forEach((card,i)=>{
+  const q=sess.qs[i],a=sess.answers[i],box=card.querySelector('.feedback');
+  if(box&&q&&a!=null)box.innerHTML=detailedQuestionFeedback(q,a);
+ });
+};
+render();
