@@ -473,7 +473,7 @@ function workplaceExample(l){
  const premise=question.split(/(?<=\.)\s+(?=(?:What|Which|How|Who|Why|When|Where|As)\b)/)[0];
  const usefulPremise=premise!==question&&premise.length>28&&!premise.includes('?');
  if(usefulPremise){
-  return 'Real-life example: '+premise+' In this situation, a talent development professional would choose to '+best.charAt(0).toLowerCase()+best.slice(1).replace(/[.!?]+$/,'')+'. '+why;
+  return 'Real-life example: '+premise+' In this situation, the appropriate workplace response is: '+best.replace(/[.!?]+$/,'')+'. '+why;
  }
  return 'Real-life example: A talent development team is making a workplace decision about '+title.toLowerCase()+'. The team uses this approach: '+best.replace(/[.!?]+$/,'')+'. '+why;
 }
