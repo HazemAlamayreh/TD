@@ -186,3 +186,99 @@ nextQuestion=function(){
  for(const l of m.lessons){const v=grouped[l[0]]||[];if(v.length===2&&v.every(Boolean))state.mastered[l[0]]=true;}
  save();render();
 };
+
+
+/* Each existing applied scenario becomes a three-step, non-reversible practice case.
+   Scoring: +1 per selected suitable action, -1 per selected unsuitable action.
+   This is independent practice, not an official ATD item or scoring claim. */
+function caseQuestions(m){
+ let qs=JOURNEY_GETQS(m,'advanced');
+ if(!qs.length)qs=(DATA.domain2Questions[m.id]||[]).map((x,i)=>({id:m.id+'-case-'+i,target:m.id,q:x[0],opts:x[1],answer:x[2],why:x[3]}));
+ return qs.slice(0,Math.min(3,qs.length));
+}
+function caseStepData(q,step){
+ const main=q.opts[q.answer],wrong=q.opts.filter((_,i)=>i!==q.answer);
+ const extra=step===0?'Clarify the expected performance outcome and examine relevant evidence before deciding.':
+  step===1?'Engage affected managers and employees to test feasibility, fairness and adoption risks.':
+  'Review outcome measures against the baseline and adjust the talent-development response.';
+ const safeWrong=step===0?[wrong[0],wrong[1],wrong[2]]:
+  step===1?['Rely on attendance data alone to make the decision.','Ignore stakeholder concerns until the project ends.','Select the cheapest intervention without assessing effectiveness.']:
+  ['Claim success solely because the activity was delivered.','Avoid documenting limitations in the results.','Continue the approach unchanged despite contrary evidence.'];
+ const options=[main,extra,...safeWrong];
+ const valid=[0,1];
+ const shift=(step+String(q.id).length)%options.length;
+ const shuffled=options.map((x,i)=>({text:x,correct:valid.includes(i)}));
+ for(let i=0;i<shift;i++)shuffled.push(shuffled.shift());
+ const ar=state.lang==='ar';
+ const prompt=step===0?(ar?'القرار الأول: ما الإجراءان الأنسب في هذا الموقف؟':'Initial decision: Which TWO actions are most appropriate?'):
+  step===1?(ar?'المعلومات الجديدة: أثار المديرون أسئلة عن الموارد والعدالة وتبني التغيير. ما الإجراءان التاليان؟':'New information: Managers raise concerns about resources, fairness and adoption. Which TWO actions follow?'):
+  (ar?'مرحلة المتابعة: أظهرت مؤشرات الأداء نتائج متفاوتة بعد التدخل. ما أفضل إجراءين؟':'Follow-up: Early performance indicators are mixed after the intervention. Which TWO actions best support sound judgment?');
+ return {prompt,options:shuffled,why:q.why||'',ar};
+}
+function initializeCase(m){
+ if(sess&&sess.stage==='advanced-case'&&sess.mid===m.id)return;
+ const previous=state.caseDraft;
+ sess={mid:m.id,stage:'advanced-case',caseIndex:0,step:0,selected:[],submitted:false,points:0,maxPoints:0,history:[],finished:false};
+ if(previous?.mid===m.id&&previous.version==='case-v19'){
+  Object.assign(sess,previous);sess.finished=false;
+ }
+}
+function persistCase(){
+ state.caseDraft={mid:sess.mid,stage:sess.stage,caseIndex:sess.caseIndex,step:sess.step,selected:sess.selected.slice(),submitted:sess.submitted,points:sess.points,maxPoints:sess.maxPoints,history:sess.history.slice(),version:'case-v19'};save();
+}
+function showAdvanced(m){
+ const qs=caseQuestions(m);
+ if(!qs.length){$('body').innerHTML='<div class="panel">'+msg('Advanced cases require source questions for this capability.','تحتاج الحالات المتقدمة إلى مصدر أسئلة لهذه القدرة.')+'</div>';return;}
+ initializeCase(m);
+ if(sess.finished){showCaseResult(m);return;}
+ const q=qs[sess.caseIndex],item=caseStepData(q,sess.step),ar=state.lang==='ar';
+ const chosen=sess.selected||[],selectedSet=new Set(chosen);
+ const stageLabels=[msg('Situation & initial decision','الموقف والقرار الأول'),msg('Stakeholder constraints','قيود أصحاب العلاقة'),msg('Measure & adjust','قياس الأثر والتعديل')];
+ let context=sess.step===0?q.q:sess.step===1?
+  msg('The team has considered its initial response. Affected stakeholders are now asking how the approach will fit operational constraints and employees’ needs.','ناقش الفريق الاستجابة الأولية. ويسأل أصحاب العلاقة الآن عن مدى ملاءمتها لقيود التشغيل واحتياجات الموظفين.'):
+  msg('The action has been introduced. Early learner feedback is positive, but changes in job performance are not yet consistent.','تم تنفيذ الإجراء. كانت انطباعات المتعلمين إيجابية، لكن التحسن في الأداء الوظيفي لم يكن ثابتاً حتى الآن.');
+ $('body').innerHTML='<div class="panel qBox"><span class="pill">'+msg('ADVANCED · CASE MANAGEMENT PRACTICE','المتقدم · تدريب إدارة الحالات')+'</span><h1>'+msg('Applied Talent Development Decisions','قرارات تطبيقية في تطوير المواهب')+'</h1><p class="muted">'+msg('Select TWO suitable actions per step. +1 for each suitable choice and −1 for each unsuitable choice. Once you proceed, you cannot change a previous step. Independent ATD-style practice, not an official exam.','اختر إجراءين مناسبين لكل خطوة. نقطة للإجراء المناسب وخصم نقطة للإجراء غير المناسب. لا يمكن تغيير الخطوات السابقة بعد الانتقال. تدريب مستقل وليس اختبار ATD رسمياً.')+'</p>'+
+ (ar?'<p class="translationNotice">نص الحالة وخياراتها المهنية الأصلية باللغة الإنجليزية؛ الإرشادات والنتائج متاحة بالعربية. لا توجد ترجمة عربية معتمدة لهذه الحالات بعد.</p>':'')+
+ '<div class="questionMeta"><span>'+msg('Case ','الحالة ')+(sess.caseIndex+1)+' / '+qs.length+' · '+msg('Step ','خطوة ')+(sess.step+1)+' / 3</span><span class="skillTag">'+esc(stageLabels[sess.step])+'</span></div><div class="barOuter"><div class="barInner" style="width:'+(100*(sess.caseIndex*3+sess.step+1)/(qs.length*3))+'%"></div></div>'+
+ '<h2 class="chapter">'+esc(context)+'</h2><h3>'+esc(item.prompt)+'</h3>'+
+ item.options.map((opt,i)=>'<button class="answer '+(selectedSet.has(i)?'selected ':'')+(sess.submitted&&opt.correct?'correct':'')+'" '+(sess.submitted?'disabled':'')+' onclick="toggleCaseOption('+i+')"><b>'+(selectedSet.has(i)?'☑':'☐')+'</b> '+esc(opt.text)+'</button>').join('')+
+ (sess.submitted?'<div class="feedback"><b>'+msg('Decision feedback','تفسير القرار')+'</b><p>'+esc(q.why||'Choose actions supported by evidence and measurable outcomes.')+'</p><p>'+msg('Suitable actions: ','الإجراءات المناسبة: ')+esc(item.options.filter(x=>x.correct).map(x=>x.text).join(' | '))+'</p><p>'+msg('This step: ','نتيجة الخطوة: ')+sess.lastDelta+' / 2</p></div>':'')+
+ '<div class="testTools">'+(sess.submitted?
+ '<button class="btn primary" onclick="advanceCase()">'+(sess.caseIndex===qs.length-1&&sess.step===2?msg('Finish cases','إنهاء الحالات'):msg('Continue to next step →','الخطوة التالية'))+'</button>':
+ '<button class="btn primary" '+(chosen.length!==2?'disabled':'')+' onclick="submitCaseStep()">'+msg('Submit two decisions','تأكيد القرارين')+'</button>')+
+ '<button class="btn" onclick="restartCases()">'+msg('Restart cases','إعادة الحالات')+'</button></div></div>';
+}
+function toggleCaseOption(i){
+ if(!sess||sess.submitted)return;
+ let a=sess.selected||[];
+ sess.selected=a.includes(i)?a.filter(x=>x!==i):a.length<2?[...a,i]:a;
+ persistCase();render();
+}
+function submitCaseStep(){
+ if(!sess||sess.selected.length!==2||sess.submitted)return;
+ const m=DATA.modules.find(x=>x.id===sess.mid),q=caseQuestions(m)[sess.caseIndex],step=caseStepData(q,sess.step);
+ const delta=sess.selected.reduce((n,i)=>n+(step.options[i].correct?1:-1),0);
+ sess.points+=delta;sess.maxPoints+=2;sess.lastDelta=delta;
+ sess.history.push({caseIndex:sess.caseIndex,step:sess.step,choices:sess.selected.slice(),delta});
+ sess.submitted=true;persistCase();render();
+}
+function advanceCase(){
+ if(!sess?.submitted)return;
+ const m=DATA.modules.find(x=>x.id===sess.mid),n=caseQuestions(m).length;
+ if(sess.step<2)sess.step++;
+ else if(sess.caseIndex<n-1){sess.caseIndex++;sess.step=0;}
+ else {
+  sess.finished=true;
+  const score=Math.max(0,sess.points)/Math.max(1,sess.maxPoints);
+  const previous=state.attempts[m.id+':advanced'];if(previous)state.attemptHistory.push({capability:m.id,stage:'advanced',...previous});
+  const a={score,rawPoints:sess.points,maxPoints:sess.maxPoints,questionCount:sess.history.length,caseVersion:'case-v19',ts:new Date().toISOString(),history:sess.history.slice()};
+  state.attempts[m.id+':advanced']=a;state.caseHistory.push({mid:m.id,...a});
+  delete state.caseDraft;save();render();return;
+ }
+ sess.selected=[];sess.submitted=false;sess.lastDelta=undefined;persistCase();render();
+}
+function restartCases(){delete state.caseDraft;sess=null;save();render();}
+function showCaseResult(m){
+ const a=state.attempts[m.id+':advanced'];
+ $('body').innerHTML='<div class="panel qBox"><span class="pill">'+msg('CASE PRACTICE COMPLETE','انتهى تدريب الحالات')+'</span><h1>'+msg('Professional judgment results','نتائج الحكم المهني')+'</h1><div class="score">'+a.rawPoints+' / '+a.maxPoints+'</div><p>'+msg('Score after penalties: ','النتيجة بعد الخصومات: ')+Math.round(a.score*100)+'%</p><p class="muted">'+msg('This practice measures decisions in simulated situations. It is not an official ATD score. Review how you selected actions and how evidence changed throughout the case.','هذا التدريب يقيس قراراتك في مواقف محاكاة وليس نتيجة ATD رسمية. راجع كيفية اختيار الإجراءات وتغيّر الأدلة خلال الحالة.')+'</p><div class="actionBar"><button class="btn primary" onclick="restartCases()">'+msg('Practice again','إعادة التدريب')+'</button><button class="btn" onclick="view(\'material\')">'+msg('Open lessons','افتح الدروس')+'</button></div></div>';
+}
