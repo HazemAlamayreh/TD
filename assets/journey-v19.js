@@ -411,6 +411,12 @@ showCaseResult=function(m){
    '<div class="feedback">'+esc(q.why||'')+'</div></div>';
  }).join('');
  area.append(section);
+ const next=DATA.modules[DATA.modules.findIndex(x=>x.id===m.id)+1];
+ const action=document.createElement('div');action.className='actionBar';
+ action.innerHTML='<button class="btn primary" onclick="view(\'material\')">'+msg('Review lessons','مراجعة الدروس')+'</button>'+
+ '<button class="btn" onclick="view(\'home\')">'+msg('Back to course overview','العودة إلى الكورس')+'</button>'+
+ (next?'<button class="btn" onclick="selectModule(\''+next.id+'\')">'+msg('Continue to next module','المتابعة إلى الموديول التالي')+' →</button>':'');
+ area.append(action);
 };
 
 
