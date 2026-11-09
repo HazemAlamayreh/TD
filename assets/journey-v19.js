@@ -282,3 +282,39 @@ function showCaseResult(m){
  const a=state.attempts[m.id+':advanced'];
  $('body').innerHTML='<div class="panel qBox"><span class="pill">'+msg('CASE PRACTICE COMPLETE','انتهى تدريب الحالات')+'</span><h1>'+msg('Professional judgment results','نتائج الحكم المهني')+'</h1><div class="score">'+a.rawPoints+' / '+a.maxPoints+'</div><p>'+msg('Score after penalties: ','النتيجة بعد الخصومات: ')+Math.round(a.score*100)+'%</p><p class="muted">'+msg('This practice measures decisions in simulated situations. It is not an official ATD score. Review how you selected actions and how evidence changed throughout the case.','هذا التدريب يقيس قراراتك في مواقف محاكاة وليس نتيجة ATD رسمية. راجع كيفية اختيار الإجراءات وتغيّر الأدلة خلال الحالة.')+'</p><div class="actionBar"><button class="btn primary" onclick="restartCases()">'+msg('Practice again','إعادة التدريب')+'</button><button class="btn" onclick="view(\'material\')">'+msg('Open lessons','افتح الدروس')+'</button></div></div>';
 }
+
+
+/* v20 persistence: completed assessments are reviewable after reload; never
+   silently start a fresh attempt or overwrite the learner's submitted answers. */
+const ATD_V20_TEST=testScreen;
+testScreen=function(m,stage){
+ const key=m.id+':'+stage;
+ const saved=state.attempts?.[key];
+ if(saved&&stage==='diagnostic'){
+  const qs=getQs(m,'diagnostic');
+  sess={mid:m.id,stage:'diagnostic',qs,answers:Array.isArray(saved.answers)?saved.answers.slice():[],pos:0,finished:true};
+  showDiagnosticResult(m);return;
+ }
+ if(saved&&stage==='mastery'){
+  const qs=getQs(m,'mastery');
+  sess={mid:m.id,stage:'mastery',qs,answers:Array.isArray(saved.answers)?saved.answers.slice():[],pos:0,finished:true};
+  resultScreen(m,'mastery');return;
+ }
+ if(saved&&stage==='advanced'){
+  sess={mid:m.id,stage:'advanced-case',finished:true};
+  showCaseResult(m);return;
+ }
+ return ATD_V20_TEST(m,stage);
+};
+const ATD_V20_RENDER=render;
+render=function(){
+ ATD_V20_RENDER();
+ const key=state.current+':'+state.view;
+ if(state.attempts?.[key]&&['diagnostic','mastery','advanced'].includes(state.view)){
+  document.querySelectorAll('#body button').forEach(button=>{
+   if(/^(retake|retake assessment|practice again|إعادة (التدريب|المحاولة|التقييم))$/i.test(button.textContent.trim())){
+    button.remove();
+   }
+  });
+ }
+};
