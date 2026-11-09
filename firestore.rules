@@ -1,22 +1,40 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
+    function signedIn() {
+      return request.auth != null;
+    }
     function isOwner(uid) {
-      return request.auth != null && request.auth.uid == uid;
+      return signedIn() && request.auth.uid == uid;
+    }
+    // Admin identities must be provisioned in Firebase Console or trusted server.
+    // Never allow the browser to create or edit its own admin role.
+    function isAdmin() {
+      return signedIn()
+        && exists(/databases/$(database)/documents/admins/$(request.auth.uid))
+        && get(/databases/$(database)/documents/admins/$(request.auth.uid)).data.active == true;
+    }
+    match /admins/{uid} {
+      allow get: if isOwner(uid);
+      allow list, create, update, delete: if false;
     }
     match /learners/{uid} {
-      allow read, create, update: if isOwner(uid);
+      allow get, list: if isOwner(uid) || isAdmin();
+      allow create, update: if isOwner(uid);
       allow delete: if false;
       match /lessonProgress/{id} {
-        allow read, create, update: if isOwner(uid);
+        allow get, list: if isOwner(uid) || isAdmin();
+        allow create, update: if isOwner(uid);
         allow delete: if false;
       }
       match /lessonMastery/{id} {
-        allow read, create, update: if isOwner(uid);
+        allow get, list: if isOwner(uid) || isAdmin();
+        allow create, update: if isOwner(uid);
         allow delete: if false;
       }
       match /assessmentAttempts/{id} {
-        allow read, create, update: if isOwner(uid);
+        allow get, list: if isOwner(uid) || isAdmin();
+        allow create, update: if isOwner(uid);
         allow delete: if false;
       }
     }
