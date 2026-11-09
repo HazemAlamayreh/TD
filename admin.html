@@ -15,7 +15,7 @@ input{border:1px solid #cbd7e4;padding:11px;border-radius:8px;min-width:190px;fl
 table{border-collapse:collapse;width:100%;min-width:750px}th,td{padding:12px;text-align:left;border-bottom:1px solid #e3eaf1;vertical-align:top}th{background:#f7f9fc;color:#49637e;font-size:12px}td .small{word-break:break-all}
 .progress{height:7px;width:110px;background:#e9edf3;border-radius:8px;overflow:hidden;margin-top:6px}.progress span{height:100%;display:block;background:#2680be}
 .tabs{display:flex;gap:7px;flex-wrap:wrap;margin:10px 0}.tabs button[aria-selected=true]{background:#123b6a;color:white}
-#status{min-height:20px}#status.error{color:#aa2535}.empty{padding:23px;text-align:center;color:#5e7286}
+#status{min-height:20px}#status.error{color:#aa2535}.answerBad{background:#fff1f0;border-left:4px solid #c33143;padding:14px;margin:9px 0;border-radius:6px}.answerGood{background:#edfaf4;border-left:4px solid #268357;padding:14px;margin:9px 0;border-radius:6px}.answerSkipped{background:#f4f5f7;border-left:4px solid #8896a8;padding:14px;margin:9px 0;border-radius:6px}.question{margin-bottom:7px;font-weight:650}.detailSection{margin:18px 0}.tag{display:inline-block;background:#e8eff6;padding:3px 8px;border-radius:8px;font-size:12px}.empty{padding:23px;text-align:center;color:#5e7286}
 @media(max-width:600px){h1{font-size:22px}.panel{padding:15px}header{padding:18px}main{padding:0 12px}}
 </style></head><body>
 <header><div><small>ATD ACADEMY · ADMINISTRATION</small><h1>Learning Analytics Dashboard</h1></div><a href="./">Back to Academy</a></header>
@@ -24,10 +24,34 @@ table{border-collapse:collapse;width:100%;min-width:750px}th,td{padding:12px;tex
 <div id="dashboard" class="hidden">
 <div class="metrics" id="metrics"></div>
 <section class="panel"><div class="toolbar"><input id="search" type="search" placeholder="Search name, email or learner UID" aria-label="Search learners"><button class="primary" id="reload">Refresh</button><button id="export">Export CSV</button></div>
-<p id="status" role="status"></p><div class="scroll"><table><thead><tr><th>Learner</th><th>Completed lessons</th><th>Mastered lessons</th><th>Assessment attempts</th><th>Average result</th><th>Details</th></tr></thead><tbody id="learnerRows"></tbody></table></div>
+<p id="status" role="status"></p><div class="scroll"><table><thead><tr><th>Learner</th><th>Completed lessons</th><th>Mastered lessons</th><th>Assessment attempts</th><th>Average result</th><th>Modules complete</th><th>First attempts ≥80%</th><th>Tracked time</th><th>Details</th></tr></thead><tbody id="learnerRows"></tbody></table></div>
 <p class="muted small">Only data saved to Cloud Firestore is included. Missing records do not prove that a learner did no work. This is a read-only dashboard.</p>
 </section>
 <section class="panel hidden" id="details"><div style="display:flex;justify-content:space-between;gap:10px"><h2 id="detailTitle">Learner details</h2><button id="closeDetails">Close</button></div><div id="detailContent"></div></section>
 </div></main>
-<script type="module" src="./assets/admin-page.js?v=20261109-admin"></script>
+<script src="./assets/data-core.js"></script>
+<script src="./assets/module-01.js"></script>
+<script src="./assets/module-02.js"></script>
+<script src="./assets/module-03.js"></script>
+<script src="./assets/module-04.js"></script>
+<script src="./assets/module-05.js"></script>
+<script src="./assets/module-06.js"></script>
+<script src="./assets/module-07.js"></script>
+<script src="./assets/module-08.js"></script>
+<script src="./assets/module-09.js"></script>
+<script src="./assets/module-10.js"></script>
+<script src="./assets/module-11.js"></script>
+<script src="./assets/module-12.js"></script>
+<script src="./assets/module-13.js"></script>
+<script src="./assets/module-14.js"></script>
+<script src="./assets/module-15.js"></script>
+<script src="./assets/module-16.js"></script>
+<script src="./assets/module-17.js"></script>
+<script src="./assets/module-18.js"></script>
+<script src="./assets/module-19.js"></script>
+<script src="./assets/module-20.js"></script>
+<script src="./assets/module-21.js"></script>
+<script src="./assets/module-22.js"></script>
+<script src="./assets/module-23.js"></script>
+<script type="module" src="./assets/admin-page.js?v=20261109-analytics-v2"></script>
 </body></html>
