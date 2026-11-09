@@ -318,3 +318,28 @@ render=function(){
   });
  }
 };
+
+/* Display permanent case decisions, the suitable choices, and rationale. */
+const ATD_V20_CASE_RESULT=showCaseResult;
+showCaseResult=function(m){
+ ATD_V20_CASE_RESULT(m);
+ const attempt=state.attempts[m.id+':advanced'];
+ if(!attempt?.history?.length)return;
+ const area=$('body').querySelector('.qBox');
+ if(!area)return;
+ const qs=caseQuestions(m);
+ const section=document.createElement('div');
+ section.innerHTML='<h2>'+msg('Saved answer review','مراجعة الإجابات المحفوظة')+'</h2>'+
+ attempt.history.map((entry,i)=>{
+  const q=qs[entry.caseIndex];if(!q)return '';
+  const step=caseStepData(q,entry.step);
+  const chosen=(entry.choices||[]).map(j=>step.options[j]).filter(Boolean);
+  const right=step.options.filter(opt=>opt.correct);
+  return '<div class="lesson"><span class="skillTag">'+msg('Case ','الحالة ')+(entry.caseIndex+1)+' · '+msg('Step ','الخطوة ')+(entry.step+1)+'</span>'+
+   '<p><b>'+msg('Your decisions: ','قراراتك: ')+'</b>'+chosen.map(x=>esc(x.text)).join(' | ')+'</p>'+
+   '<p><b>'+msg('Recommended actions: ','الإجراءات الموصى بها: ')+'</b>'+right.map(x=>esc(x.text)).join(' | ')+'</p>'+
+   '<p>'+msg('Points: ','النقاط: ')+esc(entry.delta)+'</p>'+
+   '<div class="feedback">'+esc(q.why||'')+'</div></div>';
+ }).join('');
+ area.append(section);
+};
