@@ -206,7 +206,7 @@ function caseQuestions(m){
  if(!qs.length)qs=(DATA.domain2Questions[m.id]||[]).map((x,i)=>({id:m.id+'-case-'+i,target:m.id,q:x[0],opts:x[1],answer:x[2],why:x[3]}));
  return qs.slice(0,Math.min(3,qs.length));
 }
-function caseStepData(q,step){
+function legacyCaseStepData(q,step){
  const main=q.opts[q.answer],wrong=q.opts.filter((_,i)=>i!==q.answer);
  const extra=step===0?'Clarify the expected performance outcome and examine relevant evidence before deciding.':
   step===1?'Engage affected managers and employees to test feasibility, fairness and adoption risks.':
@@ -225,23 +225,68 @@ function caseStepData(q,step){
   (ar?'مرحلة المتابعة: أظهرت مؤشرات الأداء نتائج متفاوتة بعد التدخل. ما أفضل إجراءين؟':'Follow-up: Early performance indicators are mixed after the intervention. Which TWO actions best support sound judgment?');
  return {prompt,options:shuffled,why:q.why||'',ar};
 }
+const ATD_ADVANCED_FOLLOWUP={
+"1.1":["Communications staff say the sponsor's message is being misunderstood by frontline teams.","Listen to representative employees and clarify what the message means for their work.","Agree a plain-language follow-up and named response owner.","The communications rollout reaches everyone but managers interpret the call to action differently.","Check comprehension with a short sample of affected teams.","Publish a consistent FAQ and correct conflicting manager guidance."],
+"1.2":["An employee reports that the response overlooked their circumstances.","Listen without defensiveness and test your assumptions privately.","Agree a fair adjustment that respects privacy and team needs.","Participation rises but team trust remains fragile.","Seek voluntary feedback using a psychologically safe method.","Look for evidence of inclusion over time rather than one positive comment."],
+"1.3":["Two team leads disagree about ownership after the initial decision.","Record shared outcomes and assign decision rights for each handoff.","Set a short escalation route for unresolved dependencies.","The deliverable slips because priorities changed across departments.","Revisit dependencies and renegotiate a realistic milestone with owners.","Use a retrospective to remove the coordination bottleneck."],
+"1.4":["Remote and shift-based learners report access barriers.","Co-design accessible learning routes with affected learner groups.","Check language, schedule and assistive-technology requirements.","Overall participation rises but some groups remain underrepresented.","Compare access patterns using privacy-protective group data.","Interview affected learners and address remaining barriers."],
+"1.5":["A vendor delay threatens the agreed implementation milestone.","Assess impacts on the critical path before proposing a recovery plan.","Escalate revised dependencies, ownership and costs to the sponsor.","The launch happens but pilot users report blocking defects.","Prioritize defects against acceptance criteria and learner impact.","Capture lessons learned and update the corrective-action backlog."],
+"1.6":["A sponsor requests named learner results beyond the approved audience.","Check purpose, consent and who is authorized to receive the data.","Offer a least-privilege report without unnecessary identifiers.","An audit detects unexpected access to a learning-data export.","Restrict access promptly and document the incident.","Review retention, logging and preventive governance controls."],
+"1.7":["A learner finishes courses but lacks opportunity to apply the skills.","Agree an authentic stretch assignment linked to the career goal.","Arrange manager feedback and reflection at checkpoints.","The learner reports more confidence but no demonstrated performance.","Review actual work samples against the target capability.","Adapt the development plan based on transfer evidence."],
+"2.1":["Learners struggle with authentic work tasks despite passing recall quizzes.","Introduce representative practice with scaffolded worked examples.","Add targeted formative feedback at the points of frequent error.","Practice scores improve but on-the-job errors remain high.","Compare assessment conditions with the actual workflow.","Observe workplace barriers before changing the learning design."],
+"2.2":["SMEs propose conflicting learning activities for the same outcome.","Prioritize tasks using measurable performance criteria.","Prototype the approach with representative learners.","Pilot learners remember the terminology but cannot perform the skill.","Recheck objective-to-assessment alignment using job evidence.","Revise practice activities and test the change with users."],
+"2.3":["Remote participants cannot complete a group practice exercise.","Provide an equivalent accessible collaborative activity.","Use structured turn-taking and check participation across locations.","Feedback praises the facilitator but task performance is weak.","Add focused rehearsal with criterion-based feedback.","Review participation and practice data before changing pacing."],
+"2.4":["Field learners report that the mobile LMS fails without connectivity.","Reproduce the issue using representative devices and connections.","Provide an accessible fallback while the sync defect is resolved.","The technology fix launches but completion reports still disagree.","Reconcile local event logs with server timestamps.","Deduplicate learner events and validate reporting accuracy."],
+"2.5":["Experienced staff are leaving with critical tacit knowledge.","Capture decision triggers through observation and structured interviews.","Validate the guidance with peers and tag it for retrieval.","Staff search the repository but rarely find useful answers.","Test real information-retrieval tasks and improve taxonomy.","Assign owners to review the currency and usefulness of guidance."],
+"2.6":["Emerging leaders say access to development assignments is uneven.","Set transparent selection criteria with manager involvement.","Provide equitable stretch opportunities and coaching support.","Some participants improve while others have no opportunity to apply.","Compare access to assignments and feedback across participants.","Adjust manager support and assignment design based on evidence."],
+"2.7":["A coachee says goals are unclear and sessions feel disconnected.","Agree observable goals and confidential boundaries with the coachee.","Plan reflection and real-world practice between coaching sessions.","Coachees like the program but behavior evidence is absent.","Use coachee-owned goals and appropriate follow-up evidence.","Check manager support without disclosing confidential coaching content."],
+"2.8":["Stakeholders disagree about which outcomes prove the initiative worked.","Agree an evaluation question and credible baseline.","Identify confounding influences and comparison opportunities.","Early results improve while a company-wide process also changes.","Analyze comparison trends and document attribution limits.","Report both observed outcomes and uncertainty transparently."],
+"3.1":["Finance challenges the assumptions behind the talent investment.","Link the proposed capability investment to a measurable business outcome.","Document assumptions, cost drivers and financial trade-offs.","A pilot reduces errors but store operations have also changed.","Separate talent-program contribution from operational changes.","Recalculate value using transparent assumptions and sensitivity checks."],
+"3.2":["The client wants a quick solution despite conflicting stakeholder evidence.","Clarify decision rights and test root causes with frontline staff.","Agree realistic scope and confidentiality expectations.","The client disputes findings that challenge the favored solution.","Present evidence and alternative options respectfully.","Recommend a pilot with agreed success criteria and limitations."],
+"3.3":["Supervisors reward individual output while the initiative seeks collaboration.","Align management reinforcement with the desired team behaviors.","Involve employees in diagnosing the current incentives.","Attendance is high but collaboration habits remain unchanged.","Observe everyday behaviors and team-system barriers.","Iterate the organizational intervention using outcome evidence."],
+"3.4":["Managers do not release employees for skill-building assignments.","Align development plans with workforce and talent priorities.","Agree on protected practice time and manager accountability.","A leadership pipeline grows but internal mobility stays low.","Review selection, readiness and placement evidence together.","Adjust succession pathways and managerial support."],
+"3.5":["Employees know the process yet tools and staffing prevent performance.","Observe task constraints and test non-training causes.","Engage operations to remove systemic performance barriers.","Performance rises in one team but falls in another after redesign.","Compare workflow conditions and unintended consequences.","Refine job aids, incentives or processes before adding training."],
+"3.6":["Employees understand the change but still lack practical capability.","Provide hands-on practice and accessible job support.","Equip supervisors to coach the new workflow.","Adoption rises initially but many employees revert to old habits.","Identify reinforcement gaps in the working environment.","Adjust manager routines and adoption measures."],
+"3.7":["Leaders request individual predictions from sensitive workforce data.","Check data quality, lawful purpose and fairness risks.","Restrict identifiable data to authorized analytical use.","The model appears accurate overall but performs poorly for a subgroup.","Evaluate subgroup performance and potential adverse outcomes.","Present uncertainty and human-review safeguards before decisions."],
+"3.8":["A new automation tool changes responsibilities across hybrid teams.","Map emerging capability and workflow needs with affected staff.","Pilot adaptable learning formats with accessible alternatives.","The technology trend changes before the rollout finishes.","Review real adoption and performance evidence regularly.","Revise the capability roadmap instead of following vendor hype."]
+};
+function caseStepData(q,step,version){
+ if(version!=="case-v22")return legacyCaseStepData(q,step);
+ const id=String(q.id||"").split("-")[0],v=ATD_ADVANCED_FOLLOWUP[id]||ATD_ADVANCED_FOLLOWUP["2.1"];
+ const main=q.opts[q.answer],wrong=q.opts.filter((_,i)=>i!==q.answer),ar=state.lang==="ar";
+ let prompt,options;
+ if(step===0){
+  prompt=ar?"القرار الأول: اختر الإجراءين الأنسب للحالة.":"Initial decision: Which TWO actions best address this specific situation?";
+  options=[main,"Verify the evidence and desired outcome in this situation before committing resources.",...wrong.slice(0,3)];
+ }else if(step===1){
+  prompt=(ar?"تطور جديد في الحالة: ":"Situation update: ")+v[0]+" "+(ar?"اختر إجراءين.":"Choose TWO next actions.");
+  options=[v[1],v[2],"Ignore the people affected by this decision.","Declare the work successful without checking implementation risks.","Proceed with the original plan even if new evidence contradicts it."];
+ }else{
+  prompt=(ar?"نتائج المتابعة: ":"Follow-up evidence: ")+v[3]+" "+(ar?"اختر إجراءين.":"Choose TWO evidence-led responses.");
+  options=[v[4],v[5],"Report attendance alone as demonstrated performance improvement.","Hide adverse evidence to protect the project narrative.","Do not revise the plan even if the findings reveal a gap."];
+ }
+ const offset=(step+String(q.id).length)%options.length;
+ const shuffled=options.map((text,i)=>({text,correct:i<2}));
+ for(let i=0;i<offset;i++)shuffled.push(shuffled.shift());
+ return {prompt,options:shuffled,why:q.why||"",ar};
+}
 function initializeCase(m){
  if(sess&&sess.stage==='advanced-case'&&sess.mid===m.id)return;
  const previous=state.caseDraft;
- sess={mid:m.id,stage:'advanced-case',caseIndex:0,step:0,selected:[],submitted:false,points:0,maxPoints:0,history:[],finished:false};
- if(previous?.mid===m.id&&previous.version==='case-v19'){
-  Object.assign(sess,previous);sess.finished=false;
+ sess={mid:m.id,stage:'advanced-case',caseIndex:0,step:0,selected:[],submitted:false,points:0,maxPoints:0,history:[],finished:false,caseVersion:'case-v22'};
+ if(previous?.mid===m.id&&['case-v19','case-v22'].includes(previous.version)){
+  Object.assign(sess,previous);sess.caseVersion=previous.version;sess.finished=false;
  }
 }
 function persistCase(){
- state.caseDraft={mid:sess.mid,stage:sess.stage,caseIndex:sess.caseIndex,step:sess.step,selected:sess.selected.slice(),submitted:sess.submitted,points:sess.points,maxPoints:sess.maxPoints,history:sess.history.slice(),version:'case-v19'};save();
+ state.caseDraft={mid:sess.mid,stage:sess.stage,caseIndex:sess.caseIndex,step:sess.step,selected:sess.selected.slice(),submitted:sess.submitted,points:sess.points,maxPoints:sess.maxPoints,history:sess.history.slice(),version:sess.caseVersion||'case-v22'};save();
 }
 function showAdvanced(m){
  const qs=caseQuestions(m);
  if(!qs.length){$('body').innerHTML='<div class="panel">'+msg('Advanced cases require source questions for this capability.','تحتاج الحالات المتقدمة إلى مصدر أسئلة لهذه القدرة.')+'</div>';return;}
  initializeCase(m);
  if(sess.finished){showCaseResult(m);return;}
- const q=qs[sess.caseIndex],item=caseStepData(q,sess.step),ar=state.lang==='ar';
+ const q=qs[sess.caseIndex],item=caseStepData(q,sess.step,sess.caseVersion),ar=state.lang==='ar';
  const chosen=sess.selected||[],selectedSet=new Set(chosen);
  const stageLabels=[msg('Situation & initial decision','الموقف والقرار الأول'),msg('Stakeholder constraints','قيود أصحاب العلاقة'),msg('Measure & adjust','قياس الأثر والتعديل')];
  let context=sess.step===0?q.q:sess.step===1?
@@ -281,7 +326,7 @@ function advanceCase(){
   sess.finished=true;
   const score=Math.max(0,sess.points)/Math.max(1,sess.maxPoints);
   const previous=state.attempts[m.id+':advanced'];if(previous)state.attemptHistory.push({capability:m.id,stage:'advanced',...previous});
-  const a={score,rawPoints:sess.points,maxPoints:sess.maxPoints,questionCount:sess.history.length,caseVersion:'case-v19',ts:new Date().toISOString(),history:sess.history.slice()};
+  const a={score,rawPoints:sess.points,maxPoints:sess.maxPoints,questionCount:sess.history.length,caseVersion:sess.caseVersion||'case-v22',ts:new Date().toISOString(),history:sess.history.slice()};
   state.attempts[m.id+':advanced']=a;state.caseHistory.push({mid:m.id,...a});
   delete state.caseDraft;
   state.view='advanced';
@@ -351,7 +396,7 @@ showCaseResult=function(m){
  section.innerHTML='<h2>'+msg('Saved answer review','مراجعة الإجابات المحفوظة')+'</h2>'+
  attempt.history.map((entry,i)=>{
   const q=qs[entry.caseIndex];if(!q)return '';
-  const step=caseStepData(q,entry.step);
+  const step=caseStepData(q,entry.step,attempt.caseVersion);
   const chosen=(entry.choices||[]).map(j=>step.options[j]).filter(Boolean);
   const right=step.options.filter(opt=>opt.correct);
   return '<div class="lesson"><span class="skillTag">'+msg('Case ','الحالة ')+(entry.caseIndex+1)+' · '+msg('Step ','الخطوة ')+(entry.step+1)+'</span>'+
