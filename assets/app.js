@@ -1,8 +1,8 @@
 
-const KEY='td_adaptive_academy_v5';let state;try{state=JSON.parse(localStorage.getItem(KEY))||{}}catch{state={}};
+const KEY='td_adaptive_academy_v5';let ACTIVE_KEY=KEY;let state;try{state=JSON.parse(localStorage.getItem(KEY))||{}}catch{state={}};
 state.attempts??={};state.fav??=[];state.done??={};state.current??='1.1';state.view??='home';state.focus??=null;
 let sess=null;const $=id=>document.getElementById(id),esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(state))}catch{}};const mod=()=>DATA.modules.find(m=>m.id===state.current)||DATA.modules[0];const domain=id=>id[0];
+const save=()=>{try{localStorage.setItem(ACTIVE_KEY,JSON.stringify(state))}catch{}};const mod=()=>DATA.modules.find(m=>m.id===state.current)||DATA.modules[0];const domain=id=>id[0];
 function lessonFor(id){for(const m of DATA.modules){let l=m.lessons.find(x=>x[0]===id);if(l)return {m,l}}return null}
 function selectModule(id){state.current=id;state.focus=null;view('dashboard')};function view(name){state.view=name;sess=null;save();render()};function resetTest(){sess=null;render()};
 function getQs(m,stage){if(stage==='advanced')return (DATA.advanced[m.id]||[]).map((x,i)=>({id:m.id+'-adv-'+i,target:m.lessons[i%m.lessons.length]?.[0],title:'Applied scenario',q:x[0],opts:x[1],answer:x[2],why:x[3]}));
