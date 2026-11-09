@@ -35,13 +35,13 @@ function draw(){
   };
   layer.querySelector("#atdImport").onclick=async()=>{
    if(!confirm(locale("Merge this browser's progress with your account? Existing cloud records will remain intact.","هل تريد دمج التقدم من المتصفح بحسابك؟ لن تُحذف السجلات السابقة.")))return;
-   sessionStorage.setItem(importKey(),"yes");await upload(true);draw();
+   localStorage.setItem(importKey(),"yes");await upload(true,h.guestState());await pull();draw();
   };
  }
 }
 const safe=s=>String(s).replace(/[^a-zA-Z0-9_.-]/g,"_");
-function localRecords(){
- const s=h.getState(),out=[];
+function localRecords(s=h.getState()){
+ const out=[];
  for(const [id,completed] of Object.entries(s.done||{}))if(completed)out.push(["lessonProgress",safe(id),{lessonId:id,completed:true,completedAt:s.lessonVisits?.[id]||Date.now()}]);
  for(const [id,mastered] of Object.entries(s.mastered||{}))if(mastered)out.push(["lessonMastery",safe(id),{lessonId:id,mastered:true}]);
  for(const [k,a] of Object.entries(s.attempts||{}))if(a?.ts)out.push(["assessmentAttempts",safe(k+"_"+a.ts),{assessmentKey:k,...a}]);
@@ -50,12 +50,12 @@ function localRecords(){
 }
 let known=new Set(),timer=0,ready=false;
 const importKey=()=>user?"atdCloudImportApproved:"+user.uid:"";
-const approved=()=>!!user&&sessionStorage.getItem(importKey())==="yes";
-async function upload(manual=false){
+const approved=()=>!!user&&localStorage.getItem(importKey())==="yes";
+async function upload(manual=false,source=null){
  if(!user||!ready||busy||!approved())return;
  busy=true;let count=0;
  try{
-  for(const [sub,id,data] of localRecords()){
+  for(const [sub,id,data] of localRecords(source||h.getState())){
    const key=sub+"/"+id;if(known.has(key))continue;
    const ref=doc(db,"learners",user.uid,sub,id);
    if(manual&&(await getDoc(ref)).exists()){known.add(key);continue;}
@@ -85,8 +85,9 @@ async function pull(){
 }
 onAuthStateChanged(auth,async next=>{
  user=next;ready=false;profile=null;known.clear();notice="";
+ h.useAccount(user?.uid||null);
  if(user){
-  try{const p=await getDoc(doc(db,"learners",user.uid));profile=p.exists()?p.data():null;await pull();ready=true;notice=locale("Signed in. Choose Merge local progress to start synchronizing this browser.","تم الدخول. اختر دمج التقدم المحلي لبدء المزامنة من هذا المتصفح.");}
+  try{const p=await getDoc(doc(db,"learners",user.uid));profile=p.exists()?p.data():null;await pull();ready=true;notice=approved()?locale("Signed in. Cloud sync enabled.","تم الدخول والمزامنة مفعّلة.") :locale("Signed in. Select Merge local progress once to enable cloud sync.","تم الدخول. اختر دمج التقدم المحلي مرة واحدة لتفعيل المزامنة.");}
   catch(err){notice=locale("Enable Firestore and its security rules first: ","فعّل Firestore وقواعد الأمان أولاً: ")+String(err.code||err.message);}
  }else opened=false;
  draw();
