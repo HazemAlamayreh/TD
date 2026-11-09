@@ -1,6 +1,6 @@
 import {initializeApp} from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
 import {getAuth,setPersistence,browserLocalPersistence,onAuthStateChanged,createUserWithEmailAndPassword,signInWithEmailAndPassword,sendPasswordResetEmail,updatePassword,signOut} from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
-import {getFirestore,doc,getDoc,getDocs,setDoc,collection,serverTimestamp} from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
+import {getFirestore,doc,getDoc,getDocs,setDoc,collection,serverTimestamp,increment} from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
 import {initializeAdminDashboard} from "./admin-dashboard.js";
 const app=initializeApp({apiKey:"AIzaSyBxuLsolggWnoGuTASnnWvz7OwvRdnIxZE",authDomain:"atd-master-talent-development.firebaseapp.com",projectId:"atd-master-talent-development",storageBucket:"atd-master-talent-development.firebasestorage.app",messagingSenderId:"882331359053",appId:"1:882331359053:web:a51c003529af5ae9c90904"});
 const auth=getAuth(app),db=getFirestore(app),h=window.ATDHost,readyAuth=setPersistence(auth,browserLocalPersistence);
@@ -40,7 +40,16 @@ function records(s){
  const out=[],id=v=>String(v).replace(/[^a-zA-Z0-9_.-]/g,"_");
  for(const [k,v] of Object.entries(s.done||{}))if(v)out.push(["lessonProgress",id(k),{lessonId:k,completed:true}]);
  for(const [k,v] of Object.entries(s.mastered||{}))if(v)out.push(["lessonMastery",id(k),{lessonId:k,mastered:true}]);
- for(const [k,v] of Object.entries(s.attempts||{}))if(v?.ts)out.push(["assessmentAttempts",id(k+"_"+v.ts),{assessmentKey:k,...v}]);
+ for(const [k,v] of Object.entries(s.attempts||{}))if(v?.ts){
+  let evidence={};try{
+   const [mid,stage]=k.split(":"),m=DATA.modules.find(x=>x.id===mid);
+   if(m&&Array.isArray(v.answers)&&typeof getQs==="function"&&["diagnostic","mastery"].includes(stage)){
+    const qs=getQs(m,stage);
+    if(qs.length===v.answers.length)evidence.questionSnapshots=qs.map((q,i)=>({id:q.id,target:q.target,prompt:q.q,options:q.opts,correctIndex:q.answer,explanation:q.why,selectedIndex:v.answers[i]??null}));
+   }
+  }catch(err){console.warn("Assessment evidence:",err);}
+  out.push(["assessmentAttempts",id(k+"_"+v.ts),{assessmentKey:k,...v,...evidence}]);
+ }
  for(const a of s.attemptHistory||[])if(a?.ts&&a.capability&&a.stage){const k=a.capability+":"+a.stage;out.push(["assessmentAttempts",id(k+"_"+a.ts),{assessmentKey:k,...a}]);}
  return out;
 }
@@ -86,16 +95,42 @@ async function upload(manual=false,source=null){
  }catch(e){notice=tr("Sync needs attention: ","المزامنة تحتاج مراجعة: ")+(e.code||e.message);}
  finally{busy=false;if(opened)ui();}
 }
-window.ATDCloudOnSave=()=>{if(!initialized||!user)return;clearTimeout(syncTimer);syncTimer=setTimeout(()=>upload(),900);};
+// Usage tracking begins only after an authenticated learner's cloud restore.
+// Foreground time is an approximation, not a proctored or validated study duration.
+let activitySeconds=0,activityViews=0,lastView="",activeSince=Date.now(),lastTick=Date.now(),activityTimer=0;
+function visible(){return document.visibilityState==="visible"&&document.hasFocus();}
+function tickActivity(){
+ const now=Date.now(),delta=Math.max(0,Math.min(60,Math.floor((now-lastTick)/1000)));lastTick=now;
+ if(initialized&&user&&visible())activitySeconds+=delta;
+}
+async function flushActivity(){
+ tickActivity();
+ if(!initialized||!user||(!activitySeconds&&!activityViews))return;
+ const seconds=activitySeconds,views=activityViews;activitySeconds=0;activityViews=0;
+ const uid=user.uid,date=new Date().toISOString().slice(0,10);
+ try{
+  await setDoc(doc(db,"learners",uid,"activity",date),{activeSeconds:increment(seconds),pageViews:increment(views),lastSeenAt:serverTimestamp()},{merge:true});
+ }catch(e){activitySeconds+=seconds;activityViews+=views;console.warn("Activity sync:",e.code||e.message);}
+}
+function trackPage(){
+ if(!initialized||!user)return;
+ const s=h.getState(),page=String(s.view||"home")+"|"+String(s.current||"")+"|"+String(s.focus||"");
+ if(page!==lastView){lastView=page;activityViews++;}
+}
+document.addEventListener("visibilitychange",()=>{tickActivity();if(document.visibilityState==="hidden")flushActivity();});
+window.addEventListener("blur",()=>{tickActivity();flushActivity();});
+window.addEventListener("focus",()=>{lastTick=Date.now();});
+activityTimer=setInterval(()=>{trackPage();flushActivity();},30000);
+window.ATDCloudOnSave=()=>{if(!initialized||!user)return;trackPage();clearTimeout(syncTimer);syncTimer=setTimeout(()=>upload(),900);};
 readyAuth.then(()=>onAuthStateChanged(auth,async next=>{
- clearTimeout(syncTimer);user=next;profile=null;initialized=false;busy=false;known.clear();notice="";
+ clearTimeout(syncTimer);tickActivity();if(user)flushActivity();lastTick=Date.now();lastView="";user=next;profile=null;initialized=false;busy=false;known.clear();notice="";
  h.useAccount(next?.uid||null);
  if(!next){opened=true;ui();return;}
  opened=false;ui();
  try{
   const p=await getDoc(doc(db,"learners",next.uid));profile=p.exists()?p.data():{};
   if(!p.exists())await setDoc(doc(db,"learners",next.uid),{email:next.email||"",createdAt:serverTimestamp()},{merge:true});
-  await restore();initialized=true;await upload();
+  await restore();initialized=true;trackPage();await upload();
  }catch(e){notice=tr("Could not load cloud progress: ","تعذّر تحميل التقدم السحابي: ")+(e.code||e.message);}
  ui();
 }));
