@@ -19,7 +19,8 @@ function draw(){
  (user?'<p>'+esc(user.email)+'</p><label>'+locale("Name","الاسم")+'</label><input id="atdName" value="'+esc(profile?.name)+'"><label>'+locale("Phone (optional)","رقم الهاتف (اختياري)")+'</label><input id="atdPhone" value="'+esc(profile?.phone)+'"><button class="primary" id="atdProfile">'+locale("Save profile","حفظ الملف")+'</button><button id="atdImport">'+locale("Merge local progress into my account","دمج التقدم المحلي مع حسابي")+'</button><button id="atdLogout">'+locale("Sign out","تسجيل الخروج")+'</button>':
  '<p>'+locale("Receive a login link by email; no password needed.","استلم رابط دخول عبر الإيميل، دون كلمة مرور.")+'</p><form id="atdEmailForm"><input id="atdEmail" type="email" required placeholder="name@example.com"><button class="primary" type="submit">'+locale("Send magic link","إرسال رابط الدخول")+'</button></form>')+
  '<p style="font-size:13px;line-height:1.6">'+esc(notice)+'</p></section></div>');
- layer.querySelector("#atdCloudClose").onclick=()=>{opened=false;draw();};
+ layer.querySelector("#atdCloudClose").onclick=()=>{if(user){opened=false;draw();}};
+ if(!user)layer.querySelector("#atdCloudClose").style.display="none";
  if(!user){
   layer.querySelector("#atdEmailForm").onsubmit=async e=>{
    e.preventDefault();const email=layer.querySelector("#atdEmail").value.trim();
@@ -89,7 +90,7 @@ onAuthStateChanged(auth,async next=>{
  if(user){
   try{const p=await getDoc(doc(db,"learners",user.uid));profile=p.exists()?p.data():null;await pull();ready=true;notice=approved()?locale("Signed in. Cloud sync enabled.","تم الدخول والمزامنة مفعّلة.") :locale("Signed in. Select Merge local progress once to enable cloud sync.","تم الدخول. اختر دمج التقدم المحلي مرة واحدة لتفعيل المزامنة.");}
   catch(err){notice=locale("Enable Firestore and its security rules first: ","فعّل Firestore وقواعد الأمان أولاً: ")+String(err.code||err.message);}
- }else opened=false;
+ }else opened=true;
  draw();
 });
 (async()=>{
