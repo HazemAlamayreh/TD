@@ -2,9 +2,11 @@
 import {initializeApp} from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
 import {getAuth,onAuthStateChanged,sendSignInLinkToEmail,isSignInWithEmailLink,signInWithEmailLink,signOut} from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
 import {getFirestore,doc,setDoc,getDoc,getDocs,collection,serverTimestamp} from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
+import {initializeAdminDashboard} from "./admin-dashboard.js";
 const config={apiKey:"AIzaSyBxuLsolggWnoGuTASnnWvz7OwvRdnIxZE",authDomain:"atd-master-talent-development.firebaseapp.com",projectId:"atd-master-talent-development",storageBucket:"atd-master-talent-development.firebasestorage.app",messagingSenderId:"882331359053",appId:"1:882331359053:web:a51c003529af5ae9c90904",measurementId:"G-4FEGLTW1L7"};
 const app=initializeApp(config),auth=getAuth(app),db=getFirestore(app),h=window.ATDHost;
 const layer=document.createElement("div");document.body.append(layer);
+initializeAdminDashboard(auth,db);
 const style=document.createElement("style");
 style.textContent="#atdCloudButton{position:fixed;bottom:15px;right:16px;z-index:999;background:#123f73;color:white;border:none;border-radius:30px;padding:12px 18px;cursor:pointer}#atdCloudModal{position:fixed;inset:0;background:#15243a99;z-index:1001;display:grid;place-items:center;padding:15px}#atdCloudModal section{max-width:440px;width:100%;padding:24px;border-radius:16px;background:white;color:#12223a;box-shadow:0 12px 30px #0003}#atdCloudModal input{display:block;width:100%;box-sizing:border-box;border:1px solid #bac6d6;border-radius:7px;padding:12px;margin:9px 0}#atdCloudModal button{cursor:pointer;padding:10px 14px;border-radius:7px;border:1px solid #c4cfde;margin:4px}#atdCloudModal .primary{background:#123f73;color:white}";
 document.head.append(style);
