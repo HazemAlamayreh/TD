@@ -32,6 +32,11 @@ service cloud.firestore {
         allow create, update: if isOwner(uid);
         allow delete: if false;
       }
+      match /sync/{id} {
+        allow get, list: if isOwner(uid);
+        allow create, update: if isOwner(uid);
+        allow delete: if false;
+      }
       match /assessmentAttempts/{id} {
         allow get, list: if isOwner(uid) || isAdmin();
         allow create, update: if isOwner(uid);
