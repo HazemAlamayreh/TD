@@ -32,6 +32,13 @@ service cloud.firestore {
         allow create, update: if isOwner(uid);
         allow delete: if false;
       }
+      // Foreground activity counters: each learner owns their own records.
+      // Administrators can read aggregate usage but cannot modify it.
+      match /activity/{id} {
+        allow get, list: if isOwner(uid) || isAdmin();
+        allow create, update: if isOwner(uid);
+        allow delete: if false;
+      }
       match /sync/{id} {
         allow get, list: if isOwner(uid);
         allow create, update: if isOwner(uid);
