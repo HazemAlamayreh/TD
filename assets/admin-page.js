@@ -87,11 +87,11 @@ function detail(uid){
 async function load(){
  if(!current||loading)return;loading=true;const version=++epoch;status("Loading learner analytics…");$("reload").disabled=true;$("export").disabled=true;
  try{
-  const snap=await getDocs(collection(db,"learners")),result=[];
+  const snap=await getDocs(collection(db,"learners")).catch(e=>{throw new Error("learners collection (admin list permission): "+String(e.code||e.message));}),result=[];
   for(const p of snap.docs){
    if(version!==epoch||auth.currentUser?.uid!==current.uid)return;
    const uid=p.id,x=p.data();
-   const [lessonsSnap,masterySnap,attemptsSnap]=await Promise.all(["lessonProgress","lessonMastery","assessmentAttempts"].map(k=>getDocs(collection(db,"learners",uid,k))));
+   const [lessonsSnap,masterySnap,attemptsSnap]=await Promise.all(["lessonProgress","lessonMastery","assessmentAttempts"].map(k=>getDocs(collection(db,"learners",uid,k)).catch(e=>{throw new Error("learners/"+uid+"/"+k+" (admin list permission): "+String(e.code||e.message));})));
    let activityDocs=[];try{activityDocs=(await getDocs(collection(db,"learners",uid,"activity"))).docs;}catch(err){console.warn("Activity records unavailable:",err.code||err.message);}
    const subs=[lessonsSnap,masterySnap,attemptsSnap,{docs:activityDocs}];
    const lessonIds=new Set(subs[0].docs.filter(d=>d.data().completed===true).map(d=>d.data().lessonId).filter(Boolean));
@@ -102,7 +102,7 @@ async function load(){
     seconds:activity.reduce((n,a)=>n+(Number(a.activeSeconds)||0),0),views:activity.reduce((n,a)=>n+(Number(a.pageViews)||0),0),lastSeen:last});
   }
   if(version!==epoch)return;learners=result.sort((a,b)=>(a.name||a.email).localeCompare(b.name||b.email));metrics();render();status("Loaded "+learners.length+" learner profiles · "+modules.length+" curriculum modules.");
- }catch(e){status("Could not read analytics: "+String(e.code||e.message)+". Verify the latest Firestore rules, including activity, have been published.",true);}
+ }catch(e){status("Access diagnostic: "+String(e.code||e.message)+". Check admin UID and published Firestore rules. Activity is optional.",true);}
  finally{loading=false;$("reload").disabled=false;$("export").disabled=false;}
 }
 function csv(v){return '"'+String(v??"").replace(/"/g,'""')+'"';}
