@@ -8,7 +8,7 @@ const asDate=v=>v?.toDate?.()||(typeof v==="string"||typeof v==="number"?new Dat
 const dateLabel=v=>{const d=asDate(v);return d&&!isNaN(d.valueOf())?d.toLocaleString():"—"};
 const pct=v=>typeof v==="number"&&Number.isFinite(v)?Math.round(v*100)+"%":"—";
 const hrs=s=>typeof s==="number"&&s>0?(s>=3600?(s/3600).toFixed(1)+" h":Math.ceil(s/60)+" min"):"Not tracked";
-const modules=Array.isArray(globalThis.DATA?.modules)?DATA.modules:[];
+const modules=Array.isArray(window.ATD_COURSE_MODULES)?window.ATD_COURSE_MODULES:[];
 const lessonTotal=modules.reduce((n,m)=>n+m.lessons.length,0);
 const stages={diagnostic:"Diagnostic",mastery:"Mastery",advanced:"Advanced case"};
 let current=null,learners=[],filter="",epoch=0,loading=false;
