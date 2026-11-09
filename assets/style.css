@@ -83,3 +83,13 @@ button{transition:background-color .2s,box-shadow .2s,transform .2s,border-color
 .atdPathChip:disabled{opacity:.55;cursor:not-allowed}
 .rtlMode .atdPathwayLabel{margin-right:0;margin-left:5px}
 @media(max-width:640px){.atdPathwayCompact{gap:4px;padding:5px}.atdPathChip{min-width:80px;font-size:10px;padding:5px}.atdPathwayLabel{display:none}}
+
+
+/* Completion colors: consistent across Full Material, individual lessons and sidebar. */
+.moduleLessonBtn.atdLessonCompleted,.moduleLessonBtn.done{background:#eaf8ee!important;border-color:#a3d6b2!important;color:#155c37!important}
+.moduleLessonBtn.atdLessonCompleted small,.moduleLessonBtn.done small{color:#236944!important}
+.lesson.atdLessonCompleted{border-color:#a6d9b6!important;background:linear-gradient(180deg,#f1fbf4 0%,#fff 140px)!important;box-shadow:inset 4px 0 0 #238951}
+.atdDoneMarker,.atdDoneFlag,.atdModuleDoneLabel{display:inline-block;color:#167047;background:#ddf4e5;border:1px solid #b5dfc2;border-radius:20px;padding:2px 7px;font-size:10px;font-weight:750;line-height:1.2;margin-left:6px}
+.atdDoneMarker{margin-left:auto;white-space:nowrap}
+#sidebar .sideBtn.atdModuleCompleted{border-left:4px solid #258752!important;background:#eaf7ef!important;color:#185a38!important}
+#sidebar .sideBtn.atdModuleCompleted .sideSub{color:#28724b!important}
