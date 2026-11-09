@@ -28,7 +28,15 @@ async function finishEmailSignIn(email){
   localStorage.removeItem(EMAIL_KEY);sessionStorage.removeItem(EMAIL_KEY);
   pendingSignInLink=null;notice="";
   history.replaceState({},document.title,location.origin+location.pathname);
- }catch(e){notice=locale("Unable to finish sign-in: ","تعذّر إكمال الدخول: ")+String(e.code||e.message);opened=true;draw();}
+ }catch(e){
+  const invalid=["auth/invalid-action-code","auth/expired-action-code"].includes(e.code);
+  if(invalid){
+   pendingSignInLink=null;
+   history.replaceState({},document.title,location.origin+location.pathname);
+   notice=locale("This sign-in link is expired or already used. Request one new link and open only the newest email.","رابط الدخول منتهي الصلاحية أو مستخدم سابقاً. اطلب رابطاً جديداً وافتح أحدث رسالة فقط.");
+  }else{notice=locale("Unable to finish sign-in: ","تعذّر إكمال الدخول: ")+String(e.code||e.message);}
+  opened=true;draw();
+ }
 }
 
 const locale=(en,ar)=>h.getState().lang==="ar"?ar:en;
