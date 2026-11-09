@@ -1,0 +1,27 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function isOwner(uid) {
+      return request.auth != null && request.auth.uid == uid;
+    }
+    match /learners/{uid} {
+      allow read, create, update: if isOwner(uid);
+      allow delete: if false;
+      match /lessonProgress/{id} {
+        allow read, create, update: if isOwner(uid);
+        allow delete: if false;
+      }
+      match /lessonMastery/{id} {
+        allow read, create, update: if isOwner(uid);
+        allow delete: if false;
+      }
+      match /assessmentAttempts/{id} {
+        allow read, create, update: if isOwner(uid);
+        allow delete: if false;
+      }
+    }
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
