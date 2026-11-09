@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ATD Academy | Administrator</title>
+<style>
+:root{font-family:Inter,system-ui,-apple-system,Segoe UI,sans-serif;color:#18324d;background:#f3f6fa}*{box-sizing:border-box}
+body{margin:0}header{background:#123b6a;color:#fff;padding:22px max(22px,calc((100vw - 1240px)/2));display:flex;justify-content:space-between;align-items:center;gap:15px;flex-wrap:wrap}
+header small{opacity:.76;letter-spacing:.1em}h1{font-size:25px;margin:4px 0}h2{font-size:19px;margin:0 0 13px}
+main{max-width:1240px;margin:25px auto;padding:0 20px}a{color:inherit}header a{color:#fff}button,input{font:inherit}button{cursor:pointer;border:1px solid #c7d4e2;border-radius:8px;padding:10px 14px;background:white;color:#173956}
+button.primary{background:#135e9b;color:#fff;border-color:#135e9b}button:disabled{opacity:.5;cursor:not-allowed}
+input{border:1px solid #cbd7e4;padding:11px;border-radius:8px;min-width:190px;flex:1}
+.panel{background:#fff;border:1px solid #e0e7ef;border-radius:13px;padding:22px;margin-bottom:17px;box-shadow:0 2px 9px #163e6310}
+.muted{color:#64758c}.small{font-size:12px}.hidden{display:none!important}.metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(175px,1fr));gap:13px;margin-bottom:18px}
+.metric{background:#fff;border:1px solid #e0e7ef;border-radius:12px;padding:18px}.metric strong{font-size:30px;display:block;color:#123b6a}
+.toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:15px}.scroll{overflow-x:auto}
+table{border-collapse:collapse;width:100%;min-width:750px}th,td{padding:12px;text-align:left;border-bottom:1px solid #e3eaf1;vertical-align:top}th{background:#f7f9fc;color:#49637e;font-size:12px}td .small{word-break:break-all}
+.progress{height:7px;width:110px;background:#e9edf3;border-radius:8px;overflow:hidden;margin-top:6px}.progress span{height:100%;display:block;background:#2680be}
+.tabs{display:flex;gap:7px;flex-wrap:wrap;margin:10px 0}.tabs button[aria-selected=true]{background:#123b6a;color:white}
+#status{min-height:20px}#status.error{color:#aa2535}.empty{padding:23px;text-align:center;color:#5e7286}
+@media(max-width:600px){h1{font-size:22px}.panel{padding:15px}header{padding:18px}main{padding:0 12px}}
+</style></head><body>
+<header><div><small>ATD ACADEMY · ADMINISTRATION</small><h1>Learning Analytics Dashboard</h1></div><a href="./">Back to Academy</a></header>
+<main>
+<section id="access" class="panel"><h2>Verifying administrator access…</h2><p class="muted">Sign in to the Academy using the authorized administrator account.</p></section>
+<div id="dashboard" class="hidden">
+<div class="metrics" id="metrics"></div>
+<section class="panel"><div class="toolbar"><input id="search" type="search" placeholder="Search name, email or learner UID" aria-label="Search learners"><button class="primary" id="reload">Refresh</button><button id="export">Export CSV</button></div>
+<p id="status" role="status"></p><div class="scroll"><table><thead><tr><th>Learner</th><th>Completed lessons</th><th>Mastered lessons</th><th>Assessment attempts</th><th>Average result</th><th>Details</th></tr></thead><tbody id="learnerRows"></tbody></table></div>
+<p class="muted small">Only data saved to Cloud Firestore is included. Missing records do not prove that a learner did no work. This is a read-only dashboard.</p>
+</section>
+<section class="panel hidden" id="details"><div style="display:flex;justify-content:space-between;gap:10px"><h2 id="detailTitle">Learner details</h2><button id="closeDetails">Close</button></div><div id="detailContent"></div></section>
+</div></main>
+<script type="module" src="./assets/admin-page.js?v=20261109-admin"></script>
+</body></html>
