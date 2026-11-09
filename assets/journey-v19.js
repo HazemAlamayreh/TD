@@ -283,13 +283,22 @@ function advanceCase(){
   const previous=state.attempts[m.id+':advanced'];if(previous)state.attemptHistory.push({capability:m.id,stage:'advanced',...previous});
   const a={score,rawPoints:sess.points,maxPoints:sess.maxPoints,questionCount:sess.history.length,caseVersion:'case-v19',ts:new Date().toISOString(),history:sess.history.slice()};
   state.attempts[m.id+':advanced']=a;state.caseHistory.push({mid:m.id,...a});
-  delete state.caseDraft;save();render();return;
+  delete state.caseDraft;
+  state.view='advanced';
+  state.lastResume={mid:m.id,stage:'advanced',completed:true};
+  save();
+  // Render the permanent final report explicitly so the Finish Cases button
+  // can never re-enter the same question or recreate a case session.
+  render();
+  showCaseResult(m);
+  return;
  }
  sess.selected=[];sess.submitted=false;sess.lastDelta=undefined;persistCase();render();
 }
 function restartCases(){delete state.caseDraft;sess=null;save();render();}
 function showCaseResult(m){
  const a=state.attempts[m.id+':advanced'];
+ if(!a){$('body').innerHTML='<div class="panel">'+msg('No completed case result found.','لم يتم العثور على نتيجة حالة مكتملة.')+'</div>';return;}
  $('body').innerHTML='<div class="panel qBox"><span class="pill">'+msg('CASE PRACTICE COMPLETE','انتهى تدريب الحالات')+'</span><h1>'+msg('Professional judgment results','نتائج الحكم المهني')+'</h1><div class="score">'+a.rawPoints+' / '+a.maxPoints+'</div><p>'+msg('Score after penalties: ','النتيجة بعد الخصومات: ')+Math.round(a.score*100)+'%</p><p class="muted">'+msg('This practice measures decisions in simulated situations. It is not an official ATD score. Review how you selected actions and how evidence changed throughout the case.','هذا التدريب يقيس قراراتك في مواقف محاكاة وليس نتيجة ATD رسمية. راجع كيفية اختيار الإجراءات وتغيّر الأدلة خلال الحالة.')+'</p><div class="actionBar"><button class="btn primary" onclick="restartCases()">'+msg('Practice again','إعادة التدريب')+'</button><button class="btn" onclick="view(\'material\')">'+msg('Open lessons','افتح الدروس')+'</button></div></div>';
 }
 
@@ -435,4 +444,26 @@ render=function(){
   atdRestoreDiagnosticCompletion(mod());
  ATD_V21_RENDER();
  if(!['home','saved','analytics','domain-dashboard'].includes(state.view))atdDisplayStageProgress(mod());
+};
+
+
+/* Compact single-line pathway summary, navigable and responsive. */
+atdDisplayStageProgress=function(m){
+ const top=$('top'),tabs=top?.querySelector('.tabs');if(!tabs)return;
+ const old=top.querySelector('#atdStageProgress');if(old)old.remove();
+ const stages=atdStageCompletion(m),ar=state.lang==='ar';
+ const bar=document.createElement('div');bar.id='atdStageProgress';bar.className='atdPathwayCompact';
+ bar.setAttribute('aria-label',ar?'تقدم مراحل التعلم':'Learning pathway status');
+ bar.innerHTML='<span class="atdPathwayLabel">'+msg('YOUR PATHWAY','مسارك')+'</span>'+
+ stages.map((s,i)=>{
+  const value=s.progress===null?'—':s.progress+'%',done=s.progress===100,active=state.view===s.view;
+  return '<button type="button" class="atdPathChip '+(done?'done ':'')+(active?'active':'')+'" '+
+   (s.progress===null?'disabled':'onclick="view(\''+s.view+'\')"')+' title="'+esc((ar?s.ar:s.en)+' · '+value)+'">'+
+   '<span>'+esc(ar?s.ar:s.en)+'</span><b>'+esc(value)+'</b></button>';
+ }).join('');
+ tabs.insertAdjacentElement('afterend',bar);
+ tabs.querySelectorAll('button').forEach((b,i)=>{
+  if(!stages[i])return;
+  b.textContent=(ar?stages[i].ar:stages[i].en)+(stages[i].progress===100?' ✓':'');
+ });
 };
