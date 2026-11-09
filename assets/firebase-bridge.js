@@ -47,6 +47,15 @@ function records(s){
     const qs=getQs(m,stage);
     if(qs.length===v.answers.length)evidence.questionSnapshots=qs.map((q,i)=>({id:q.id,target:q.target,prompt:q.q,options:q.opts,correctIndex:q.answer,explanation:q.why,selectedIndex:v.answers[i]??null}));
    }
+   if(m&&stage==="advanced"&&Array.isArray(v.history)&&typeof caseQuestions==="function"&&typeof caseStepData==="function"){
+    const cases=caseQuestions(m);
+    evidence.caseStepSnapshots=v.history.map(entry=>{
+     const q=cases[entry.caseIndex];if(!q)return null;
+     const step=caseStepData(q,entry.step);
+     return {caseIndex:entry.caseIndex,step:entry.step,prompt:q.q,decisionPrompt:step.prompt,options:step.options.map(o=>o.text),
+      correctIndices:step.options.map((o,i)=>o.correct?i:-1).filter(i=>i>=0),selectedIndices:entry.choices||[],delta:entry.delta,explanation:q.why};
+    }).filter(Boolean);
+   }
   }catch(err){console.warn("Assessment evidence:",err);}
   out.push(["assessmentAttempts",id(k+"_"+v.ts),{assessmentKey:k,...v,...evidence}]);
  }
