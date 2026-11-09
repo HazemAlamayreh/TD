@@ -11,7 +11,7 @@ export function initializeAdminDashboard(auth,db){
  const metric=(name,value)=>'<div class="metric"><b>'+esc(value)+'</b>'+esc(name)+'</div>';
  function shell(){
   root.innerHTML=admin?'<button id="atdAdminLaunch">Admin Dashboard</button>':"";
-  if(admin)e("#atdAdminLaunch").onclick=()=>{open=true;paint();if(!loaded)load();};
+  if(admin)e("#atdAdminLaunch").onclick=()=>{window.location.assign("./admin.html");};
  }
  function paint(){
   shell();if(!admin||!open)return;
