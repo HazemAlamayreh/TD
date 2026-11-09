@@ -154,6 +154,16 @@ function advanceDiagnostic(){
  const answered=sess.answers.filter(a=>a!==null&&a!==undefined).length;
  state.knowledgeGaps[m.id]=[...new Set(sess.qs.filter((q,i)=>sess.answers[i]!==q.answer).map(q=>q.target))];
  state.attempts[m.id+':diagnostic']={bankVersion:JOURNEY_VERSION,score:correct/sess.qs.length,answered,skipped,missed,answers:sess.answers.slice(),questionCount:sess.qs.length,ts:new Date().toISOString()};
+ // One foundation question maps to each lesson. All mapped questions must
+ // be correct before granting lesson completion; skipped/wrong remain gaps.
+ const grouped={};
+ sess.qs.forEach((q,i)=>{if(!m.lessons.some(l=>l[0]===q.target))return;
+  (grouped[q.target]??=[]).push(sess.answers[i]===q.answer);
+ });
+ state.autoReviewed??={};state.done??={};
+ for(const [lessonId,results] of Object.entries(grouped)){
+  if(results.length&&results.every(Boolean)){state.done[lessonId]=true;state.autoReviewed[lessonId]=true;}
+ }
  delete state.draft;sess.finished=true;save();render();
 }
 function showDiagnosticResult(m){
@@ -342,4 +352,87 @@ showCaseResult=function(m){
    '<div class="feedback">'+esc(q.why||'')+'</div></div>';
  }).join('');
  area.append(section);
+};
+
+
+/* v21: five-stage completion tracker and repair of diagnostic-to-lesson credit.
+   Percentages here represent workflow completion, not examination scores. */
+function atdRestoreDiagnosticCompletion(m){
+ if(m.preview)return;
+ const a=state.attempts?.[m.id+':diagnostic'];
+ if(!a||!Array.isArray(a.answers)||a.bankVersion!==JOURNEY_VERSION)return;
+ const qs=getQs(m,'diagnostic');
+ if(qs.length!==a.answers.length)return; // Never regrade against an incompatible bank.
+ const grouped={};
+ qs.forEach((q,i)=>{if(!m.lessons.some(l=>l[0]===q.target))return;
+  (grouped[q.target]??=[]).push(a.answers[i]===q.answer);
+ });
+ state.autoReviewed??={};state.done??={};
+ let changed=false;
+ for(const [id,marks] of Object.entries(grouped))if(marks.length&&marks.every(Boolean)){
+  if(!state.done[id]){state.done[id]=true;changed=true;}
+  if(!state.autoReviewed[id]){state.autoReviewed[id]=true;changed=true;}
+ }
+ if(changed)save();
+}
+function atdStageCompletion(m){
+ const d=state.attempts[m.id+':diagnostic'],mastery=state.attempts[m.id+':mastery'],advanced=state.attempts[m.id+':advanced'];
+ const draft=state.draft,caseDraft=state.caseDraft;
+ const qcount=getQs(m,'diagnostic').length||1;
+ const dProgress=d?100:(draft?.mid===m.id&&draft.stage==='diagnostic'?
+  Math.round(100*(draft.answers||[]).filter(x=>x!==undefined).length/qcount):0);
+ // Review focuses on lessons with diagnostic knowledge gaps; it is complete
+ // when none remain or all related lessons have since been marked reviewed.
+ const gaps=d?[...new Set((state.knowledgeGaps?.[m.id]||[]).filter(id=>m.lessons.some(l=>l[0]===id)))]:[];
+ const reviewed=gaps.filter(id=>state.done[id]||state.studiedLessons?.[id]||state.manualReviewed?.[id]).length;
+ const reviewProgress=!d?0:!gaps.length?100:Math.round(100*reviewed/gaps.length);
+ const materialTotal=m.lessons.length;
+ const materialDone=m.lessons.filter(l=>!!state.done[l[0]]).length;
+ const materialProgress=m.preview?null:materialTotal?Math.round(100*materialDone/materialTotal):0;
+ const masteryCount=getQs(m,'mastery').length||1;
+ const masteryProgress=m.preview?null:mastery?100:draft?.mid===m.id&&draft.stage==='mastery'?
+  Math.round(100*(draft.answers||[]).filter(x=>x!==undefined).length/masteryCount):0;
+ const caseTotal=Math.max(1,Math.min(3,caseQuestions(m).length)*3);
+ const advancedProgress=m.preview?null:advanced?100:caseDraft?.mid===m.id?
+  Math.min(99,Math.round(100*((caseDraft.history||[]).length/caseTotal))):0;
+ return [
+  {view:'diagnostic',en:'Diagnostic Exam',ar:'التقييم التشخيصي',progress:dProgress,score:d?.score},
+  {view:'review',en:'My Review',ar:'مراجعتي',progress:reviewProgress},
+  {view:'material',en:'Full Material',ar:'المحتوى الكامل',progress:materialProgress,amount:materialDone+'/'+materialTotal},
+  {view:'mastery',en:'Mastery Check',ar:'اختبار الإتقان',progress:masteryProgress,score:mastery?.score},
+  {view:'advanced',en:'Advanced Scenarios',ar:'الحالات المتقدمة',progress:advancedProgress,score:advanced?.score}
+ ];
+}
+function atdDisplayStageProgress(m){
+ const top=$('top');if(!top||!top.querySelector('.tabs'))return;
+ const stages=atdStageCompletion(m),ar=state.lang==='ar';
+ const old=top.querySelector('#atdStageProgress');if(old)old.remove();
+ const section=document.createElement('section');section.id='atdStageProgress';section.className='atdStageProgress';
+ section.setAttribute('aria-label',ar?'تقدم مراحل الموديول':'Module learning stage progress');
+ section.innerHTML='<div class="atdStageProgressHeading"><strong>'+msg('Your learning pathway','مسارك التعليمي')+'</strong><small>'+msg('Progress means stage completion, not test score.','النسبة تعني إكمال المرحلة، وليست علامة الاختبار.')+'</small></div>'+
+ '<div class="atdStageProgressGrid">'+stages.map((s,i)=>{
+  const pct=s.progress===null?null:Math.max(0,Math.min(100,s.progress));
+  const done=pct===100,active=state.view===s.view;
+  const summary=pct===null?msg('Not available yet','غير متوفر حالياً'):done?msg('✓ Completed','✓ مكتمل'):pct?msg('In progress','قيد التقدم'):msg('Not started','لم يبدأ');
+  return '<button type="button" class="atdStageTrack '+(done?'completed ':'')+(active?'current':'')+'" onclick="view(\''+s.view+'\')" '+(pct===null?'disabled':'')+'>'+
+   '<span class="atdStageTrackTitle">'+(i+1)+'. '+esc(ar?s.ar:s.en)+'</span>'+
+   '<span class="atdStageTrackValue">'+(pct===null?'—':pct+'%')+'</span>'+
+   '<span class="atdStageBar"><span style="width:'+(pct||0)+'%"></span></span>'+
+   '<small>'+summary+(s.amount?' · '+esc(s.amount):'')+'</small></button>';
+ }).join('')+'</div>';
+ top.querySelector('.tabs').insertAdjacentElement('afterend',section);
+ const tabs=top.querySelectorAll('.tabs button');
+ tabs.forEach((tab,i)=>{const stage=stages[i];if(!stage)return;const pct=stage.progress;
+  const status=pct===100?' ✓':pct>0?' · '+pct+'%':'';
+  tab.textContent=(ar?stage.ar:stage.en)+status;
+ });
+}
+const ATD_V21_RENDER=render;
+render=function(){
+ // Repairs correct diagnostic answers already stored under the current bank
+ // when switching accounts or returning after a reload.
+ if(state.view!=='home'&&state.view!=='saved'&&state.view!=='analytics'&&state.view!=='domain-dashboard')
+  atdRestoreDiagnosticCompletion(mod());
+ ATD_V21_RENDER();
+ if(!['home','saved','analytics','domain-dashboard'].includes(state.view))atdDisplayStageProgress(mod());
 };
