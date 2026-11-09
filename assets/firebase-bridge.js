@@ -1,10 +1,11 @@
 
 import {initializeApp} from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
-import {getAuth,onAuthStateChanged,sendSignInLinkToEmail,isSignInWithEmailLink,signInWithEmailLink,signOut} from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
+import {getAuth,setPersistence,browserLocalPersistence,onAuthStateChanged,sendSignInLinkToEmail,isSignInWithEmailLink,signInWithEmailLink,signOut} from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
 import {getFirestore,doc,setDoc,getDoc,getDocs,collection,serverTimestamp} from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
 import {initializeAdminDashboard} from "./admin-dashboard.js";
 const config={apiKey:"AIzaSyBxuLsolggWnoGuTASnnWvz7OwvRdnIxZE",authDomain:"atd-master-talent-development.firebaseapp.com",projectId:"atd-master-talent-development",storageBucket:"atd-master-talent-development.firebasestorage.app",messagingSenderId:"882331359053",appId:"1:882331359053:web:a51c003529af5ae9c90904",measurementId:"G-4FEGLTW1L7"};
 const app=initializeApp(config),auth=getAuth(app),db=getFirestore(app),h=window.ATDHost;
+const persistenceReady=setPersistence(auth,browserLocalPersistence).catch(e=>{console.warn("Firebase persistence:",e.code||e.message)});
 const layer=document.createElement("div");document.body.append(layer);
 initializeAdminDashboard(auth,db);
 const style=document.createElement("style");
@@ -78,7 +79,7 @@ function draw(){
   };
   layer.querySelector("#atdImport").onclick=async()=>{
    if(!confirm(locale("Merge this browser's progress with your account? Existing cloud records will remain intact.","هل تريد دمج التقدم من المتصفح بحسابك؟ لن تُحذف السجلات السابقة.")))return;
-   localStorage.setItem(importKey(),"yes");await upload(true,h.guestState());await pull();draw();
+   await upload(true,h.guestState());await pull();draw();
   };
  }
 }
@@ -93,7 +94,7 @@ function localRecords(s=h.getState()){
 }
 let known=new Set(),timer=0,ready=false;
 const importKey=()=>user?"atdCloudImportApproved:"+user.uid:"";
-const approved=()=>!!user&&localStorage.getItem(importKey())==="yes";
+const approved=()=>!!user; // Signed-in learner work syncs automatically; importing guest history requires separate approval.
 async function upload(manual=false,source=null){
  if(!user||!ready||busy||!approved())return;
  busy=true;let count=0;
@@ -126,15 +127,15 @@ async function pull(){
  }
  if(changed){h.save();h.render();}
 }
-onAuthStateChanged(auth,async next=>{
+persistenceReady.then(()=>onAuthStateChanged(auth,async next=>{
  user=next;ready=false;profile=null;known.clear();notice="";
  h.useAccount(user?.uid||null);
  if(user){
-  try{const p=await getDoc(doc(db,"learners",user.uid));profile=p.exists()?p.data():null;await pull();ready=true;notice=approved()?locale("Signed in. Cloud sync enabled.","تم الدخول والمزامنة مفعّلة.") :locale("Signed in. Select Merge local progress once to enable cloud sync.","تم الدخول. اختر دمج التقدم المحلي مرة واحدة لتفعيل المزامنة.");}
+  try{const p=await getDoc(doc(db,"learners",user.uid));profile=p.exists()?p.data():null;if(!p.exists()){await setDoc(doc(db,"learners",user.uid),{email:user.email||"",createdAt:serverTimestamp(),updatedAt:serverTimestamp()},{merge:true});profile={email:user.email};}await pull();ready=true;upload();notice=approved()?locale("Signed in. Cloud sync enabled.","تم الدخول والمزامنة مفعّلة.") :locale("Signed in. Select Merge local progress once to enable cloud sync.","تم الدخول. اختر دمج التقدم المحلي مرة واحدة لتفعيل المزامنة.");}
   catch(err){notice=locale("Enable Firestore and its security rules first: ","فعّل Firestore وقواعد الأمان أولاً: ")+String(err.code||err.message);}
  }else opened=true;
  draw();
-});
+}));
 (async()=>{
  pendingSignInLink=resolveSignInLink();
  if(!pendingSignInLink)return;
