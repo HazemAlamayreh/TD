@@ -259,11 +259,11 @@ function caseStepData(q,step,version){
   prompt=ar?"القرار الأول: اختر الإجراءين الأنسب للحالة.":"Initial decision: Which TWO actions best address this specific situation?";
   options=[main,"Verify the evidence and desired outcome in this situation before committing resources.",...wrong.slice(0,3)];
  }else if(step===1){
-  prompt=(ar?"تطور جديد في الحالة: ":"Situation update: ")+v[0]+" "+(ar?"اختر إجراءين.":"Choose TWO next actions.");
-  options=[v[1],v[2],"Ignore the people affected by this decision.","Declare the work successful without checking implementation risks.","Proceed with the original plan even if new evidence contradicts it."];
+  prompt=(ar?"تطور جديد في الحالة: ":"Situation update: ")+v[0]+" "+(ar?"الحالة الأصلية: ":"Original situation: ")+q.q+" "+(ar?"اختر إجراءين.":"Choose TWO next actions.");
+  options=[v[1],v[2],...wrong.slice(0,3)];
  }else{
-  prompt=(ar?"نتائج المتابعة: ":"Follow-up evidence: ")+v[3]+" "+(ar?"اختر إجراءين.":"Choose TWO evidence-led responses.");
-  options=[v[4],v[5],"Report attendance alone as demonstrated performance improvement.","Hide adverse evidence to protect the project narrative.","Do not revise the plan even if the findings reveal a gap."];
+  prompt=(ar?"نتائج المتابعة: ":"Follow-up evidence: ")+v[3]+" "+(ar?"الحالة الأصلية: ":"Original situation: ")+q.q+" "+(ar?"اختر إجراءين.":"Choose TWO evidence-led responses.");
+  options=[v[4],v[5],"Assume this evidence proves complete success: "+v[3],"Ignore the implications for the original case: "+q.q,"Continue with the original decision without considering this follow-up: "+v[3]];
  }
  const offset=(step+String(q.id).length)%options.length;
  const shuffled=options.map((text,i)=>({text,correct:i<2}));
@@ -393,7 +393,12 @@ showCaseResult=function(m){
  if(!area)return;
  const qs=caseQuestions(m);
  const section=document.createElement('div');
- section.innerHTML='<h2>'+msg('Saved answer review','مراجعة الإجابات المحفوظة')+'</h2>'+
+ const stepCount=attempt.history.length;
+ const correctChoices=attempt.history.reduce((sum,e)=>sum+Math.max(0,Math.min(2,(Number(e.delta)+2)/2)),0);
+ const incorrectChoices=stepCount*2-correctChoices;
+ section.innerHTML='<h2>'+msg('Final feedback · first submitted decisions','التغذية الراجعة النهائية · قرارات المحاولة الأولى')+'</h2>'+
+ '<div class="dashMetrics"><div class="dashMetric"><div class="skillTag">'+msg('CORRECT DECISIONS','قرارات صحيحة')+'</div><strong>'+correctChoices+'</strong></div><div class="dashMetric"><div class="skillTag">'+msg('INCORRECT DECISIONS','قرارات خاطئة')+'</div><strong>'+incorrectChoices+'</strong></div><div class="dashMetric"><div class="skillTag">'+msg('STEPS COMPLETED','الخطوات المكتملة')+'</div><strong>'+stepCount+'</strong></div></div>'+
+ '<p class="muted">'+msg('These are the decisions you submitted on the first and only submission of each step; results are preserved for review.','هذه قراراتك عند أول إرسال لكل خطوة؛ النتائج محفوظة للمراجعة.')+'</p>'+
  attempt.history.map((entry,i)=>{
   const q=qs[entry.caseIndex];if(!q)return '';
   const step=caseStepData(q,entry.step,attempt.caseVersion);
@@ -402,7 +407,7 @@ showCaseResult=function(m){
   return '<div class="lesson"><span class="skillTag">'+msg('Case ','الحالة ')+(entry.caseIndex+1)+' · '+msg('Step ','الخطوة ')+(entry.step+1)+'</span>'+
    '<p><b>'+msg('Your decisions: ','قراراتك: ')+'</b>'+chosen.map(x=>esc(x.text)).join(' | ')+'</p>'+
    '<p><b>'+msg('Recommended actions: ','الإجراءات الموصى بها: ')+'</b>'+right.map(x=>esc(x.text)).join(' | ')+'</p>'+
-   '<p>'+msg('Points: ','النقاط: ')+esc(entry.delta)+'</p>'+
+   '<p><b>'+msg('Decision quality: ','جودة القرارات: ')+'</b>'+(entry.delta===2?msg('Both choices suitable','الاختياران مناسبان'):entry.delta===0?msg('One suitable and one unsuitable','اختيار مناسب وآخر غير مناسب'):msg('Both choices unsuitable','الاختياران غير مناسبين'))+'</p><p>'+msg('Points: ','النقاط: ')+esc(entry.delta)+'</p>'+
    '<div class="feedback">'+esc(q.why||'')+'</div></div>';
  }).join('');
  area.append(section);
