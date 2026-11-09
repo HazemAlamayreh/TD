@@ -523,3 +523,57 @@ atdDisplayStageProgress=function(m){
   b.textContent=(ar?stages[i].ar:stages[i].en)+(stages[i].progress===100?' ✓':'');
  });
 };
+
+
+/* v23 — keep module header at top when switching tabs, and emphasize done lessons. */
+const ATD_V23_VIEW=view;
+view=function(name){
+ const before=state.view;
+ ATD_V23_VIEW(name);
+ if(before!==state.view&&['diagnostic','review','material','mastery','advanced'].includes(state.view)){
+  // Avoid retaining the previous tab's scroll offset on My Review.
+  window.scrollTo({top:0,left:0,behavior:'instant'});
+ }
+};
+const ATD_V23_RENDER=render;
+render=function(){
+ ATD_V23_RENDER();
+ const root=$('body');
+ if(!root)return;
+ if(state.view==='material'){
+  root.querySelectorAll('.moduleLessonBtn').forEach(button=>{
+   const id=button.textContent.trim().match(/\d+\.\d+\.\d+/)?.[0];
+   if(!id)return;
+   const done=!!state.done[id];
+   button.classList.toggle('atdLessonCompleted',done);
+   button.setAttribute('aria-label',id+(done?' — Completed':' — Not completed'));
+   if(done&&!button.querySelector('.atdDoneMarker')){
+    const label=document.createElement('span');label.className='atdDoneMarker';
+    label.textContent=msg('✓ Completed','✓ مكتمل');button.append(label);
+   }
+  });
+  root.querySelectorAll('.lesson').forEach(card=>{
+   const id=card.id?.replace(/^lesson-/,'').replace(/-/g,'.');
+   if(!id)return;
+   const done=!!state.done[id];
+   card.classList.toggle('atdLessonCompleted',done);
+   const tag=card.querySelector('.skillTag');
+   if(tag&&done&&!card.querySelector('.atdDoneFlag')){
+    const flag=document.createElement('span');flag.className='atdDoneFlag';
+    flag.textContent=msg('✓ Completed','✓ مكتمل');tag.insertAdjacentElement('afterend',flag);
+   }
+  });
+ }
+ // The left course navigation also indicates whole-module completion.
+ document.querySelectorAll('#sidebar .sideBtn').forEach(button=>{
+  const id=button.querySelector('b')?.textContent?.trim().match(/^\d+\.\d+/)?.[0];
+  const m=DATA.modules.find(x=>x.id===id);
+  if(!m||!m.lessons.length)return;
+  const done=m.lessons.every(l=>!!state.done[l[0]]);
+  button.classList.toggle('atdModuleCompleted',done);
+  if(done&&!button.querySelector('.atdModuleDoneLabel')){
+   const label=document.createElement('span');label.className='atdModuleDoneLabel';
+   label.textContent=msg('✓ Completed','✓ مكتمل');button.append(label);
+  }
+ });
+};
