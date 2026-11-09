@@ -87,7 +87,9 @@ async function load(){
   for(const p of snap.docs){
    if(version!==epoch||auth.currentUser?.uid!==current.uid)return;
    const uid=p.id,x=p.data();
-   const subs=await Promise.all(["lessonProgress","lessonMastery","assessmentAttempts","activity"].map(k=>getDocs(collection(db,"learners",uid,k))));
+   const [lessonsSnap,masterySnap,attemptsSnap]=await Promise.all(["lessonProgress","lessonMastery","assessmentAttempts"].map(k=>getDocs(collection(db,"learners",uid,k))));
+   let activityDocs=[];try{activityDocs=(await getDocs(collection(db,"learners",uid,"activity"))).docs;}catch(err){console.warn("Activity records unavailable:",err.code||err.message);}
+   const subs=[lessonsSnap,masterySnap,attemptsSnap,{docs:activityDocs}];
    const lessonIds=new Set(subs[0].docs.filter(d=>d.data().completed===true).map(d=>d.data().lessonId).filter(Boolean));
    const masteryIds=new Set(subs[1].docs.filter(d=>d.data().mastered===true).map(d=>d.data().lessonId).filter(Boolean));
    const attempts=subs[2].docs.map(d=>({...d.data(),recordId:d.id})),activity=subs[3].docs.map(d=>d.data());
