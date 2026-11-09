@@ -35,7 +35,7 @@ function draw(){
   };
   layer.querySelector("#atdImport").onclick=async()=>{
    if(!confirm(locale("Merge this browser's progress with your account? Existing cloud records will remain intact.","هل تريد دمج التقدم من المتصفح بحسابك؟ لن تُحذف السجلات السابقة.")))return;
-   await upload(true);draw();
+   sessionStorage.setItem(importKey(),"yes");await upload(true);draw();
   };
  }
 }
@@ -49,8 +49,10 @@ function localRecords(){
  return out;
 }
 let known=new Set(),timer=0,ready=false;
+const importKey=()=>user?"atdCloudImportApproved:"+user.uid:"";
+const approved=()=>!!user&&sessionStorage.getItem(importKey())==="yes";
 async function upload(manual=false){
- if(!user||!ready||busy)return;
+ if(!user||!ready||busy||!approved())return;
  busy=true;let count=0;
  try{
   for(const [sub,id,data] of localRecords()){
@@ -84,7 +86,7 @@ async function pull(){
 onAuthStateChanged(auth,async next=>{
  user=next;ready=false;profile=null;known.clear();notice="";
  if(user){
-  try{const p=await getDoc(doc(db,"learners",user.uid));profile=p.exists()?p.data():null;await pull();ready=true;notice=locale("Connected. Progress can sync across devices.","تم الاتصال ويمكن مزامنة التقدم بين الأجهزة.");}
+  try{const p=await getDoc(doc(db,"learners",user.uid));profile=p.exists()?p.data():null;await pull();ready=true;notice=locale("Signed in. Choose Merge local progress to start synchronizing this browser.","تم الدخول. اختر دمج التقدم المحلي لبدء المزامنة من هذا المتصفح.");}
   catch(err){notice=locale("Enable Firestore and its security rules first: ","فعّل Firestore وقواعد الأمان أولاً: ")+String(err.code||err.message);}
  }else opened=false;
  draw();
@@ -98,5 +100,5 @@ onAuthStateChanged(auth,async next=>{
  catch(err){notice=String(err.code||err.message);draw();}
 })();
 const previousRender=window.render;
-window.render=function(...args){const v=previousRender(...args);if(user&&ready){clearTimeout(timer);timer=setTimeout(()=>upload(),1000);}return v;};
+window.render=function(...args){const v=previousRender(...args);if(user&&ready&&approved()){clearTimeout(timer);timer=setTimeout(()=>upload(),1000);}return v;};
 draw();
