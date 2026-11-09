@@ -71,3 +71,15 @@ button{transition:background-color .2s,box-shadow .2s,transform .2s,border-color
 .rtlMode .atdStageTrack{text-align:right}
 @media(max-width:850px){.atdStageProgressGrid{grid-template-columns:repeat(3,minmax(0,1fr))}}
 @media(max-width:490px){.atdStageProgress{padding:12px}.atdStageProgressGrid{grid-template-columns:repeat(2,minmax(0,1fr))}.atdStageTrack{padding:10px}}
+
+
+/* Compact one-row pathway: replaces the prior five large progress cards. */
+.atdPathwayCompact{display:flex;flex-wrap:wrap;align-items:center;gap:5px;margin:7px 0 3px;padding:6px 8px;background:#f4f7fb;border:1px solid #e1e8f2;border-radius:9px}
+.atdPathwayLabel{font-size:10px;font-weight:800;letter-spacing:.04em;color:#667b90;margin-right:5px}
+.atdPathChip{display:inline-flex;gap:6px;align-items:center;justify-content:center;flex:1 1 auto;min-width:100px;padding:5px 7px;font-size:11px;line-height:1.15;background:white;border:1px solid #d8e3ed;border-radius:6px;color:#40566e;cursor:pointer}
+.atdPathChip b{color:#1a5b91;white-space:nowrap;font-size:11px}
+.atdPathChip.done{background:#eff8f2;border-color:#bcdcc5}.atdPathChip.done b{color:#1b7449}
+.atdPathChip.active{border-color:#2776b2;background:#eaf3fa}
+.atdPathChip:disabled{opacity:.55;cursor:not-allowed}
+.rtlMode .atdPathwayLabel{margin-right:0;margin-left:5px}
+@media(max-width:640px){.atdPathwayCompact{gap:4px;padding:5px}.atdPathChip{min-width:80px;font-size:10px;padding:5px}.atdPathwayLabel{display:none}}
