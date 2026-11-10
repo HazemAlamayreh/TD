@@ -33,22 +33,22 @@ firebase deploy --project atd-master-talent-development --only functions,firesto
 
 The Functions deployed are:
 - `importEmployees` (admin-only; 25 records/batch; real email activation; links existing Email/Password account by **same UID**)
-- `resolveEmployeeLogin` (public lookup of **opaque** Firebase sign-in alias; limited requests)
+- `resolveEmployeeLogin` (legacy Employee-ID compatibility lookup; current learner UI uses work email as the primary username)
 - `resetEmployeePassword` (public generic-response email reset; limited requests)
 
-For **new** employee IDs, Firebase Auth uses an unpredictable, separate login email alias. Work email is used for delivering the **secure password setup link**, not as the Auth login identifier. Existing email accounts keep their original Auth email and UID, so progress isn't lost.
+For **new** employees, the verified **work email is the Firebase Authentication username**. The Employee ID remains an HR reference and is never used as a password. Employees set their own password from the secure invitation link. Existing verified email accounts keep their original UID, so learning history is not replaced.
 
 ## Operating notes and risks
 
 - Test on 1–2 **non-production test employees** before uploading the full list.
 - Employee ID values are normalized to uppercase; leading zeros are retained. They must be 2–40 characters containing letters, digits, underscore, dot or hyphen.
-- Admin CSV file has: `Employee ID, Full Name, Work Email, Department`.
+- Admin CSV file has: `Employee ID, Full Name, Work Email, Division, Department`.
 - No default passwords or employee IDs used as passwords. Activation emails are generated with Firebase Admin's password-reset link.
 - If email fails, the employee is left as `invite_pending`; **re-importing the same ID and email** re-sends the invitation.
 - If the import fails during provisioning, `provision_failed` requires administrator investigation.
 - Existing email/password accounts must have **verified email ownership** before they can be linked to an Employee ID. If import returns `verification_required`, the employee signs in with their existing email, selects **Send verification email**, verifies it, and an admin re-imports the same row. This preserves the original Auth UID and learning history.
 - Import is idempotent for existing employee IDs and normal accounts.
-- Newly created employee accounts use random opaque Auth aliases. For **linked legacy accounts**, the login resolver must return their existing Firebase Auth email to preserve the same UID/password and existing email sign-in. Because employee ID lookup is public before login, this carries employee-email enumeration risk. A rate limit is included; enable **Firebase App Check** and production monitoring, or require employees to use their work email until a stronger identity-provider/SSO solution is implemented.
+- Work email is the primary login. `resolveEmployeeLogin` remains only for legacy Employee-ID compatibility and should not be presented as the normal login path. A rate limit is included; enable **Firebase App Check** and production monitoring before relying on any public identifier lookup.
 - Work emails and employee IDs are personal data; limit admin access and avoid sharing roster exports publicly.
 - Configure HTTPS/SMTP reputation, organizational privacy policy, permitted admin access, and retention for employee personal data.
 - Review Cloud Functions charges and configure billing alerts. Cloud Functions deployment requires Blaze even within no-cost quotas.
