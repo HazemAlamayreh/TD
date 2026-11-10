@@ -153,6 +153,32 @@
    if(status){status.textContent=window.ATDRules.levelLabel(ev.level,state.lang);status.className=ev.resolved?"good":"warn";}
   });
  }
+ function enhanceReview(m){
+  const root=document.getElementById("body");if(!root||root.querySelector(".adaptiveReviewSummary"))return;
+  const p=window.ATDRules?.profile(m);if(!p)return;
+  const box=document.createElement("section");box.className="panel adaptiveReviewSummary";
+  box.innerHTML='<div class="adaptiveTeacherTop"><div><span class="adaptiveEyebrow">'+t("EVIDENCE-BASED REVIEW","مراجعة مبنية على الأدلة")+'</span><h2>'+t("Focus on unresolved gaps","ركّز على الفجوات غير المغلقة")+'</h2></div><span class="adaptiveGapCount">'+p.priorityGaps.length+" "+t("remaining","متبقية")+'</span></div>'+
+   (p.priorityGaps.length?'<p>'+t("These lessons still need learning evidence before the gap is considered resolved:","هذه الدروس ما زالت تحتاج دليلاً قبل اعتبار الفجوة مغلقة:")+'</p><div class="adaptiveRecommendations">'+
+    p.priorityGaps.map(id=>{const x=lessonData(id);return '<button class="adaptiveRecommendation" onclick="openLesson(\''+id+'\')"><b>'+e(id)+'</b><span>'+e(x?.l[1]||id)+'</span><small>'+e(window.ATDRules.levelLabel(evidence(id).level,state.lang))+'</small></button>';}).join("")+'</div>':
+    '<p class="good">'+t("✓ All diagnostic gaps currently have sufficient learning evidence. You can continue to Mastery.","✓ جميع الفجوات التشخيصية لديها دليل تعلم كافٍ حالياً. يمكنك الانتقال إلى الإتقان.")+'</p>');
+  root.prepend(box);
+  root.querySelectorAll(".card").forEach(card=>{
+   const id=card.querySelector(".pill")?.textContent?.match(/\d+\.\d+\.\d+/)?.[0];if(!id)return;
+   const ev=evidence(id);card.classList.toggle("adaptiveReviewResolved",ev.resolved);
+   const pill=card.querySelector(".pill");if(pill)pill.textContent=id+" · "+window.ATDRules.levelLabel(ev.level,state.lang);
+  });
+ }
+ function enhanceAnalytics(){
+  const root=document.getElementById("body");if(!root||root.querySelector(".adaptivePortfolio"))return;
+  const profiles=window.ATDRules?.profileAll?.()||[];
+  const priority=profiles.flatMap(p=>p.priorityGaps.map(id=>({id,moduleId:p.moduleId,title:lessonData(id)?.l[1]||id,level:evidence(id).level})));
+  const levels={};for(const p of profiles)for(const l of p.lessons)levels[l.level]=(levels[l.level]||0)+1;
+  const box=document.createElement("section");box.className="panel adaptivePortfolio";
+  box.innerHTML='<div class="adaptiveTeacherTop"><div><span class="adaptiveEyebrow">'+t("YOUR CAPABILITY EVIDENCE","دليل قدراتك")+'</span><h2>'+t("Adaptive development portfolio","ملف التطوير التكيفي")+'</h2></div><span class="adaptiveGapCount">'+priority.length+" "+t("priority gaps","فجوات أولوية")+'</span></div>'+
+   '<div class="adaptiveLevelSummary">'+["not-assessed","emerging","developing","proficient","demonstrated"].map(level=>'<div><strong>'+(levels[level]||0)+'</strong><span>'+e(window.ATDRules.levelLabel(level,state.lang))+'</span></div>').join("")+'</div>'+
+   (priority.length?'<h3>'+t("Next development priorities","أولويات التطوير التالية")+'</h3><div class="adaptiveRecommendations">'+priority.slice(0,6).map(x=>'<button class="adaptiveRecommendation" onclick="openLesson(\''+x.id+'\')"><b>'+e(x.id)+'</b><span>'+e(x.title)+'</span><small>'+e(window.ATDRules.levelLabel(x.level,state.lang))+'</small></button>').join("")+'</div>':'<p class="good">'+t("No unresolved evidence gaps are currently identified.","لا توجد حالياً فجوات دليل غير مغلقة.")+'</p>');
+  const hero=root.querySelector(".dashHero");if(hero)hero.insertAdjacentElement("afterend",box);else root.prepend(box);
+ }
  function enhanceSidebar(){
   document.querySelectorAll("#sidebar .sideBtn").forEach(button=>{
    const id=button.querySelector("b")?.textContent?.trim().match(/^\d+\.\d+/)?.[0],m=DATA.modules.find(x=>x.id===id);if(!m)return;
@@ -170,6 +196,8 @@
    const root=document.getElementById("body");if(root){enhanceLessonButtons(root,m);root.querySelectorAll(".lesson").forEach(enhanceLesson);}
   }
   if(state.view==="dashboard")enhanceDashboard(m);
+  if(state.view==="review")enhanceReview(m);
+  if(state.view==="analytics")enhanceAnalytics();
   enhanceSidebar();
  }
  const previous=render;
