@@ -168,10 +168,25 @@ const EI_TEACHER={
    const id=h?.textContent.match(/1\.2\.\d+/)?.[0]||el.id?.match(/1\.2\.\d+/)?.[0];
    if(!id||!EI_TEACHER[id])continue;
    el.querySelectorAll(".eiTeacher").forEach(x=>x.remove());
+   // Original curriculum statements remain available on demand, rather than
+   // showing a second generic explanation immediately after the guided lesson.
    const existing=el.querySelector(".learnblock:not(.example)");
-   if(existing){existing.classList.add("eiSourceNote");existing.style.display="none";}
    const workplace=el.querySelector(".learnblock.example");
-   if(workplace){workplace.classList.add("eiSourceNote");workplace.style.display="none";}
+   if(existing&&!el.querySelector(".eiSourceDetails")){
+    const extra=document.createElement("details");extra.className="eiSourceDetails";
+    const title=document.createElement("summary");title.textContent=translated("Original curriculum summary and application","ملخص المنهج الأصلي والتطبيق");extra.append(title);
+    existing.before(extra);extra.append(existing);
+    if(workplace)extra.append(workplace);
+   }
+   // Legacy check questions may still be in English. Put them in a clearly
+   // labeled, optional disclosure so Arabic learning is never interrupted.
+   const micro=el.querySelector(".microCheck");
+   if(micro&&!micro.closest(".eiReferencePractice")){
+    const details=document.createElement("details");details.className="eiReferencePractice";
+    const summary=document.createElement("summary");
+    summary.textContent=translated("Extra exam-style practice questions (English bank)","أسئلة إضافية على نمط الامتحان (البنك الإنجليزي)");
+    details.append(summary);micro.before(details);details.append(micro);
+   }
    const mount=document.createElement("div");
    mount.innerHTML=sectionHtml(id);
    const target=el.querySelector(".row");
