@@ -6,3 +6,14 @@ getQs=function(m,stage){
  if(state.lang!=="ar"||m.id!=="1.2"||!["diagnostic","mastery"].includes(stage))return items;
  let counts={};return items.map(q=>{const n=counts[q.target]||0;counts[q.target]=n+1;const t=EI_ASSESSMENT_AR[q.target]?.[stage==="diagnostic"?"d":"m"]?.[n];return t?{...q,q:t[0],opts:t[1].slice(),why:t[2],language:"ar"}:q;});
 };
+
+// Keep the current exam page in the selected language when switching Arabic/English,
+// without changing answers, question IDs, bank versions, or assessment progress.
+const EI_PREVIOUS_RENDER=render;
+render=function(){
+ if(state.current==="1.2"&&sess&&sess.mid==="1.2"&&["diagnostic","mastery"].includes(sess.stage)&&!sess.finished){
+  const translated=getQs(DATA.modules.find(x=>x.id==="1.2"),sess.stage);
+  if(translated.length===sess.qs.length&&translated.every((q,i)=>q.id===sess.qs[i].id))sess.qs=translated;
+ }
+ EI_PREVIOUS_RENDER();
+};
