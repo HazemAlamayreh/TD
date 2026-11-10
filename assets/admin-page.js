@@ -29,7 +29,7 @@ function getStats(x){
  for(const a of attempts)if(Array.isArray(a.questionSnapshots))for(const q of a.questionSnapshots){const key=a.assessmentKey+"/"+q.id;if(seen.has(key))continue;seen.add(key);if(!Number.isInteger(q.selectedIndex))continue;if(q.correctIndex===q.selectedIndex)firstItem.right++;else firstItem.wrong++;}
  return {modules:m,modulesComplete:m.filter(a=>a.finished).length,completed:x.lessonIds.size,mastered:x.masteryIds.size,firstPass:passing,firstFail:failed,firstAssessed:initial.length,scoreCount:validScores.length,scoreAverage:validScores.length?validScores.reduce((s,v)=>s+v,0)/validScores.length:null,questionEvidence:questionEvidence.length,answered:answered.length,correct:correct.length,incorrect:incorrect.length,skipped:questionEvidence.filter(q=>q.selectedIndex===null).length,firstItem};
 }
-function filtered(){return learners.filter(x=>(x.name+" "+x.email+" "+x.uid).toLowerCase().includes(filter.toLowerCase()));}
+function filtered(){return learners.filter(x=>(x.name+" "+x.email+" "+x.uid+" "+(x.employeeId||"")+" "+(x.department||"")+" "+(x.division||"")).toLowerCase().includes(filter.toLowerCase()));}
 function metrics(){
  const s=learners.reduce((r,x)=>{const a=getStats(x);r.lessons+=a.completed;r.modules+=a.modulesComplete;r.attempts+=x.attempts.length;r.minutes+=x.seconds;r.firstPass+=a.firstPass;return r;},{lessons:0,modules:0,attempts:0,minutes:0,firstPass:0});
  const cards=[["Synced learners",learners.length],["Completed lessons",s.lessons],["Modules completed",s.modules],["Assessment attempts",s.attempts],["First assessments ≥80%",s.firstPass],["Foreground time tracked",hrs(s.minutes)]];
@@ -84,10 +84,43 @@ function renderSkillsCohort(){
  '<div class="skillFootnote">'+s.learners+' learner'+(s.learners===1?'':'s')+' with sufficient evidence · '+s.items+' answered items collectively</div></div>').join("")+'</div>':
  '<div class="skillEmpty">Skills will appear as learners complete and synchronize enough question-level responses. Four answered items per skill are required before a learner contributes to the cohort summary.</div>');
 }
+function renderDepartmentSkills(){
+ const target=$("departmentSkills");if(!target)return;
+ const groups=new Map();
+ for(const learner of learners){
+  const department=(learner.department||"Unassigned Department").trim()||"Unassigned Department";
+  const division=(learner.division||"").trim();
+  const key=division+"||"+department;
+  if(!groups.has(key))groups.set(key,{division,department,learners:[]});
+  groups.get(key).learners.push(learner);
+ }
+ const cards=[...groups.values()].sort((a,b)=>a.department.localeCompare(b.department)).map(group=>{
+  const models=group.learners.map(x=>skillModel(x));
+  const skills=skillDefinitions().map(def=>{
+   const rows=models.map(m=>m.rows.find(r=>r.id===def.id)).filter(r=>r&&r.answered>=4&&typeof r.rate==="number");
+   return {...def,learners:rows.length,mean:rows.length?rows.reduce((s,r)=>s+r.rate,0)/rows.length:null,items:rows.reduce((s,r)=>s+r.answered,0)};
+  }).filter(s=>s.learners>0);
+  const priorities=skills.slice().sort((a,b)=>a.mean-b.mean).slice(0,4);
+  const strengths=skills.filter(s=>s.mean>=.8).sort((a,b)=>b.mean-a.mean);
+  const evidenceLearners=new Set();
+  for(const model of models)if(model.scorable.length)evidenceLearners.add(model);
+  const warning=group.learners.length<3||skills.length<3?
+   '<div class="deptWarning">Limited evidence: interpret this as a development-planning signal, not a department performance rating.</div>':"";
+  return '<article class="deptCard"><h3>'+esc(group.department)+'</h3><div class="deptMeta">'+
+   esc(group.division?group.division+" · ":"")+group.learners.length+' learner'+(group.learners.length===1?'':'s')+
+   ' · '+skills.length+' skill areas with sufficient evidence</div>'+
+   (priorities.length?'<h4 class="skillSubhead">Suggested development focus</h4>'+priorities.map(s=>
+    '<div class="deptPriority"><span>'+esc(s.label)+'</span><b>'+Math.round(100*s.mean)+'%</b></div>').join("")+
+    (strengths.length?'<div class="skillFootnote">Observed strengths: '+strengths.slice(0,3).map(s=>esc(s.label)+" "+Math.round(100*s.mean)+"%").join(" · ")+'</div>':"")
+    :'<div class="skillEmpty">No department-level skill area has enough synchronized question evidence yet.</div>')+warning+'</article>';
+ });
+ target.innerHTML='<div class="skillLegend"><b>How to use this:</b> Start with the lowest evidence-based skill areas, then assign targeted lessons or practice. Compare later evidence to see whether the gap closes. Department averages use only learners with ≥4 answered items in that skill.</div>'+
+  (cards.length?'<div class="deptGrid">'+cards.join("")+'</div>':'<div class="skillEmpty">No learner departments are available yet. Add Department during employee import or learner setup.</div>');
+}
 function exportSkillsCSV(){
- const heading=["Learner","Email","UID","Skill","Skill score %","Correct","Incorrect","Skipped","Answered unique items","Evidence coverage","Skill indicator","Diagnostic items","Mastery items","Mapped lessons","Unmapped records"];
+ const heading=["Learner","Employee ID","Division","Department","Email","UID","Skill","Skill score %","Correct","Incorrect","Skipped","Answered unique items","Evidence coverage","Skill indicator","Diagnostic items","Mastery items","Mapped lessons","Unmapped records"];
  const rows=filtered().flatMap(x=>{const model=skillModel(x);return model.rows.filter(s=>s.answered||s.skipped).map(s=>
-  [x.name,x.email,x.uid,s.label,s.rate===null?"":Math.round(s.rate*100),s.correct,s.wrong,s.skipped,s.answered,s.coverage,s.band,s.diagnostic,s.mastery,s.lessonIds.join("; "),model.unmapped]);});
+  [x.name,x.employeeId||"",x.division||"",x.department||"",x.email,x.uid,s.label,s.rate===null?"":Math.round(s.rate*100),s.correct,s.wrong,s.skipped,s.answered,s.coverage,s.band,s.diagnostic,s.mastery,s.lessonIds.join("; "),model.unmapped]);});
  const blob=new Blob(["\uFEFF"+[heading,...rows].map(r=>r.map(csv).join(",")).join("\r\n")],{type:"text/csv;charset=utf-8"});
  const url=URL.createObjectURL(blob),link=document.createElement("a");link.href=url;link.download="ATD-Skill-Profile-"+new Date().toISOString().slice(0,10)+".csv";document.body.append(link);link.click();link.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);
 }
@@ -154,10 +187,10 @@ async function load(){
    const masteryIds=new Set(subs[1].docs.filter(d=>d.data().mastered===true).map(d=>d.data().lessonId).filter(Boolean));
    const attempts=subs[2].docs.map(d=>({...d.data(),recordId:d.id})),activity=subs[3].docs.map(d=>d.data());
    const last=activity.map(a=>a.lastSeenAt).filter(Boolean).sort((a,b)=>(asDate(b)?.valueOf()||0)-(asDate(a)?.valueOf()||0))[0]||null;
-   result.push({uid,name:x.name||"",email:x.email||"",phone:x.phone||"",lessonIds,masteryIds,attempts,
+   result.push({uid,name:x.name||"",email:x.email||"",phone:x.phone||"",employeeId:x.employeeId||"",division:x.division||"",department:x.department||"",lessonIds,masteryIds,attempts,
     seconds:activity.reduce((n,a)=>n+(Number(a.activeSeconds)||0),0),views:activity.reduce((n,a)=>n+(Number(a.pageViews)||0),0),lastSeen:last});
   }
-  if(version!==epoch)return;learners=result.sort((a,b)=>(a.name||a.email).localeCompare(b.name||b.email));metrics();render();renderSkillsCohort();status("Loaded "+learners.length+" learner profiles · "+modules.length+" curriculum modules.");
+  if(version!==epoch)return;learners=result.sort((a,b)=>(a.name||a.email).localeCompare(b.name||b.email));metrics();render();renderSkillsCohort();renderDepartmentSkills();status("Loaded "+learners.length+" learner profiles · "+modules.length+" curriculum modules.");
  }catch(e){status("Access diagnostic: "+String(e.code||e.message)+". Check admin UID and published Firestore rules. Activity is optional.",true);}
  finally{loading=false;$("reload").disabled=false;$("export").disabled=false;}
 }
