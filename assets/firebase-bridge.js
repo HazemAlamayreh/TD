@@ -9,7 +9,7 @@ const root=document.createElement("div");document.body.append(root);
 const css=document.createElement("style");
 css.textContent="#atdAccountButton{position:fixed;bottom:16px;right:16px;z-index:1000;border:0;border-radius:30px;padding:12px 16px;background:#143d72;color:white;cursor:pointer}#atdAccountMask{position:fixed;inset:0;background:#12233ac9;display:grid;place-items:center;z-index:1300;padding:16px}#atdAccountPanel{background:#fff;color:#152538;width:min(460px,100%);max-height:90vh;overflow:auto;border-radius:14px;padding:25px;font:14px/1.5 system-ui,sans-serif}#atdAccountPanel input{width:100%;box-sizing:border-box;padding:12px;margin:5px 0 12px;border:1px solid #c4cfdd;border-radius:6px}#atdAccountPanel button{padding:10px 14px;margin:5px 3px;border:1px solid #bbcadc;border-radius:7px;cursor:pointer;background:#f4f7fa}#atdAccountPanel button.primary{color:#fff;background:#143d72}";
 document.head.append(css);
-let user=null,profile=null,opened=false,mode="login",notice="",initialized=false,busy=false,syncTimer=null,syncing=false,known=new Set();
+let user=null,profile=null,opened=false,mode="login",notice="",initialized=false,busy=false,syncTimer=null,syncing=false,known=new Set(),adminStatus={uid:null,state:"unchecked",message:""};
 const tr=(en,ar)=>h.getState().lang==="ar"?ar:en;
 const esc=v=>String(v??"").replace(/[&<>"']/g,x=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[x]));
 function ui(){
@@ -18,7 +18,7 @@ function ui(){
  if(!opened)return;
  let body;
  if(user){
- body='<p>'+esc(user.email)+'</p><div style="padding:12px;margin:10px 0;background:#f1f6fc;border:1px solid #d5e2f0;border-radius:10px"><b>'+tr("Administrator access","صلاحية المدير")+'</b><p style="font-size:12px;word-break:break-all;margin:6px 0">'+tr("Your account UID: ","معرّف حسابك UID: ")+'<code>'+esc(user.uid)+'</code></p><button type="button" id="atdCheckAdminRole">'+tr("Check my Admin permission","فحص صلاحية Admin")+'</button><p style="font-size:12px;margin:6px 0 0">'+tr("Admin access must be assigned using this exact UID in Firestore admins/{uid}, with active: true (boolean).","لازم يكون نفس هذا الـ UID داخل admins/{uid} في Firestore، والحقل active يساوي true من نوع boolean.")+'</p></div><label>'+tr("Name","الاسم")+'</label><input id="atdProfileName" value="'+esc(profile?.name)+'"><label>'+tr("Phone (optional)","الهاتف (اختياري)")+'</label><input id="atdProfilePhone" value="'+esc(profile?.phone)+'"><button id="atdSaveProfile">'+tr("Save profile","حفظ البيانات")+'</button><h3>'+tr("Set or change password","تعيين أو تغيير كلمة المرور")+'</h3><p>'+tr("Former Magic Link learners can set a password while signed in, keeping the same progress.","المتدرب الذي استخدم رابط الإيميل سابقاً يستطيع تعيين كلمة مرور من حسابه الحالي دون فقدان التقدم.")+'</p><form id="atdPasswordForm"><input type="password" id="atdNewPassword" required minlength="8" autocomplete="new-password" placeholder="'+tr("New password (8+ characters)","كلمة مرور جديدة (8 أحرف أو أكثر)")+'"><button type="submit">'+tr("Save password","حفظ كلمة المرور")+'</button></form><button id="atdImportOld">'+tr("Import older browser progress","استيراد التقدم القديم")+'</button><button id="atdLogout">'+tr("Sign out","تسجيل الخروج")+'</button>';
+ body='<p>'+esc(user.email)+'</p><div style="padding:12px;margin:10px 0;background:#f1f6fc;border:1px solid #d5e2f0;border-radius:10px"><b>'+tr("Administrator access","صلاحية المدير")+'</b><p style="font-size:12px;word-break:break-all;margin:6px 0">'+tr("Your account UID: ","معرّف حسابك UID: ")+'<code>'+esc(user.uid)+'</code></p><button type="button" id="atdCheckAdminRole">'+tr("Check my Admin permission","فحص صلاحية Admin")+'</button><p style="font-size:12px;margin:6px 0 0">'+(adminStatus.uid===user.uid?esc(adminStatus.message):tr("Status not checked. Click Check my Admin permission.","لم يتم فحص الصلاحية بعد. اضغط زر فحص صلاحية Admin."))+'</p>'+(adminStatus.uid===user.uid&&adminStatus.state==="active"?'<a href="./admin.html" style="display:block;margin:8px 0;font-weight:bold;color:#12623d">'+tr("Open Admin Dashboard","افتح لوحة المدير")+'</a>':'')+'</div><label>'+tr("Name","الاسم")+'</label><input id="atdProfileName" value="'+esc(profile?.name)+'"><label>'+tr("Phone (optional)","الهاتف (اختياري)")+'</label><input id="atdProfilePhone" value="'+esc(profile?.phone)+'"><button id="atdSaveProfile">'+tr("Save profile","حفظ البيانات")+'</button><h3>'+tr("Set or change password","تعيين أو تغيير كلمة المرور")+'</h3><p>'+tr("Former Magic Link learners can set a password while signed in, keeping the same progress.","المتدرب الذي استخدم رابط الإيميل سابقاً يستطيع تعيين كلمة مرور من حسابه الحالي دون فقدان التقدم.")+'</p><form id="atdPasswordForm"><input type="password" id="atdNewPassword" required minlength="8" autocomplete="new-password" placeholder="'+tr("New password (8+ characters)","كلمة مرور جديدة (8 أحرف أو أكثر)")+'"><button type="submit">'+tr("Save password","حفظ كلمة المرور")+'</button></form><button id="atdImportOld">'+tr("Import older browser progress","استيراد التقدم القديم")+'</button><button id="atdLogout">'+tr("Sign out","تسجيل الخروج")+'</button>';
  }else{
  body='<h3>'+tr(mode==="login"?"Sign in":"Create account",mode==="login"?"تسجيل الدخول":"إنشاء حساب")+'</h3><form id="atdCredentials"><label>'+tr("Email (username)","البريد الإلكتروني (اسم المستخدم)")+'</label><input id="atdEmail" type="email" autocomplete="username" required placeholder="name@example.com"><label>'+tr("Password","كلمة المرور")+'</label><input type="password" id="atdPassword" minlength="8" required autocomplete="'+(mode==="login"?"current-password":"new-password")+'">'+(mode==="register"?'<label>'+tr("Confirm password","تأكيد كلمة المرور")+'</label><input id="atdConfirm" type="password" required minlength="8" autocomplete="new-password">':'')+'<button type="submit" class="primary">'+tr(mode==="login"?"Sign in":"Create account",mode==="login"?"دخول":"إنشاء حساب")+'</button></form><button id="atdMode">'+tr(mode==="login"?"New learner? Register":"Already have an account? Sign in",mode==="login"?"متدرب جديد؟ إنشاء حساب":"عندك حساب؟ تسجيل الدخول")+'</button><button id="atdReset">'+tr("Forgot password?","نسيت كلمة المرور؟")+'</button>';
  }
@@ -31,16 +31,18 @@ function ui(){
   get("#atdCredentials").onsubmit=async e=>{e.preventDefault();const email=get("#atdEmail").value.trim().toLowerCase(),password=get("#atdPassword").value;if(mode==="register"&&password!==get("#atdConfirm").value){notice=tr("Passwords do not match.","كلمتا المرور غير متطابقتين.");ui();return;}try{await readyAuth;if(mode==="register")await createUserWithEmailAndPassword(auth,email,password);else await signInWithEmailAndPassword(auth,email,password);notice="";opened=false;ui();}catch(x){notice=x.code||x.message;ui();}};
  }else{
   get("#atdCheckAdminRole").onclick=async()=>{
-   const btn=get("#atdCheckAdminRole");btn.disabled=true;btn.textContent=tr("Checking…","جارٍ الفحص…");
+   const btn=get("#atdCheckAdminRole");btn.disabled=true;
    try{
     const who=auth.currentUser;if(!who)throw Error("Not signed in");
     const role=await getDoc(doc(db,"admins",who.uid));
+    if(auth.currentUser?.uid!==who.uid)return;
     const active=role.exists()&&role.data().active===true;
+    adminStatus={uid:who.uid,state:active?"active":role.exists()?"inactive":"missing",message:active?
+      tr("Admin ACTIVE — Firestore permission verified.","Admin ACTIVE — تم التحقق من الصلاحية داخل Firestore."):
+      role.exists()?tr("Admin record exists, but active is not Boolean true.","مستند الأدمن موجود، لكن active ليست Boolean true."):
+      tr("No Admin document matches your UID.","لا يوجد مستند Admin يطابق UID حسابك.")};
     if(window.ATDRecheckAdminAccess)await window.ATDRecheckAdminAccess();
-    notice=active?tr("Admin is ACTIVE. Open the Admin Dashboard at /admin.html","صلاحية Admin مفعّلة. افتح صفحة /admin.html"):
-     role.exists()?tr("Admin record exists but active is not Boolean true. Check Firestore field type.","مستند الأدمن موجود لكن active ليست Boolean true. تأكد من نوع الحقل."):
-     tr("Admin record NOT FOUND for this UID. Add it in Firestore admins collection.","لا يوجد مستند Admin لهذا الـUID. أضفه داخل مجموعة admins في Firestore.");
-   }catch(err){notice=tr("Cannot verify role: ","تعذّر فحص الصلاحية: ")+(err.code||err.message);}
+   }catch(err){adminStatus={uid:auth.currentUser?.uid||null,state:"error",message:tr("Role check error: ","خطأ بفحص الصلاحية: ")+(err.code||err.message)};}
    ui();
   };
   get("#atdLogout").onclick=()=>signOut(auth);
@@ -145,7 +147,7 @@ window.addEventListener("focus",()=>{lastTick=Date.now();});
 activityTimer=setInterval(()=>{trackPage();flushActivity();},30000);
 window.ATDCloudOnSave=()=>{if(!initialized||!user)return;trackPage();clearTimeout(syncTimer);syncTimer=setTimeout(()=>upload(),900);};
 readyAuth.then(()=>onAuthStateChanged(auth,async next=>{
- clearTimeout(syncTimer);tickActivity();if(user)flushActivity();lastTick=Date.now();lastView="";user=next;profile=null;initialized=false;busy=false;known.clear();notice="";
+ clearTimeout(syncTimer);tickActivity();if(user)flushActivity();lastTick=Date.now();lastView="";user=next;adminStatus={uid:null,state:"unchecked",message:""};profile=null;initialized=false;busy=false;known.clear();notice="";
  h.useAccount(next?.uid||null);
  if(!next){opened=true;ui();return;}
  opened=false;ui();
