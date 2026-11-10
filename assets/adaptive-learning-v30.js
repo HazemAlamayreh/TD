@@ -87,7 +87,7 @@
   if(micro){
    const lbl=micro.querySelector(".learnlabel");if(lbl)lbl.textContent=t("4 · CHECK YOUR DECISION","4 · تحقق من قرارك");
   }
-  if(!card.querySelector(".adaptiveTeacher")){
+  if(!card.querySelector(".adaptiveTeacher")&&!card.querySelector(".eiTeacher")){
    const wrap=document.createElement("div");wrap.innerHTML=teacherPanel(l,ev,isPilot);
    const panel=wrap.firstElementChild;
    if(micro)micro.insertAdjacentElement("beforebegin",panel);
