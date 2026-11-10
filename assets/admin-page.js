@@ -1,3 +1,4 @@
+import {analyzeLearnerSkills,cohortSkillSummary,skillDefinitions} from "./skill-analytics.js?v=20261110-skills-v1";
 import {initializeApp} from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
 import {getAuth,onAuthStateChanged} from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
 import {getFirestore,doc,getDoc,getDocs,collection} from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
@@ -37,6 +38,59 @@ function render(){
  const found=filtered();$("learnerRows").innerHTML=found.length?found.map(x=>{const a=getStats(x);return '<tr><td><b>'+esc(x.name||"Unnamed learner")+'</b><div class="small muted">'+esc(x.email||"No email")+'</div><div class="small muted">'+esc(x.uid)+'</div></td><td>'+a.completed+' / '+lessonTotal+'</td><td>'+a.mastered+'</td><td>'+x.attempts.length+'</td><td>'+pct(a.scoreAverage)+'</td><td>'+a.modulesComplete+' / '+modules.length+'</td><td>'+a.firstPass+' / '+a.firstAssessed+'</td><td>'+esc(hrs(x.seconds))+'</td><td><button data-learner="'+esc(x.uid)+'">Full report</button></td></tr>'}).join(""):'<tr><td colspan="9" class="empty">No learners match your search.</td></tr>';
  $("learnerRows").querySelectorAll("[data-learner]").forEach(b=>b.onclick=()=>detail(b.dataset.learner));
 }
+
+function skillModel(x){return analyzeLearnerSkills(x.attempts,modules);}
+function skillCard(r){
+ const score=r.rate===null?"—":Math.round(100*r.rate)+"%",sample=r.answered;
+ const tone=r.band==="Observed strength"?"strong":r.band==="Development priority"?"priority":"";
+ return '<div class="skillCard"><div class="skillCardHeader"><h4>'+esc(r.label)+'</h4><strong>'+esc(score)+'</strong></div>'+
+ '<div class="skillMeter '+tone+'"><span style="width:'+(r.rate===null?0:Math.round(100*r.rate))+'%"></span></div>'+
+ '<div class="skillFootnote"><span class="skillTag">'+esc(r.band)+'</span> · '+sample+' answered item'+(sample===1?'':'s')+
+ ' · '+r.correct+' correct · '+r.wrong+' incorrect · '+r.skipped+' skipped</div>'+
+ '<div class="skillFootnote">'+esc(r.coverage)+' · '+r.lessonIds.length+' lesson areas · Diagnostic '+r.diagnostic+' / Mastery '+r.mastery+'</div></div>';
+}
+function skillDetail(x){
+ const model=skillModel(x),tested=model.rows.filter(r=>r.answered>0||r.skipped>0);
+ const sorted=tested.sort((a,b)=>(b.answered-a.answered)||a.label.localeCompare(b.label));
+ const summary='<div class="metrics"><div class="metric"><strong>'+model.available+'</strong>Unique scored / skipped items</div>'+
+ '<div class="metric"><strong>'+model.scorable.length+'</strong>Skills with ≥4 answered items</div>'+
+ '<div class="metric"><strong>'+model.strength.length+'</strong>Observed strengths</div>'+
+ '<div class="metric"><strong>'+model.priorities.length+'</strong>Development priorities</div></div>';
+ const takeaways=model.priorities.length?
+  '<h4 class="skillSubhead">Suggested development focus</h4>'+model.priorities.slice(0,5).map(s=>
+    '<p><b>'+esc(s.label)+'</b> · '+Math.round(100*s.rate)+'% from '+s.answered+' items. Review '+esc(s.examples.map(x=>x.lessonId+' '+x.lessonTitle).slice(0,3).join("; ")||"related material")+'</p>').join("")
+  :'<p class="muted">No skill area has enough low-scoring evidence to flag as a development priority yet.</p>';
+ const advanced=model.advanced.length?'<h4 class="skillSubhead">Advanced decision-making evidence (separate metric)</h4>'+
+  '<div class="scroll"><table><thead><tr><th>Skill area</th><th>Module</th><th>Case steps</th><th>Decision points score</th></tr></thead><tbody>'+
+  model.advanced.map(a=>'<tr><td>'+esc(a.label)+'</td><td>'+esc(a.mid)+'</td><td>'+a.steps+'</td><td>'+Math.round(a.rate*100)+'%</td></tr>').join("")+'</tbody></table></div>':'';
+ return '<section class="detailSection"><h3>Workplace Skill Profile</h3><div class="skillLegend">'+
+ '<b>How this works:</b> Each stored question is assigned to the skill associated with its lesson (sometimes a more specific skill by lesson title). '+
+ 'The score is correct answers ÷ answered items, using the first saved response to each unique item; skipped items are counted separately. Retakes cannot inflate it. '+
+ 'At least 4 items are needed for a provisional classification: ≥80% observed strength, below 60% development priority, otherwise developing. '+
+ 'Evidence under 4 items is insufficient. This is a <b>practice-performance indicator, not a validated workplace skill rating</b>. '+
+ 'Diagnostic and Mastery evidence is shown together, but stage difficulty varies. Advanced case scores are reported separately.'+
+ '</div>'+summary+
+ (sorted.length?'<div class="skillGrid">'+sorted.map(skillCard).join("")+'</div>':'<div class="skillEmpty">No suitable question-level evidence has synchronized yet. Save and sync completed assessments; older scores without reliable question evidence cannot be used for a skill rating.</div>')+
+ takeaways+advanced+
+ '<p class="skillFootnote">Evidence coverage: '+model.withoutSnapshots+' assessments have no question snapshots; '+model.unmapped+' responses could not be matched reliably; '+model.retakeResponses+' repeated responses were excluded. Skill mappings follow course topics, not a psychometrically validated competency framework. Avoid personnel decisions based solely on these indicators.</p></section>';
+}
+function renderSkillsCohort(){
+ const cohort=cohortSkillSummary(learners,modules);
+ const covered=cohort.filter(s=>s.learners>0).sort((a,b)=>b.learners-a.learners||a.label.localeCompare(b.label));
+ const target=$("skillsCohort");if(!target)return;
+ target.innerHTML='<div class="skillLegend"><b>Team overview:</b> Mean of learners’ first-attempt question accuracy per skill. Only learners with at least four answered items for that skill are included. This is not a population benchmark or a validated employee ranking.</div>'+
+ (covered.length?'<div class="skillGrid">'+covered.map(s=>'<div class="skillCard"><div class="skillCardHeader"><h4>'+esc(s.label)+'</h4><strong>'+Math.round(100*s.mean)+'%</strong></div><div class="skillMeter"><span style="width:'+Math.round(100*s.mean)+'%"></span></div>'+
+ '<div class="skillFootnote">'+s.learners+' learner'+(s.learners===1?'':'s')+' with sufficient evidence · '+s.items+' answered items collectively</div></div>').join("")+'</div>':
+ '<div class="skillEmpty">Skills will appear as learners complete and synchronize enough question-level responses. Four answered items per skill are required before a learner contributes to the cohort summary.</div>');
+}
+function exportSkillsCSV(){
+ const heading=["Learner","Email","UID","Skill","Skill score %","Correct","Incorrect","Skipped","Answered unique items","Evidence coverage","Skill indicator","Diagnostic items","Mastery items","Mapped lessons","Unmapped records"];
+ const rows=filtered().flatMap(x=>{const model=skillModel(x);return model.rows.filter(s=>s.answered||s.skipped).map(s=>
+  [x.name,x.email,x.uid,s.label,s.rate===null?"":Math.round(s.rate*100),s.correct,s.wrong,s.skipped,s.answered,s.coverage,s.band,s.diagnostic,s.mastery,s.lessonIds.join("; "),model.unmapped]);});
+ const blob=new Blob(["\uFEFF"+[heading,...rows].map(r=>r.map(csv).join(",")).join("\r\n")],{type:"text/csv;charset=utf-8"});
+ const url=URL.createObjectURL(blob),link=document.createElement("a");link.href=url;link.download="ATD-Skill-Profile-"+new Date().toISOString().slice(0,10)+".csv";document.body.append(link);link.click();link.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);
+}
+
 function attemptLabel(a){const [mid,stage]=String(a.assessmentKey||"").split(":");const m=modules.find(x=>x.id===mid);return (m?m.id+" "+m.name:mid||"Assessment")+" — "+(stages[stage]||stage||"Other");}
 function itemHTML(q,i){
  const selected=q.selectedIndex,skipped=selected===null||selected===undefined;
@@ -74,6 +128,7 @@ function detail(uid){
  ["First saved item responses incorrect",a.firstItem.wrong],["Pages opened (tracked)",x.views||"Not tracked"],
  ["Foreground time tracked",hrs(x.seconds)],["Last activity",dateLabel(x.lastSeen)]
  ].map(([k,v])=>'<div class="metric"><strong>'+esc(v)+'</strong>'+esc(k)+'</div>').join("")+'</div>'+
+ skillDetail(x)+
  '<h3>Average score — calculation</h3><p>Sum of the scores of all <b>'+a.scoreCount+'</b> recorded assessments with numeric scores ÷ '+a.scoreCount+' = <b>'+pct(a.scoreAverage)+'</b>. This is an <b>attempt-weighted</b> mean across Diagnostic, Mastery and Advanced Case practice, not an official ATD certification result. Retakes count as additional attempts; missing scores are excluded. Advanced Case scores use a different scoring method, so compare stage averages rather than treating this as a validated proficiency measurement.</p>'+
  '<h3>Per-stage results</h3><div class="scroll"><table><thead><tr><th>Stage</th><th>Attempts</th><th>Average</th><th>Latest</th></tr></thead><tbody>'+
  ["diagnostic","mastery","advanced"].map(stage=>{const arr=scored.filter(t=>t.assessmentKey?.endsWith(":"+stage));return '<tr><td>'+esc(stages[stage])+'</td><td>'+arr.length+'</td><td>'+pct(arr.length?arr.reduce((n,v)=>n+v.score,0)/arr.length:null)+'</td><td>'+pct(arr.length?arr.slice().sort((l,r)=>(asDate(r.ts)?.valueOf()||0)-(asDate(l.ts)?.valueOf()||0))[0].score:null)+'</td></tr>'}).join("")+'</tbody></table></div>'+
@@ -101,7 +156,7 @@ async function load(){
    result.push({uid,name:x.name||"",email:x.email||"",phone:x.phone||"",lessonIds,masteryIds,attempts,
     seconds:activity.reduce((n,a)=>n+(Number(a.activeSeconds)||0),0),views:activity.reduce((n,a)=>n+(Number(a.pageViews)||0),0),lastSeen:last});
   }
-  if(version!==epoch)return;learners=result.sort((a,b)=>(a.name||a.email).localeCompare(b.name||b.email));metrics();render();status("Loaded "+learners.length+" learner profiles · "+modules.length+" curriculum modules.");
+  if(version!==epoch)return;learners=result.sort((a,b)=>(a.name||a.email).localeCompare(b.name||b.email));metrics();render();renderSkillsCohort();status("Loaded "+learners.length+" learner profiles · "+modules.length+" curriculum modules.");
  }catch(e){status("Access diagnostic: "+String(e.code||e.message)+". Check admin UID and published Firestore rules. Activity is optional.",true);}
  finally{loading=false;$("reload").disabled=false;$("export").disabled=false;}
 }
@@ -113,7 +168,7 @@ function exportCsv(){
  const url=URL.createObjectURL(blob),link=document.createElement("a");link.href=url;link.download="ATD-Learner-Analytics-"+new Date().toISOString().slice(0,10)+".csv";document.body.append(link);link.click();link.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);
 }
 $("search").oninput=e=>{filter=e.target.value;render();};
-$("reload").onclick=()=>load();$("export").onclick=()=>exportCsv();
+$("reload").onclick=()=>load();$("export").onclick=()=>exportCsv();$("exportSkills").onclick=()=>exportSkillsCSV();
 $("closeDetails").onclick=()=>$("details").classList.add("hidden");
 onAuthStateChanged(auth,async user=>{
  ++epoch;current=user;learners=[];$("details").classList.add("hidden");
