@@ -52,9 +52,9 @@ async function sendSetupEmail({authEmail,email,name,employeeId,existing=false},m
   from:JSON.parse(SMTP_CONFIG.value()).from,to:email,
   subject:existing?"ATD Academy — reset your password":"ATD Academy — activate your employee account",
   text:"Hello "+name+",\n\n"+
-    "Your ATD Academy employee username is: "+employeeId+"\n"+
+    "Your ATD Academy work email: "+email+"\nEmployee reference: "+employeeId+"\n"+
     (existing?"Use this secure link to reset your Academy password: ":"Set your own Academy password using this one-time secure link: ")+link+"\n\n"+
-    "After setting your password, sign in with your Employee ID and your own password at "+ORIGIN+"/\n"+
+    "After setting your password, sign in with your WORK EMAIL and your own password at "+ORIGIN+"/\n"+
     "If you did not expect this message, contact your Academy administrator.\n\nATD Academy"
  });
 }
@@ -94,9 +94,9 @@ async function importOne(row,mailer,adminUid){
   let user,existing=false;
   try{user=await auth.getUserByEmail(row.email);existing=true;}catch(e){if(e.code!=="auth/user-not-found")throw e;}
   if(!user){
-   // Unpredictable synthetic Auth email prevents employee-ID alias squatting.
-   const alias="e-"+crypto.randomUUID().replace(/-/g,"")+"@"+LOGIN_DOMAIN;
-   user=await auth.createUser({email:alias,displayName:row.name,password:crypto.randomBytes(40).toString("base64url"),disabled:false});
+   // Work email is the primary sign-in identity for newly created employees.
+   // Employees choose their own password using an emailed Firebase setup link.
+   user=await auth.createUser({email:row.email,displayName:row.name,password:crypto.randomBytes(40).toString("base64url"),disabled:false});
   }
   if(existing&&!user.emailVerified){
    await ref.set({status:"verification_required",linkedExistingAccount:true,updatedAt:FieldValue.serverTimestamp()},{merge:true});
