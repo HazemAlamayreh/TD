@@ -39,7 +39,7 @@ table{border-collapse:collapse;width:100%;min-width:750px}th,td{padding:12px;tex
 <section class="panel" id="skillsOverview"><div class="skillSectionHeader"><div><h2>Workplace Skills Analytics</h2><p class="muted small">Evidence-based skill indicators from saved assessment responses, not an official competency certification.</p></div><button id="exportSkills" type="button">Export Skills CSV</button></div><div id="skillsCohort"></div></section>
 <section class="panel" id="departmentSkillsOverview"><div class="skillSectionHeader"><div><h2>Department Capability Intelligence</h2><p class="muted small">Groups learner evidence by Department to identify shared development priorities. Small samples are shown with an evidence warning and must not be used as employee ranking.</p></div></div><div id="departmentSkills"></div></section>
 <section class="panel"><div class="toolbar"><input id="search" type="search" placeholder="Search name, email or learner UID" aria-label="Search learners"><button class="primary" id="reload">Refresh</button><button id="export">Export CSV</button></div>
-<p id="status" role="status"></p><div class="scroll"><table><thead><tr><th>Learner</th><th>Completed lessons</th><th>Mastered lessons</th><th>Assessment attempts</th><th>Average result</th><th>Modules complete</th><th>First attempts ≥80%</th><th>Tracked time</th><th>Details</th></tr></thead><tbody id="learnerRows"></tbody></table></div>
+<p id="status" role="status"></p><div class="scroll"><table><thead><tr><th>Learner</th><th>Completed lessons</th><th>Mastered lessons</th><th>Assessment attempts</th><th>Average result</th><th>Modules complete</th><th>First attempts passed</th><th>Tracked time</th><th>Details</th></tr></thead><tbody id="learnerRows"></tbody></table></div>
 <p class="muted small">Only data saved to Cloud Firestore is included. Missing records do not prove that a learner did no work. This is a read-only dashboard.</p>
 </section>
 <section class="panel" id="employeeManagement"><h2>Employee Management</h2><p class="muted">Sign in with an active Admin account to import employees.</p></section>
@@ -70,5 +70,5 @@ table{border-collapse:collapse;width:100%;min-width:750px}th,td{padding:12px;tex
 <script src="./assets/module-22.js"></script>
 <script src="./assets/module-23.js"></script>
 <script>window.ATD_COURSE_MODULES=DATA.modules;</script>
-<script type="module" src="./assets/admin-page.js?v=20261110-roster-pilot-v2"></script>
+<script type="module" src="./assets/admin-page.js?v=20261110-adaptive-v30"></script>
 </body></html>
