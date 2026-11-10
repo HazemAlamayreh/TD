@@ -24,7 +24,7 @@ function inputRow(x){
  const employeeId=cleanId(x?.employeeId),email=normalizedEmail(x?.email),name=cleanText(x?.name,120),department=cleanText(x?.department,100);
  if(!EMP_ID.test(employeeId)||!EMAIL.test(email)||!name||name.length<2)throw new HttpsError("invalid-argument","Valid Employee ID, full name and work email are required.");
  if(email.endsWith("@"+LOGIN_DOMAIN))throw new HttpsError("invalid-argument","The work email cannot use the reserved login domain.");
- return {employeeId,email,name,department};
+ return {employeeId,email,name,department,division};
 }
 async function requireAdmin(request){
  if(!request.auth?.uid)throw new HttpsError("unauthenticated","Sign in to the Academy first.");
@@ -60,7 +60,7 @@ async function sendSetupEmail({authEmail,email,name,employeeId,existing=false},m
 }
 async function linkVerifiedAccount(row,user,ref){
  await ref.set({uid:user.uid,loginEmail:user.email,status:"linked",linkedExistingAccount:true,updatedAt:FieldValue.serverTimestamp()},{merge:true});
- await db.doc("learners/"+user.uid).set({employeeId:row.employeeId,name:row.name,email:row.email,department:row.department,updatedAt:FieldValue.serverTimestamp()},{merge:true});
+ await db.doc("learners/"+user.uid).set({employeeId:row.employeeId,name:row.name,email:row.email,department:row.department,division:row.division,updatedAt:FieldValue.serverTimestamp()},{merge:true});
  return {employeeId:row.employeeId,status:"linked",message:"Verified existing account linked; original UID, password and progress retained."};
 }
 async function importOne(row,mailer,adminUid){
