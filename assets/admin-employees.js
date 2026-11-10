@@ -2,7 +2,7 @@ import {getFunctions,httpsCallable} from "https://www.gstatic.com/firebasejs/12.
 const esc=s=>String(s??"").replace(/[&<>"']/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch]));
 const normalize=s=>String(s??"").trim();
 const headings={
- "employeeid":"employeeId","employee id":"employeeId","employee number":"employeeId","staff id":"employeeId","staff number":"employeeId","id":"employeeId","الرقم الوظيفي":"employeeId",
+ "employeeid":"employeeId","employee id":"employeeId","employee code":"employeeId","employee number":"employeeId","staff id":"employeeId","staff number":"employeeId","id":"employeeId","الرقم الوظيفي":"employeeId",
  "name":"name","employee name":"name","full name":"name","الاسم":"name",
  "email":"email","work email":"email","workemail":"email","email address":"email","البريد الإلكتروني":"email",
  "department":"department","team":"department","division":"division","القسم":"department"
