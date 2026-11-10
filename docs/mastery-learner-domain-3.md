@@ -33,13 +33,13 @@ The CHRO asks TD to reduce labor cost. Two business units have similar headcount
 
 A manufacturer faces automation and new market entrants. What is the BEST first TD response?
 
-**A.** Launch a generic digital skills course for everyone
+**A.** Review strategic priorities and scan external changes to identify future capabilities
 
-**B.** Review strategic priorities and scan external changes to identify future capabilities
+**B.** Increase annual training hours
 
-**C.** Increase annual training hours
+**C.** Wait for employees to request training
 
-**D.** Wait for employees to request training
+**D.** Launch a generic digital skills course for everyone
 
 ### 3.1.2-M2 · Competitive strategy and environmental scanning
 
@@ -57,13 +57,13 @@ A manufacturer plans to automate several production tasks while new competitors 
 
 Customer satisfaction has declined although employees completed service training. Which action BEST diagnoses the gap?
 
-**A.** Repeat the same training immediately
+**A.** Use satisfaction with the training as proof of success
 
-**B.** Analyze customer touchpoints, response times and first-contact resolution with operations
+**B.** Ask trainers to add more slides
 
-**C.** Use satisfaction with the training as proof of success
+**C.** Repeat the same training immediately
 
-**D.** Ask trainers to add more slides
+**D.** Analyze customer touchpoints, response times and first-contact resolution with operations
 
 ### 3.1.3-M2 · Customer service and value propositions
 
@@ -79,15 +79,15 @@ Customer satisfaction falls even though most service staff completed training. C
 
 ### 3.1.4-M1 · TD contribution and integrated talent management
 
-An executive asks how L&D supports competitive advantage. Which evidence is MOST persuasive?
+The COO asks how TD contributes to competitive results. Which evidence is most relevant?
 
-**A.** Number of slides created
+**A.** The total learning budget allocated to priority departments.
 
-**B.** Higher training attendance alone
+**B.** The average learner satisfaction score from the most popular modules.
 
-**C.** Improvement in a business KPI with plausible links to targeted behaviors
+**C.** A credible link between target behavior and an important business measure.
 
-**D.** Number of LMS logins
+**D.** The number of courses completed by staff during the last quarter.
 
 ### 3.1.4-M2 · TD contribution and integrated talent management
 
@@ -127,15 +127,15 @@ The TD director wants to classify a major learning-platform expense as a capital
 
 ### 3.1.6-M1 · Budgeting and resource management
 
-A TD program is 20% over budget halfway through delivery. What should happen NEXT?
+A program is 20% over budget halfway through delivery. What should the owner propose?
 
-**A.** Hide the variance until year-end
+**A.** Review cost drivers, forecast completion costs and present corrective options.
 
-**B.** Stop every learning initiative
+**B.** Continue spending and report the variance at program closure.
 
-**C.** Analyze cost drivers and options, then communicate a corrective plan to the budget owner
+**C.** Remove evaluation activities to recover the difference immediately.
 
-**D.** Move expenses to another project without approval
+**D.** Shift remaining costs to another budget without approval.
 
 ### 3.1.6-M2 · Budgeting and resource management
 
@@ -151,15 +151,15 @@ A leadership initiative is 20% over budget at its midpoint. Spending reports sho
 
 ### 3.1.7-M1 · Evidence-based TD business cases
 
-Leaders are undecided about a manager development program. Which proposal BEST supports a decision?
+Leaders are choosing between two talent-development investments. What makes a business case decision-ready?
 
-**A.** A list of planned workshops
+**A.** A summary of learner preferences and the implementation timeline.
 
-**B.** A case linking the performance problem, options, forecast benefits, costs, risks and measures
+**B.** A statement of the sponsor's preferred solution and its visibility.
 
-**C.** A testimonial without supporting data
+**C.** A detailed comparison of course content and facilitator credentials.
 
-**D.** A lengthy history of instructional theories
+**D.** A comparison of costs, expected benefits, assumptions, risks and results measures.
 
 ### 3.1.7-M2 · Evidence-based TD business cases
 
@@ -177,13 +177,13 @@ The executive committee is comparing a coaching pilot with a digital self-study 
 
 A CFO has five minutes for a TD investment decision. What presentation sequence works BEST?
 
-**A.** Start with course design history and definitions
+**A.** Focus entirely on learner satisfaction
 
-**B.** Present outcome and decision needed, then evidence, costs, risks and next steps
+**B.** Start with course design history and definitions
 
-**C.** Open with all raw survey comments
+**C.** Present outcome and decision needed, then evidence, costs, risks and next steps
 
-**D.** Focus entirely on learner satisfaction
+**D.** Open with all raw survey comments
 
 ### 3.1.8-M2 · Executive financial communication
 
@@ -201,15 +201,15 @@ The CFO has five minutes to hear why an academy initiative should receive additi
 
 ### 3.2.1-M1 · Trusted advisor and consulting process
 
-A manager requests a sales course to address falling revenue. What should an internal consultant do FIRST?
+A sales leader requests training to reverse falling revenue. Before recommending delivery, what should the consultant agree with the sponsor?
 
-**A.** Immediately build the course
+**A.** Business results to improve, diagnostic scope and criteria for success.
 
-**B.** Agree on the business problem, desired results and evidence needed for diagnosis
+**B.** The number of attendees and preferred learning platform.
 
-**C.** Contract a vendor before reviewing data
+**C.** A list of potential facilitators and the first delivery date.
 
-**D.** Measure reactions to the proposed course
+**D.** The budget ceiling and format for the final presentation.
 
 ### 3.2.1-M2 · Trusted advisor and consulting process
 
@@ -251,13 +251,13 @@ Operations believes frontline turnover is driven by workload; HR believes career
 
 A sponsor and finance leader give conflicting directions about project scope. What is the BEST response?
 
-**A.** Follow whichever person replies first
+**A.** Change the scope secretly
 
-**B.** Clarify agreed decision rights and negotiate resolution with both parties
+**B.** Follow whichever person replies first
 
-**C.** Ignore the finance leader
+**C.** Clarify agreed decision rights and negotiate resolution with both parties
 
-**D.** Change the scope secretly
+**D.** Ignore the finance leader
 
 ### 3.2.3-M2 · Stakeholder relationships and governance
 
@@ -275,13 +275,13 @@ Finance and the program sponsor issue conflicting instructions about the scope o
 
 A team misses targets despite strong knowledge-test scores. Which data collection approach is MOST useful?
 
-**A.** Another knowledge quiz only
+**A.** A facilitator popularity survey
 
-**B.** Workplace observation plus performance and process data
+**B.** Assume lack of motivation without evidence
 
-**C.** A facilitator popularity survey
+**C.** Another knowledge quiz only
 
-**D.** Assume lack of motivation without evidence
+**D.** Workplace observation plus performance and process data
 
 ### 3.2.4-M2 · Needs assessment methods
 
@@ -289,7 +289,7 @@ Supervisors pass the procedural knowledge test but still make frequent errors in
 
 **A.** Repeat the knowledge test with more difficult terminology.
 
-**B.** Observe real tasks, inspect process data and compare conditions in strong and weak teams.
+**B.** Observe real tasks and compare process evidence across teams.
 
 **C.** Survey training satisfaction and prioritize the lowest-rated topics.
 
@@ -297,15 +297,15 @@ Supervisors pass the procedural knowledge test but still make frequent errors in
 
 ### 3.2.5-M1 · Synthesis and stakeholder buy-in
 
-Stakeholders question the proposed solution despite strong data. What should the consultant do FIRST?
+A consultant's diagnosis is sound, but stakeholders say the recommendation is not practical. What should the consultant do next?
 
-**A.** Dismiss objections as resistance
+**A.** Ask about constraints and co-design a feasible option tied to the evidence.
 
-**B.** Explore stakeholders’ concerns and decision criteria, then connect findings to those needs
+**B.** Seek executive approval before discussing operational concerns.
 
-**C.** Repeat the same slide more loudly
+**C.** Replace the evidence-based recommendation with the original course request.
 
-**D.** Bypass stakeholders entirely
+**D.** Present the same data again without changing the implementation plan.
 
 ### 3.2.5-M2 · Synthesis and stakeholder buy-in
 
@@ -321,15 +321,15 @@ A consultant recommends redesigning workflow after a strong gap analysis, but st
 
 ### 3.2.6-M1 · Communicating recommendations
 
-As a neutral meeting facilitator, a TD practitioner is asked which vendor the group should select. What is the BEST response?
+A neutral TD facilitator is asked to choose a vendor for the committee. What response best preserves the facilitator's role?
 
-**A.** Choose a personal favorite
+**A.** Select the vendor with the strongest public reputation.
 
-**B.** Present evidence and agreed criteria objectively, then guide the group to a decision
+**B.** Present the evidence and criteria, then guide the accountable group to decide.
 
-**C.** Declare the cheapest supplier always wins
+**C.** Ask members to vote without presenting the evaluation results.
 
-**D.** Avoid discussing the decision
+**D.** Transfer the decision to the vendor that offers the lowest price.
 
 ### 3.2.6-M2 · Communicating recommendations
 
@@ -347,13 +347,13 @@ During a vendor-selection workshop, participants ask the TD facilitator to choos
 
 A rare skill is needed for a short project and no internal experts are available. What is the BEST sourcing approach?
 
-**A.** Recruit a permanent team automatically
+**A.** Assign untrained internal staff with no support
 
-**B.** Evaluate qualified external specialists against cost, fit and transfer requirements
+**B.** Recruit a permanent team automatically
 
-**C.** Abandon the project
+**C.** Evaluate qualified external specialists against cost, fit and transfer requirements
 
-**D.** Assign untrained internal staff with no support
+**D.** Abandon the project
 
 ### 3.2.7-M2 · Sourcing and external partnerships
 
@@ -369,15 +369,15 @@ A company needs a rare data-engineering skill for a three-month analytics pilot,
 
 ### 3.2.8-M1 · Overcoming resistance and implementation barriers
 
-A restructuring initiative faces resistance from managers who fear losing control. What should the TD consultant do FIRST?
+Managers resist a new structure because they fear losing decision authority. What should the consultant do first?
 
-**A.** Label managers as difficult
+**A.** Offer an additional change-training session before discussing consequences.
 
-**B.** Explore the concern, allow respectful disagreement and clarify decision rights and impacts
+**B.** Escalate the resistance immediately as a performance-management issue.
 
-**C.** Repeat awareness training until resistance ends
+**C.** Explain the benefits and request public endorsement at the meeting.
 
-**D.** Exclude managers from implementation
+**D.** Explore specific concerns and clarify where managers can influence the change.
 
 ### 3.2.8-M2 · Overcoming resistance and implementation barriers
 
@@ -421,13 +421,13 @@ A new incentive plan rewards individual output, and team collaboration drops sha
 
 A consultant completes employee interviews during an OD engagement. What should occur NEXT?
 
-**A.** Announce a solution without consulting the client
+**A.** Deliver training irrespective of findings
 
-**B.** Return findings for validation and co-create a supported action plan
+**B.** Announce a solution without consulting the client
 
-**C.** Close the project
+**C.** Return findings for validation and co-create a supported action plan
 
-**D.** Deliver training irrespective of findings
+**D.** Close the project
 
 ### 3.3.2-M2 · Designing and implementing OD strategy
 
@@ -445,13 +445,13 @@ An OD consultant finishes confidential interviews and observes recurring role co
 
 A change initiative needs to understand employees’ awareness, desire, knowledge, ability and reinforcement. Which model fits BEST?
 
-**A.** ADKAR
+**A.** SWOT alone
 
-**B.** SWOT alone
+**B.** Mager ABCD
 
-**C.** Mager ABCD
+**C.** Bloom taxonomy
 
-**D.** Bloom taxonomy
+**D.** ADKAR
 
 ### 3.3.3-M2 · Systems and change theories
 
@@ -469,13 +469,13 @@ Employees accept the rationale for a new process but cannot perform it under nor
 
 An org chart shows the project sponsor, but adoption depends on influential employees without formal authority. What should TD do?
 
-**A.** Ignore informal relationships
+**A.** Map informal influence and engage trusted peer connectors
 
-**B.** Map informal influence and engage trusted peer connectors
+**B.** Replace the org chart
 
-**C.** Replace the org chart
+**C.** Communicate only to executives
 
-**D.** Communicate only to executives
+**D.** Ignore informal relationships
 
 ### 3.3.4-M2 · Formal and informal influence networks
 
@@ -493,13 +493,13 @@ A digital transformation has formal executive support but low adoption in operat
 
 An employee receives competing priorities from two project and functional managers. Which structure is MOST likely?
 
-**A.** Pure functional
+**A.** Single-owner sole proprietorship
 
-**B.** Matrix
+**B.** Unstructured volunteer network
 
-**C.** Single-owner sole proprietorship
+**C.** Pure functional
 
-**D.** Unstructured volunteer network
+**D.** Matrix
 
 ### 3.3.5-M2 · Organizational management and structures
 
@@ -517,13 +517,13 @@ An employee receives contradictory instructions from a functional manager and a 
 
 HR defines a required policy that all department managers must follow. This is an example of what authority?
 
-**A.** Staff authority only
+**A.** Customer authority
 
-**B.** Functional authority over a defined policy
+**B.** Staff authority only
 
-**C.** No organizational authority
+**C.** Functional authority over a defined policy
 
-**D.** Customer authority
+**D.** No organizational authority
 
 ### 3.3.6-M2 · Reporting structures and authority
 
@@ -589,13 +589,13 @@ Employees complete collaboration training but still withhold information because
 
 An organization claims collaboration as a value but rewards only individual output. What should TD recommend?
 
-**A.** Create posters about teamwork
+**A.** Align recognition, performance measures and leadership expectations to collaborative behaviors
 
-**B.** Align recognition, performance measures and leadership expectations to collaborative behaviors
+**B.** Rename the value
 
-**C.** Rename the value
+**C.** Wait for culture to change on its own
 
-**D.** Wait for culture to change on its own
+**D.** Create posters about teamwork
 
 ### 3.3.9-M2 · Culture principles, values and competencies
 
@@ -637,13 +637,13 @@ Turnover has increased in two departments with low trust scores, but other depar
 
 Employees stop responding to engagement surveys because nothing changes. What should TD prioritize?
 
-**A.** Add more survey questions
+**A.** Run anonymous surveys daily without follow-up
 
-**B.** Communicate findings, co-design actions and monitor progress with managers
+**B.** Add more survey questions
 
-**C.** Make every response public
+**C.** Communicate findings, co-design actions and monitor progress with managers
 
-**D.** Run anonymous surveys daily without follow-up
+**D.** Make every response public
 
 ### 3.3.11-M2 · Employee engagement assessment
 
@@ -661,13 +661,13 @@ Employee response to pulse surveys is falling because previous findings were nev
 
 Engagement survey results are poor, and leaders want a one-off morale event. What should TD prioritize?
 
-**A.** Offer one course and assume it has solved the organizational problem.
+**A.** Ignore leadership ownership and system constraints.
 
-**B.** Co-design a sustained engagement strategy tied to management behaviors, work conditions and follow-up.
+**B.** Use completion counts as the only success criterion.
 
-**C.** Ignore leadership ownership and system constraints.
+**C.** Offer one course and assume it has solved the organizational problem.
 
-**D.** Use completion counts as the only success criterion.
+**D.** Co-design a sustained engagement strategy tied to management behaviors, work conditions and follow-up.
 
 ### 3.3.12-M2 · Implementing employee engagement strategies
 
@@ -685,13 +685,13 @@ An engagement survey identifies poor workload planning and weak manager communic
 
 A fatigued workforce reports overwhelming workload and poor access to information. What is the BEST response?
 
-**A.** Assign resilience training as the only intervention
+**A.** Work with leaders to simplify workflows, rebalance demands and enable support
 
-**B.** Work with leaders to simplify workflows, rebalance demands and enable support
+**B.** Tell employees to work harder
 
-**C.** Tell employees to work harder
+**C.** Measure course satisfaction only
 
-**D.** Measure course satisfaction only
+**D.** Assign resilience training as the only intervention
 
 ### 3.3.13-M2 · Organizational well-being
 
@@ -711,13 +711,13 @@ Employees report exhaustion, unpredictable schedules and limited access to neces
 
 Workforce planning identifies a leadership skill shortage. How should talent functions work together?
 
-**A.** Connect shared competency data to recruitment, development, succession, performance and rewards.
+**A.** Assume attendance or positive reactions alone demonstrate organizational impact.
 
-**B.** Begin by adding generic mandatory courses without examining evidence.
+**B.** Act without stakeholder alignment, validation or an implementation plan.
 
-**C.** Assume attendance or positive reactions alone demonstrate organizational impact.
+**C.** Connect shared competency data to recruitment, development, succession, performance and rewards.
 
-**D.** Act without stakeholder alignment, validation or an implementation plan.
+**D.** Begin by adding generic mandatory courses without examining evidence.
 
 ### 3.4.1-M2 · Integrated talent management functions
 
@@ -735,13 +735,13 @@ A workforce review reveals a leadership shortage, but recruitment and succession
 
 Several departments propose unrelated training plans. What should TD establish first?
 
-**A.** Begin by adding generic mandatory courses without examining evidence.
+**A.** Assume attendance or positive reactions alone demonstrate organizational impact.
 
-**B.** An overarching talent strategy derived from business goals, workforce gaps and agreed outcome measures.
+**B.** Act without stakeholder alignment, validation or an implementation plan.
 
-**C.** Assume attendance or positive reactions alone demonstrate organizational impact.
+**C.** Begin by adding generic mandatory courses without examining evidence.
 
-**D.** Act without stakeholder alignment, validation or an implementation plan.
+**D.** An overarching talent strategy derived from business goals, workforce gaps and agreed outcome measures.
 
 ### 3.4.2-M2 · Aligning talent strategy and business strategy
 
@@ -759,13 +759,13 @@ A company plans expansion, but departments submit unrelated training requests. W
 
 A TD goal reports course completions but does not relate to strategic revenue objectives. What next?
 
-**A.** Begin by adding generic mandatory courses without examining evidence.
+**A.** Map the objective to critical-role capability, target behavior and a relevant business KPI.
 
-**B.** Assume attendance or positive reactions alone demonstrate organizational impact.
+**B.** Act without stakeholder alignment, validation or an implementation plan.
 
-**C.** Map the objective to critical-role capability, target behavior and a relevant business KPI.
+**C.** Begin by adding generic mandatory courses without examining evidence.
 
-**D.** Act without stakeholder alignment, validation or an implementation plan.
+**D.** Assume attendance or positive reactions alone demonstrate organizational impact.
 
 ### 3.4.3-M2 · Aligning talent strategy to organizational results
 
@@ -783,13 +783,13 @@ The CEO asks how 10,000 completed learning hours supported revenue growth. Which
 
 Midyear priorities shift and three training initiatives compete for the same resources. What is most defensible?
 
-**A.** Begin by adding generic mandatory courses without examining evidence.
+**A.** Act without stakeholder alignment, validation or an implementation plan.
 
-**B.** Assume attendance or positive reactions alone demonstrate organizational impact.
+**B.** Use agreed strategic criteria and governance to reprioritize plans, resources and milestones.
 
-**C.** Act without stakeholder alignment, validation or an implementation plan.
+**C.** Begin by adding generic mandatory courses without examining evidence.
 
-**D.** Use agreed strategic criteria and governance to reprioritize plans, resources and milestones.
+**D.** Assume attendance or positive reactions alone demonstrate organizational impact.
 
 ### 3.4.4-M2 · Strategic planning for talent development
 
@@ -807,13 +807,13 @@ The board changes its priority to customer retention, and three TD initiatives c
 
 A learning program slips repeatedly because SMEs cannot approve material on time. What should TD do?
 
-**A.** Analyze the resource bottleneck, decision rights and schedule risk, then implement a mitigation plan.
+**A.** Assume attendance or positive reactions alone demonstrate organizational impact.
 
-**B.** Begin by adding generic mandatory courses without examining evidence.
+**B.** Act without stakeholder alignment, validation or an implementation plan.
 
-**C.** Assume attendance or positive reactions alone demonstrate organizational impact.
+**C.** Analyze the resource bottleneck, decision rights and schedule risk, then implement a mitigation plan.
 
-**D.** Act without stakeholder alignment, validation or an implementation plan.
+**D.** Begin by adding generic mandatory courses without examining evidence.
 
 ### 3.4.5-M2 · Forecasting constraints and risks
 
@@ -831,13 +831,13 @@ SME approval delays repeatedly threaten an academy launch. Which risk treatment 
 
 An academy has excellent courses but low adoption by frontline employees. What should marketing do?
 
-**A.** Begin by adding generic mandatory courses without examining evidence.
+**A.** Assume attendance or positive reactions alone demonstrate organizational impact.
 
-**B.** Segment users, explain relevant benefits, choose accessible channels and measure adoption outcomes.
+**B.** Act without stakeholder alignment, validation or an implementation plan.
 
-**C.** Assume attendance or positive reactions alone demonstrate organizational impact.
+**C.** Begin by adding generic mandatory courses without examining evidence.
 
-**D.** Act without stakeholder alignment, validation or an implementation plan.
+**D.** Segment users, explain relevant benefits, choose accessible channels and measure adoption outcomes.
 
 ### 3.4.6-M2 · Marketing talent development services
 
@@ -855,13 +855,13 @@ Frontline employees rarely enroll in the academy, although the content meets the
 
 Remote staff report that they never heard about a development initiative. What should TD change?
 
-**A.** Begin by adding generic mandatory courses without examining evidence.
+**A.** Plan repeated, accessible, audience-specific messaging with named owners, timing and feedback.
 
-**B.** Assume attendance or positive reactions alone demonstrate organizational impact.
+**B.** Act without stakeholder alignment, validation or an implementation plan.
 
-**C.** Plan repeated, accessible, audience-specific messaging with named owners, timing and feedback.
+**C.** Begin by adding generic mandatory courses without examining evidence.
 
-**D.** Act without stakeholder alignment, validation or an implementation plan.
+**D.** Assume attendance or positive reactions alone demonstrate organizational impact.
 
 ### 3.4.7-M2 · TD communication strategy
 
@@ -879,13 +879,13 @@ Remote employees say they never received development-pathway information. What s
 
 The CEO asks what value the LMS provides to the business. Which response is strongest?
 
-**A.** Begin by adding generic mandatory courses without examining evidence.
+**A.** Act without stakeholder alignment, validation or an implementation plan.
 
-**B.** Assume attendance or positive reactions alone demonstrate organizational impact.
+**B.** Show credible links between changed work outcomes, business KPIs, cost and strategic goals.
 
-**C.** Act without stakeholder alignment, validation or an implementation plan.
+**C.** Begin by adding generic mandatory courses without examining evidence.
 
-**D.** Show credible links between changed work outcomes, business KPIs, cost and strategic goals.
+**D.** Assume attendance or positive reactions alone demonstrate organizational impact.
 
 ### 3.4.8-M2 · Communicating TD business value
 
@@ -903,13 +903,13 @@ The CEO asks what value the academy platform adds. Usage is high but workplace c
 
 Managers say learning is an L&D responsibility and never allow time to practice. What should TD do?
 
-**A.** Build an executive-supported learning culture with manager accountability and work-based development.
+**A.** Assume attendance or positive reactions alone demonstrate organizational impact.
 
-**B.** Begin by adding generic mandatory courses without examining evidence.
+**B.** Act without stakeholder alignment, validation or an implementation plan.
 
-**C.** Assume attendance or positive reactions alone demonstrate organizational impact.
+**C.** Build an executive-supported learning culture with manager accountability and work-based development.
 
-**D.** Act without stakeholder alignment, validation or an implementation plan.
+**D.** Begin by adding generic mandatory courses without examining evidence.
 
 ### 3.4.9-M2 · The business case for lifelong learning
 
@@ -927,13 +927,13 @@ Managers approve courses but rarely release employees to practice. How should TD
 
 A future growth plan requires capabilities not present in current employees. What should TD do first?
 
-**A.** Forecast critical-role demand and compare it with current skills before selecting the six Bs.
+**A.** Assume attendance or positive reactions alone demonstrate organizational impact.
 
-**B.** Begin by adding generic mandatory courses without examining evidence.
+**B.** Act without stakeholder alignment, validation or an implementation plan.
 
-**C.** Assume attendance or positive reactions alone demonstrate organizational impact.
+**C.** Forecast critical-role demand and compare it with current skills before selecting the six Bs.
 
-**D.** Act without stakeholder alignment, validation or an implementation plan.
+**D.** Begin by adding generic mandatory courses without examining evidence.
 
 ### 3.4.10-M2 · Strategic workforce planning
 
@@ -975,13 +975,13 @@ A critical director will retire next year and no successor is ready. Which respo
 
 A leader nominates high potentials only from their personal network. What correction is appropriate?
 
-**A.** Begin by adding generic mandatory courses without examining evidence.
+**A.** Use transparent role-relevant criteria, multiple evidence sources and calibrated cross-functional review.
 
-**B.** Assume attendance or positive reactions alone demonstrate organizational impact.
+**B.** Act without stakeholder alignment, validation or an implementation plan.
 
-**C.** Use transparent role-relevant criteria, multiple evidence sources and calibrated cross-functional review.
+**C.** Begin by adding generic mandatory courses without examining evidence.
 
-**D.** Act without stakeholder alignment, validation or an implementation plan.
+**D.** Assume attendance or positive reactions alone demonstrate organizational impact.
 
 ### 3.4.12-M2 · High-potential talent identification and development
 
@@ -1023,13 +1023,13 @@ AI now handles routine customer inquiries, but the support job description remai
 
 New hires leave within weeks because the workplace differs from recruitment promises. What should change?
 
-**A.** Align employer brand, realistic role expectations and structured onboarding with lived employee experience.
+**A.** Assume attendance or positive reactions alone demonstrate organizational impact.
 
-**B.** Begin by adding generic mandatory courses without examining evidence.
+**B.** Act without stakeholder alignment, validation or an implementation plan.
 
-**C.** Assume attendance or positive reactions alone demonstrate organizational impact.
+**C.** Align employer brand, realistic role expectations and structured onboarding with lived employee experience.
 
-**D.** Act without stakeholder alignment, validation or an implementation plan.
+**D.** Begin by adding generic mandatory courses without examining evidence.
 
 ### 3.4.14-M2 · Talent acquisition and employee experience
 
@@ -1071,13 +1071,13 @@ A specialized analytics skill is needed for a three-month project, but internal 
 
 Managers give feedback only at annual ratings discussions. What redesign is strongest?
 
-**A.** Begin by adding generic mandatory courses without examining evidence.
+**A.** Use ongoing goals, coaching, role-relevant evidence, development actions and regular check-ins.
 
-**B.** Assume attendance or positive reactions alone demonstrate organizational impact.
+**B.** Act without stakeholder alignment, validation or an implementation plan.
 
-**C.** Use ongoing goals, coaching, role-relevant evidence, development actions and regular check-ins.
+**C.** Begin by adding generic mandatory courses without examining evidence.
 
-**D.** Act without stakeholder alignment, validation or an implementation plan.
+**D.** Assume attendance or positive reactions alone demonstrate organizational impact.
 
 ### 3.4.16-M2 · Performance management strategy
 
@@ -1119,15 +1119,15 @@ A customer-service team passed all knowledge checks but still misses targets bec
 
 ### 3.5.2-M1 · Business, gap, process and cause analysis
 
-A sponsor asks for retraining to improve errors. What analytical evidence is required?
+A sponsor requests retraining after error rates triple. Which analysis should precede the intervention?
 
-**A.** Begin by adding generic mandatory courses without examining evidence.
+**A.** Compare actual and expected results and test likely causes with work evidence.
 
-**B.** Assume attendance or positive reactions alone demonstrate organizational impact.
+**B.** Select the course topic mentioned most often by supervisors.
 
-**C.** Compare desired and actual outcomes and examine process, culture and root causes with multiple sources.
+**C.** Survey employees about the preferred method of learning.
 
-**D.** Act without stakeholder alignment, validation or an implementation plan.
+**D.** Schedule refresher training and collect performance data afterward.
 
 ### 3.5.2-M2 · Business, gap, process and cause analysis
 
@@ -1167,15 +1167,15 @@ Employees know the approved process but cannot complete it accurately because re
 
 ### 3.5.4-M1 · Conducting performance analysis
 
-One team consistently outperforms peers. How can TD improve performance analysis?
+One branch consistently outperforms similar teams. Which comparison best helps identify effective practices?
 
-**A.** Observe key performers and compare the steps, information and enablers they use with standard practice.
+**A.** Compare total training hours completed in each branch.
 
-**B.** Begin by adding generic mandatory courses without examining evidence.
+**B.** Review the average job tenure of each branch and rank the results.
 
-**C.** Assume attendance or positive reactions alone demonstrate organizational impact.
+**C.** Compare task steps, tools and work conditions in strong and weak branches.
 
-**D.** Act without stakeholder alignment, validation or an implementation plan.
+**D.** Ask high performers what they believe makes them successful.
 
 ### 3.5.4-M2 · Conducting performance analysis
 
@@ -1217,13 +1217,13 @@ A customer-service gap stems from duplicate system entries and an incentive for 
 
 Technicians need help diagnosing an infrequent equipment error during work. What is best?
 
-**A.** Begin by adding generic mandatory courses without examining evidence.
+**A.** Provide a searchable, context-specific troubleshooting decision aid available at the point of need.
 
-**B.** Assume attendance or positive reactions alone demonstrate organizational impact.
+**B.** Act without stakeholder alignment, validation or an implementation plan.
 
-**C.** Provide a searchable, context-specific troubleshooting decision aid available at the point of need.
+**C.** Begin by adding generic mandatory courses without examining evidence.
 
-**D.** Act without stakeholder alignment, validation or an implementation plan.
+**D.** Assume attendance or positive reactions alone demonstrate organizational impact.
 
 ### 3.5.6-M2 · Designing performance support systems
 
@@ -1267,13 +1267,13 @@ A training fix improves one team's throughput but creates handoff errors for the
 
 Staff understand why change is needed but cannot perform the new workflow. What ADKAR element is missing?
 
-**A.** Begin by adding generic mandatory courses without examining evidence.
+**A.** Ability: provide practice, tools, coaching and time to perform the new behavior.
 
-**B.** Assume attendance or positive reactions alone demonstrate organizational impact.
+**B.** Act without stakeholder alignment, validation or an implementation plan.
 
-**C.** Ability: provide practice, tools, coaching and time to perform the new behavior.
+**C.** Begin by adding generic mandatory courses without examining evidence.
 
-**D.** Act without stakeholder alignment, validation or an implementation plan.
+**D.** Assume attendance or positive reactions alone demonstrate organizational impact.
 
 ### 3.6.1-M2 · Change management theories and models
 
@@ -1291,13 +1291,13 @@ Employees understand why the new workflow matters but cannot perform it under pr
 
 A restructuring creates rumors, concern and uncertainty about roles. What should TD support first?
 
-**A.** Begin by adding generic mandatory courses without examining evidence.
+**A.** Act without stakeholder alignment, validation or an implementation plan.
 
-**B.** Assume attendance or positive reactions alone demonstrate organizational impact.
+**B.** Transparent two-way communication, manager coaching, employee input and targeted skill support.
 
-**C.** Act without stakeholder alignment, validation or an implementation plan.
+**C.** Begin by adding generic mandatory courses without examining evidence.
 
-**D.** Transparent two-way communication, manager coaching, employee input and targeted skill support.
+**D.** Assume attendance or positive reactions alone demonstrate organizational impact.
 
 ### 3.6.2-M2 · Human reactions and drivers of change
 
@@ -1339,13 +1339,13 @@ Employees resist a new scheduling system because it reduces their control over s
 
 A major change initiative starts without a visible sponsor or success criteria. What should be done?
 
-**A.** Begin by adding generic mandatory courses without examining evidence.
+**A.** Secure leadership sponsorship, define current and future states, assign roles and establish measures.
 
-**B.** Secure leadership sponsorship, define current and future states, assign roles and establish measures.
+**B.** Assume attendance or positive reactions alone demonstrate organizational impact.
 
-**C.** Assume attendance or positive reactions alone demonstrate organizational impact.
+**C.** Act without stakeholder alignment, validation or an implementation plan.
 
-**D.** Act without stakeholder alignment, validation or an implementation plan.
+**D.** Begin by adding generic mandatory courses without examining evidence.
 
 ### 3.6.4-M2 · Designing and executing change strategies
 
@@ -1387,15 +1387,15 @@ The CHRO wants to know why turnover rose last quarter, not merely how many emplo
 
 ### 3.7.2-M1 · Gathering and organizing analytics data
 
-A TD analyst has access to many disconnected data sets but no clear question. What comes first?
+The TD analyst receives several HR datasets but has no defined decision to support. What should happen before collection expands?
 
-**A.** Agree on a specific business question, research objectives and data audit before collecting more data.
+**A.** Ask stakeholders which source they can export the fastest.
 
-**B.** Begin by adding generic mandatory courses without examining evidence.
+**B.** Choose a dashboard format and explore any interesting correlations.
 
-**C.** Assume attendance or positive reactions alone demonstrate organizational impact.
+**C.** Agree the business question, access permissions and required data quality.
 
-**D.** Act without stakeholder alignment, validation or an implementation plan.
+**D.** Merge all available files and calculate preliminary trends.
 
 ### 3.7.2-M2 · Gathering and organizing analytics data
 
@@ -1437,13 +1437,13 @@ Two leaders request an attrition dashboard but define retention differently. Wha
 
 Training and productivity increase together. What can an analyst report responsibly?
 
-**A.** Begin by adding generic mandatory courses without examining evidence.
+**A.** An association that needs further investigation; correlation alone does not establish causation.
 
-**B.** Assume attendance or positive reactions alone demonstrate organizational impact.
+**B.** Act without stakeholder alignment, validation or an implementation plan.
 
-**C.** An association that needs further investigation; correlation alone does not establish causation.
+**C.** Begin by adding generic mandatory courses without examining evidence.
 
-**D.** Act without stakeholder alignment, validation or an implementation plan.
+**D.** Assume attendance or positive reactions alone demonstrate organizational impact.
 
 ### 3.7.4-M2 · Interpreting and communicating data
 
@@ -1485,13 +1485,13 @@ A chart makes a 2% change look dramatic by trimming the axis. Executives are usi
 
 A leader wants to see changes in absenteeism across 12 months. Which display suits the task?
 
-**A.** A time-series line chart with consistent dates and scales.
+**A.** Assume attendance or positive reactions alone demonstrate organizational impact.
 
-**B.** Begin by adding generic mandatory courses without examining evidence.
+**B.** Act without stakeholder alignment, validation or an implementation plan.
 
-**C.** Assume attendance or positive reactions alone demonstrate organizational impact.
+**C.** A time-series line chart with consistent dates and scales.
 
-**D.** Act without stakeholder alignment, validation or an implementation plan.
+**D.** Begin by adding generic mandatory courses without examining evidence.
 
 ### 3.7.6-M2 · Selecting an effective chart
 
@@ -1535,13 +1535,13 @@ A predictive model labels employees as likely to resign, and managers begin with
 
 A strategy shift introduces automation and cross-border hybrid teams. What should TD examine?
 
-**A.** Internal and external drivers and their implications for future workforce skills and learning systems.
+**A.** Assume attendance or positive reactions alone demonstrate organizational impact.
 
-**B.** Begin by adding generic mandatory courses without examining evidence.
+**B.** Act without stakeholder alignment, validation or an implementation plan.
 
-**C.** Assume attendance or positive reactions alone demonstrate organizational impact.
+**C.** Internal and external drivers and their implications for future workforce skills and learning systems.
 
-**D.** Act without stakeholder alignment, validation or an implementation plan.
+**D.** Begin by adding generic mandatory courses without examining evidence.
 
 ### 3.8.1-M2 · Factors shaping future talent needs
 
@@ -1559,13 +1559,13 @@ The organization plans to automate workflows and expand hybrid teams across regi
 
 Leaders request early warnings about AI-related role changes. What is an appropriate approach?
 
-**A.** Begin by adding generic mandatory courses without examining evidence.
+**A.** Assume attendance or positive reactions alone demonstrate organizational impact.
 
-**B.** Use structured environmental scanning, assess trends, co-design actions and monitor regularly.
+**B.** Act without stakeholder alignment, validation or an implementation plan.
 
-**C.** Assume attendance or positive reactions alone demonstrate organizational impact.
+**C.** Begin by adding generic mandatory courses without examining evidence.
 
-**D.** Act without stakeholder alignment, validation or an implementation plan.
+**D.** Use structured environmental scanning, assess trends, co-design actions and monitor regularly.
 
 ### 3.8.2-M2 · Environmental scanning process
 
@@ -1583,13 +1583,13 @@ Leaders want early warning of how AI may change critical roles. Which environmen
 
 A team generates fifty ideas but cannot decide which to prototype. What should the facilitator introduce?
 
-**A.** Begin by adding generic mandatory courses without examining evidence.
+**A.** A convergence method that evaluates feasibility, value and alignment to user needs.
 
-**B.** Assume attendance or positive reactions alone demonstrate organizational impact.
+**B.** Act without stakeholder alignment, validation or an implementation plan.
 
-**C.** A convergence method that evaluates feasibility, value and alignment to user needs.
+**C.** Begin by adding generic mandatory courses without examining evidence.
 
-**D.** Act without stakeholder alignment, validation or an implementation plan.
+**D.** Assume attendance or positive reactions alone demonstrate organizational impact.
 
 ### 3.8.3-M2 · Innovation and creativity techniques
 
@@ -1607,13 +1607,13 @@ A design team has produced 50 ideas for a new employee experience but must choos
 
 A vendor promises immersive learning will solve every performance gap. What should TD do?
 
-**A.** Begin by adding generic mandatory courses without examining evidence.
+**A.** Act without stakeholder alignment, validation or an implementation plan.
 
-**B.** Assume attendance or positive reactions alone demonstrate organizational impact.
+**B.** Assess fit, readiness, risks, security, cost and actual performance needs before procurement.
 
-**C.** Act without stakeholder alignment, validation or an implementation plan.
+**C.** Begin by adding generic mandatory courses without examining evidence.
 
-**D.** Assess fit, readiness, risks, security, cost and actual performance needs before procurement.
+**D.** Assume attendance or positive reactions alone demonstrate organizational impact.
 
 ### 3.8.4-M2 · Emerging learning technologies
 
@@ -1631,13 +1631,13 @@ A vendor claims an immersive tool will solve all onboarding gaps. The organizati
 
 Two websites offer conflicting statistics about skills shortages. What is the best information practice?
 
-**A.** Trace data to credible original sources, examine dates, author credentials, methods and bias.
+**A.** Assume attendance or positive reactions alone demonstrate organizational impact.
 
-**B.** Begin by adding generic mandatory courses without examining evidence.
+**B.** Act without stakeholder alignment, validation or an implementation plan.
 
-**C.** Assume attendance or positive reactions alone demonstrate organizational impact.
+**C.** Trace data to credible original sources, examine dates, author credentials, methods and bias.
 
-**D.** Act without stakeholder alignment, validation or an implementation plan.
+**D.** Begin by adding generic mandatory courses without examining evidence.
 
 ### 3.8.5-M2 · Finding and evaluating credible information
 
@@ -1655,13 +1655,13 @@ Two websites report conflicting estimates of emerging workforce skills. The TD d
 
 A leader succeeds in familiar situations but struggles in a new role. Which approach builds agility?
 
-**A.** Begin by adding generic mandatory courses without examining evidence.
+**A.** Assume attendance or positive reactions alone demonstrate organizational impact.
 
-**B.** Use reflection, feedback, stretching experiences and transfer of lessons to unfamiliar situations.
+**B.** Act without stakeholder alignment, validation or an implementation plan.
 
-**C.** Assume attendance or positive reactions alone demonstrate organizational impact.
+**C.** Begin by adding generic mandatory courses without examining evidence.
 
-**D.** Act without stakeholder alignment, validation or an implementation plan.
+**D.** Use reflection, feedback, stretching experiences and transfer of lessons to unfamiliar situations.
 
 ### 3.8.6-M2 · Learning agility and transfer
 
