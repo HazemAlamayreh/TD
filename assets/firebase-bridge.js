@@ -2,8 +2,9 @@ import {initializeApp} from "https://www.gstatic.com/firebasejs/12.6.0/firebase-
 import {getAuth,setPersistence,browserLocalPersistence,onAuthStateChanged,createUserWithEmailAndPassword,signInWithEmailAndPassword,sendPasswordResetEmail,updatePassword,signOut} from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
 import {getFirestore,doc,getDoc,getDocs,setDoc,collection,serverTimestamp,increment} from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
 import {initializeAdminDashboard} from "./admin-dashboard.js?v=20261110-role-refresh";
+import {getFunctions,httpsCallable} from "https://www.gstatic.com/firebasejs/12.6.0/firebase-functions.js";
 const app=initializeApp({apiKey:"AIzaSyBxuLsolggWnoGuTASnnWvz7OwvRdnIxZE",authDomain:"atd-master-talent-development.firebaseapp.com",projectId:"atd-master-talent-development",storageBucket:"atd-master-talent-development.firebasestorage.app",messagingSenderId:"882331359053",appId:"1:882331359053:web:a51c003529af5ae9c90904"});
-const auth=getAuth(app),db=getFirestore(app),h=window.ATDHost,readyAuth=setPersistence(auth,browserLocalPersistence);
+const auth=getAuth(app),db=getFirestore(app),functions=getFunctions(app,"us-central1"),resolveEmployeeLogin=httpsCallable(functions,"resolveEmployeeLogin"),resetEmployeePassword=httpsCallable(functions,"resetEmployeePassword"),h=window.ATDHost,readyAuth=setPersistence(auth,browserLocalPersistence);
 initializeAdminDashboard(auth,db);
 const root=document.createElement("div");document.body.append(root);
 const css=document.createElement("style");
@@ -13,22 +14,56 @@ let user=null,profile=null,opened=false,mode="login",notice="",initialized=false
 const tr=(en,ar)=>h.getState().lang==="ar"?ar:en;
 const esc=v=>String(v??"").replace(/[&<>"']/g,x=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[x]));
 function ui(){
- root.innerHTML='<button id="atdAccountButton">'+esc(user?(profile?.name||user.email):tr("My account","حسابي"))+'</button>';
+ root.innerHTML='<button id="atdAccountButton">'+esc(user?(profile?.name||profile?.email||user.email):tr("My account","حسابي"))+'</button>';
  root.querySelector("#atdAccountButton").onclick=()=>{opened=true;ui();};
  if(!opened)return;
  let body;
  if(user){
- body='<p>'+esc(user.email)+'</p><div style="padding:12px;margin:10px 0;background:#f1f6fc;border:1px solid #d5e2f0;border-radius:10px"><b>'+tr("Administrator access","صلاحية المدير")+'</b><p style="font-size:12px;word-break:break-all;margin:6px 0">'+tr("Your account UID: ","معرّف حسابك UID: ")+'<code>'+esc(user.uid)+'</code></p><button type="button" id="atdCheckAdminRole">'+tr("Check my Admin permission","فحص صلاحية Admin")+'</button><p style="font-size:12px;margin:6px 0 0">'+(adminStatus.uid===user.uid?esc(adminStatus.message):tr("Status not checked. Click Check my Admin permission.","لم يتم فحص الصلاحية بعد. اضغط زر فحص صلاحية Admin."))+'</p>'+(adminStatus.uid===user.uid&&adminStatus.state==="active"?'<a href="./admin.html" style="display:block;margin:8px 0;font-weight:bold;color:#12623d">'+tr("Open Admin Dashboard","افتح لوحة المدير")+'</a>':'')+'</div><label>'+tr("Name","الاسم")+'</label><input id="atdProfileName" value="'+esc(profile?.name)+'"><label>'+tr("Phone (optional)","الهاتف (اختياري)")+'</label><input id="atdProfilePhone" value="'+esc(profile?.phone)+'"><button id="atdSaveProfile">'+tr("Save profile","حفظ البيانات")+'</button><h3>'+tr("Set or change password","تعيين أو تغيير كلمة المرور")+'</h3><p>'+tr("Former Magic Link learners can set a password while signed in, keeping the same progress.","المتدرب الذي استخدم رابط الإيميل سابقاً يستطيع تعيين كلمة مرور من حسابه الحالي دون فقدان التقدم.")+'</p><form id="atdPasswordForm"><input type="password" id="atdNewPassword" required minlength="8" autocomplete="new-password" placeholder="'+tr("New password (8+ characters)","كلمة مرور جديدة (8 أحرف أو أكثر)")+'"><button type="submit">'+tr("Save password","حفظ كلمة المرور")+'</button></form><button id="atdImportOld">'+tr("Import older browser progress","استيراد التقدم القديم")+'</button><button id="atdLogout">'+tr("Sign out","تسجيل الخروج")+'</button>';
+ body='<p>'+esc(profile?.email||user.email)+'</p><div style="padding:12px;margin:10px 0;background:#f1f6fc;border:1px solid #d5e2f0;border-radius:10px"><b>'+tr("Administrator access","صلاحية المدير")+'</b><p style="font-size:12px;word-break:break-all;margin:6px 0">'+tr("Your account UID: ","معرّف حسابك UID: ")+'<code>'+esc(user.uid)+'</code></p><button type="button" id="atdCheckAdminRole">'+tr("Check my Admin permission","فحص صلاحية Admin")+'</button><p style="font-size:12px;margin:6px 0 0">'+(adminStatus.uid===user.uid?esc(adminStatus.message):tr("Status not checked. Click Check my Admin permission.","لم يتم فحص الصلاحية بعد. اضغط زر فحص صلاحية Admin."))+'</p>'+(adminStatus.uid===user.uid&&adminStatus.state==="active"?'<a href="./admin.html" style="display:block;margin:8px 0;font-weight:bold;color:#12623d">'+tr("Open Admin Dashboard","افتح لوحة المدير")+'</a>':'')+'</div><label>'+tr("Name","الاسم")+'</label><input id="atdProfileName" value="'+esc(profile?.name)+'"><label>'+tr("Phone (optional)","الهاتف (اختياري)")+'</label><input id="atdProfilePhone" value="'+esc(profile?.phone)+'"><button id="atdSaveProfile">'+tr("Save profile","حفظ البيانات")+'</button><h3>'+tr("Set or change password","تعيين أو تغيير كلمة المرور")+'</h3><p>'+tr("Former Magic Link learners can set a password while signed in, keeping the same progress.","المتدرب الذي استخدم رابط الإيميل سابقاً يستطيع تعيين كلمة مرور من حسابه الحالي دون فقدان التقدم.")+'</p><form id="atdPasswordForm"><input type="password" id="atdNewPassword" required minlength="8" autocomplete="new-password" placeholder="'+tr("New password (8+ characters)","كلمة مرور جديدة (8 أحرف أو أكثر)")+'"><button type="submit">'+tr("Save password","حفظ كلمة المرور")+'</button></form><button id="atdImportOld">'+tr("Import older browser progress","استيراد التقدم القديم")+'</button><button id="atdLogout">'+tr("Sign out","تسجيل الخروج")+'</button>';
  }else{
- body='<h3>'+tr(mode==="login"?"Sign in":"Create account",mode==="login"?"تسجيل الدخول":"إنشاء حساب")+'</h3><form id="atdCredentials"><label>'+tr("Email (username)","البريد الإلكتروني (اسم المستخدم)")+'</label><input id="atdEmail" type="email" autocomplete="username" required placeholder="name@example.com"><label>'+tr("Password","كلمة المرور")+'</label><input type="password" id="atdPassword" minlength="8" required autocomplete="'+(mode==="login"?"current-password":"new-password")+'">'+(mode==="register"?'<label>'+tr("Confirm password","تأكيد كلمة المرور")+'</label><input id="atdConfirm" type="password" required minlength="8" autocomplete="new-password">':'')+'<button type="submit" class="primary">'+tr(mode==="login"?"Sign in":"Create account",mode==="login"?"دخول":"إنشاء حساب")+'</button></form><button id="atdMode">'+tr(mode==="login"?"New learner? Register":"Already have an account? Sign in",mode==="login"?"متدرب جديد؟ إنشاء حساب":"عندك حساب؟ تسجيل الدخول")+'</button><button id="atdReset">'+tr("Forgot password?","نسيت كلمة المرور؟")+'</button>';
+ body='<h3>'+tr(mode==="login"?"Sign in":"Create account",mode==="login"?"تسجيل الدخول":"إنشاء حساب")+'</h3><form id="atdCredentials"><label>'+tr("Work Email or Employee ID","إيميل العمل أو الرقم الوظيفي")+'</label><input id="atdEmail" type="text" autocomplete="username" required placeholder="EMP001 or name@example.com"><label>'+tr("Password","كلمة المرور")+'</label><input type="password" id="atdPassword" minlength="8" required autocomplete="'+(mode==="login"?"current-password":"new-password")+'">'+(mode==="register"?'<label>'+tr("Confirm password","تأكيد كلمة المرور")+'</label><input id="atdConfirm" type="password" required minlength="8" autocomplete="new-password">':'')+'<button type="submit" class="primary">'+tr(mode==="login"?"Sign in":"Create account",mode==="login"?"دخول":"إنشاء حساب")+'</button></form><button id="atdMode">'+tr(mode==="login"?"New learner? Register":"Already have an account? Sign in",mode==="login"?"متدرب جديد؟ إنشاء حساب":"عندك حساب؟ تسجيل الدخول")+'</button><button id="atdReset">'+tr("Forgot password?","نسيت كلمة المرور؟")+'</button>';
  }
  root.insertAdjacentHTML("beforeend",'<div id="atdAccountMask"><section id="atdAccountPanel" dir="'+(h.getState().lang==="ar"?"rtl":"ltr")+'"><button id="atdClose" style="float:right">×</button><h2>ATD Academy Account</h2>'+body+'<p role="status">'+esc(notice)+'</p></section></div>');
  const get=s=>root.querySelector(s);
  get("#atdClose").onclick=()=>{if(user){opened=false;ui();}};if(!user)get("#atdClose").style.display="none";
  if(!user){
   get("#atdMode").onclick=()=>{mode=mode==="login"?"register":"login";notice="";ui();};
-  get("#atdReset").onclick=async()=>{const email=get("#atdEmail").value.trim();if(!email){notice=tr("Enter your email first.","أدخل بريدك أولاً.");ui();return;}try{await sendPasswordResetEmail(auth,email);notice=tr("Check email for password reset instructions.","راجع بريدك لتعليمات إعادة كلمة المرور.");}catch(e){notice=e.code||e.message;}ui();};
-  get("#atdCredentials").onsubmit=async e=>{e.preventDefault();const email=get("#atdEmail").value.trim().toLowerCase(),password=get("#atdPassword").value;if(mode==="register"&&password!==get("#atdConfirm").value){notice=tr("Passwords do not match.","كلمتا المرور غير متطابقتين.");ui();return;}try{await readyAuth;if(mode==="register")await createUserWithEmailAndPassword(auth,email,password);else await signInWithEmailAndPassword(auth,email,password);notice="";opened=false;ui();}catch(x){notice=x.code||x.message;ui();}};
+  get("#atdReset").onclick=async()=>{
+   const identifier=get("#atdEmail").value.trim();
+   if(!identifier){notice=tr("Enter your Employee ID or work email first.","أدخل الرقم الوظيفي أو إيميل العمل أولاً.");ui();return;}
+   try{
+    if(identifier.includes("@"))await sendPasswordResetEmail(auth,identifier.toLowerCase());
+    else await resetEmployeePassword({employeeId:identifier});
+    notice=tr("If this account exists, password instructions will be sent to the associated email.","إذا كان الحساب موجوداً، سترسل تعليمات كلمة المرور إلى إيميله المرتبط.");
+   }catch(e){
+    notice=e.code==="functions/not-found"?tr("Employee ID service is not deployed yet. Email login and reset still work.","خدمة الرقم الوظيفي لم تُنشر بعد. تسجيل الدخول بالإيميل ما زال يعمل."):(e.code||e.message);
+   }ui();
+  };
+  get("#atdCredentials").onsubmit=async e=>{
+   e.preventDefault();
+   const identifier=get("#atdEmail").value.trim(),password=get("#atdPassword").value;
+   if(mode==="register"&&password!==get("#atdConfirm").value){notice=tr("Passwords do not match.","كلمتا المرور غير متطابقتين.");ui();return;}
+   try{
+    await readyAuth;
+    if(mode==="register"){
+     if(!identifier.includes("@")||identifier.toLowerCase().endsWith("@employee-login.academy.idevelopmena.com"))
+      throw Error(tr("Registration requires a valid personal work email. Employee IDs are assigned by your Academy admin.","التسجيل الجديد يحتاج إيميل عمل صحيح؛ الرقم الوظيفي يضيفه مدير الأكاديمية."));
+     await createUserWithEmailAndPassword(auth,identifier.toLowerCase(),password);
+    }else{
+     let loginEmail=identifier.toLowerCase();
+     if(!identifier.includes("@")){
+      const found=await resolveEmployeeLogin({employeeId:identifier});
+      loginEmail=found.data?.loginEmail;
+      if(!loginEmail)throw Error(tr("Employee ID service returned no login address.","لم يتم العثور على حساب لهذا الرقم الوظيفي."));
+     }
+     await signInWithEmailAndPassword(auth,loginEmail,password);
+    }
+    notice="";opened=false;ui();
+   }catch(x){
+    notice=x.code==="functions/not-found"?tr("Employee ID service needs Firebase Cloud Functions deployment. Email login is still available.","خدمة الرقم الوظيفي تحتاج نشر Cloud Functions في Firebase، ودخول الإيميل ما زال متاحاً."):
+     (x.code||x.message);ui();
+   }
+  };
  }else{
   get("#atdCheckAdminRole").onclick=async()=>{
    const btn=get("#atdCheckAdminRole");btn.disabled=true;
