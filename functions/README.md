@@ -46,8 +46,10 @@ For **new** employee IDs, Firebase Auth uses an unpredictable, separate login em
 - No default passwords or employee IDs used as passwords. Activation emails are generated with Firebase Admin's password-reset link.
 - If email fails, the employee is left as `invite_pending`; **re-importing the same ID and email** re-sends the invitation.
 - If the import fails during provisioning, `provision_failed` requires administrator investigation.
+- Existing email/password accounts must have **verified email ownership** before they can be linked to an Employee ID. If import returns `verification_required`, the employee signs in with their existing email, selects **Send verification email**, verifies it, and an admin re-imports the same row. This preserves the original Auth UID and learning history.
 - Import is idempotent for existing employee IDs and normal accounts.
-- The resolver only returns an unguessable Auth alias rather than a person's work email. Add **Firebase App Check** and production telemetry/rate controls before high-scale use.
+- Newly created employee accounts use random opaque Auth aliases. For **linked legacy accounts**, the login resolver must return their existing Firebase Auth email to preserve the same UID/password and existing email sign-in. Because employee ID lookup is public before login, this carries employee-email enumeration risk. A rate limit is included; enable **Firebase App Check** and production monitoring, or require employees to use their work email until a stronger identity-provider/SSO solution is implemented.
+- Work emails and employee IDs are personal data; limit admin access and avoid sharing roster exports publicly.
 - Configure HTTPS/SMTP reputation, organizational privacy policy, permitted admin access, and retention for employee personal data.
 - Review Cloud Functions charges and configure billing alerts. Cloud Functions deployment requires Blaze even within no-cost quotas.
 - The web pages are deployed through GitHub Pages. Deploying these backend functions is a separate administrative step.
