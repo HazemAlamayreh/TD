@@ -2,6 +2,8 @@
    Original authored practice items; not official ATD examination questions. */
 const ATD_DIAGNOSTIC_BANK_VERSION="diagnostic-pair-v24";
 const ATD_MASTERY_BANK_VERSION="mastery-scenario-v24";
+function atdDiagnosticBankVersion(m){return ["1.1","1.3"].includes(m.id)?"diagnostic-quality-v25":ATD_DIAGNOSTIC_BANK_VERSION;}
+function atdDiagnosticQuestionSuffix(m){return ["1.1","1.3"].includes(m.id)?"d25":"d24";}
 const ATD_PASS={diagnostic:.80,mastery:.75,advanced:.70};
 const ATD_OLD_GETQS=getQs;
 function atdSelectQuestions(m,stage){
@@ -9,7 +11,7 @@ function atdSelectQuestions(m,stage){
   if(!m.lessons.length)return ATD_OLD_GETQS(m,stage);
   return m.lessons.flatMap(l=>{
    const special=typeof CPTD_EI_ITEMS!=="undefined"?CPTD_EI_ITEMS[l[0]]:null;
-   if(special?.d?.length===2)return special.d.map((x,i)=>({id:l[0]+"-d24-"+(i+1),target:l[0],title:l[1],q:x[0],opts:x[1].slice(),answer:x[2],why:x[3],bankVersion:ATD_DIAGNOSTIC_BANK_VERSION,domain:l[0].split(".")[0],capability:m.id,capabilityStatement:m.id==="1.2"?"1.2.A":null,cognitiveDemand:"Apply / Analyze",difficulty:"Medium"}));
+   if(special?.d?.length===2)return special.d.map((x,i)=>({id:l[0]+"-"+atdDiagnosticQuestionSuffix(m)+"-"+(i+1),target:l[0],title:l[1],q:x[0],opts:x[1].slice(),answer:x[2],why:x[3],bankVersion:atdDiagnosticBankVersion(m),domain:l[0].split(".")[0],capability:m.id,capabilityStatement:m.id==="1.2"?"1.2.A":null,cognitiveDemand:"Apply / Analyze",difficulty:"Medium"}));
    const q=TWO_QUESTION_BANK[l[0]]||[];
    return q.length===2?q.map((v,i)=>({...v,id:l[0]+"-d24-"+(i+1),target:l[0],title:l[1],opts:v.opts.slice(),bankVersion:ATD_DIAGNOSTIC_BANK_VERSION})):[];
   });
@@ -42,7 +44,7 @@ function atdSelectQuestions(m,stage){
 getQs=function(m,stage){return atdSelectQuestions(m,stage);};
 function atdVersionMatches(a,stage,m){
  if(!a)return false;
- if(stage==="diagnostic")return a.bankVersion===ATD_DIAGNOSTIC_BANK_VERSION&&a.questionCount===getQs(m,stage).length;
+ if(stage==="diagnostic")return a.bankVersion===atdDiagnosticBankVersion(m)&&a.questionCount===getQs(m,stage).length;
  if(stage==="mastery")return a.bankVersion===ATD_MASTERY_BANK_VERSION&&a.questionCount===getQs(m,stage).length;
  return a.caseVersion==="case-v24"&&a.questionCount===caseQuestions(m).length*4;
 }
@@ -83,7 +85,7 @@ advanceDiagnostic=function(){
  if(completing){
   const a=state.attempts[mid+":diagnostic"],m=DATA.modules.find(x=>x.id===mid);
   if(a&&m){
-   a.bankVersion=ATD_DIAGNOSTIC_BANK_VERSION;
+   a.bankVersion=atdDiagnosticBankVersion(m);
    a.questionCount=sess.qs.length;
    atdRefreshDiagnosticLessons(m);
    save();render();
