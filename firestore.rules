@@ -18,6 +18,16 @@ service cloud.firestore {
       allow get: if isOwner(uid);
       allow list, create, update, delete: if false;
     }
+    // Employee directory is provisioned exclusively by trusted Cloud Functions.
+    // Admins can inspect directory entries but cannot edit identifiers in-browser.
+    match /employees/{employeeId} {
+      allow get, list: if isAdmin();
+      allow create, update, delete: if false;
+    }
+    // Rate-limit counters are managed only via Firebase Admin SDK.
+    match /employeeRequestLimits/{key} {
+      allow read, write: if false;
+    }
     match /learners/{uid} {
       allow get, list: if isOwner(uid) || isAdmin();
       allow create, update: if isOwner(uid);
