@@ -178,7 +178,8 @@ state.legacyAttempts??={};state.lessonProof??={};state.studiedLessons??={};
 for(const m of DATA.modules){
  for(const stage of ['diagnostic','mastery']){
    const key=m.id+':'+stage,attempt=state.attempts[key];
-   if(attempt&&attempt.bankVersion!==BANK_VERSION){
+   if(attempt&&attempt.bankVersion!==BANK_VERSION &&
+      !/^(diagnostic-(?:pair|quality)|mastery-(?:scenario|editorial|audited))/.test(String(attempt.bankVersion||""))){
      state.legacyAttempts[key]=state.legacyAttempts[key]||attempt;
      delete state.attempts[key];
    }
