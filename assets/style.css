@@ -109,3 +109,34 @@ button{transition:background-color .2s,box-shadow .2s,transform .2s,border-color
 .atdPathChip.atdCptdFail{border-color:#edd1a2;background:#fff7e8}
 .moduleLessonBtn.atdCptdClearedLesson{background:#edf7fd!important;border-color:#90c5e5!important;color:#145f8b!important}
 .lesson.atdCptdClearedLesson{border-left:4px solid #2486b8!important;background:#f5faff!important}
+
+
+/* Module 1.2: accessible, responsive, bilingual teacher-led lessons. */
+.eiTeacher{margin:18px 0 24px;display:grid;gap:13px;direction:inherit}
+.eiTeacherHero{background:#eef5fc;border-left:4px solid #2874a6;padding:18px 20px;border-radius:12px}
+[dir="rtl"] .eiTeacherHero{border-left:0;border-right:4px solid #2874a6}
+.eiEyebrow,.eiStoryTag{display:inline-block;font-size:11px;font-weight:800;letter-spacing:.03em;color:#286186;margin-bottom:9px}
+.eiTeacher h4{font-size:17px;margin:4px 0 8px;color:#173a5a}
+.eiTeacher p{font-size:15px;line-height:1.85;margin:8px 0}
+.eiTakeaway{background:#fff;border:1px solid #c8d9e9;border-radius:9px;padding:11px 13px;margin-top:12px;line-height:1.6}
+.eiStory{padding:17px 19px;background:#fcf8ed;border:1px solid #e9ddbc;border-radius:12px}
+.eiSteps{padding:16px 19px;border:1px solid #dbe5ef;border-radius:12px;background:var(--card,#fff)}
+.eiSteps ol{list-style:none;padding:0;margin:9px 0 0}
+.eiSteps li{font-size:14px;line-height:1.75;margin:7px 0;padding:5px 0}
+.eiSteps li b{color:#246e9d}
+.eiDeep{padding:15px 17px;border:1px solid #b9d2e8;border-radius:11px;background:#f7fbff}
+.eiDeep summary,.eiSourceDetails summary,.eiReferencePractice summary{font-weight:700;font-size:14px;cursor:pointer}
+.eiDeep[open] summary{margin-bottom:10px}
+.eiTry{padding:18px;background:#f4f7fb;border:1px solid #cedbe7;border-radius:12px}
+.eiQuestion{font-weight:700}
+.eiChoice{display:block;width:100%;text-align:start;padding:12px 15px;margin:7px 0;border:1px solid #c9d7e5;border-radius:9px;background:#fff;color:#223e58;font-size:14px;line-height:1.55;cursor:pointer}
+.eiChoice:hover,.eiChoice:focus-visible{border-color:#2479b8;outline:2px solid #2479b833}
+.eiChoice.eiCorrect{background:#e7f5ed;border-color:#69af86}
+.eiChoice.eiWrong{background:#fff0eb;border-color:#df9c85}
+.eiFeedback{padding:12px;margin:10px 0;border-radius:8px;background:#e7f0fa;line-height:1.7;font-size:13px}
+.eiNote{font-size:12px!important;color:#627286}
+.eiSourceDetails,.eiReferencePractice{border:1px solid #d8e4ee;border-radius:10px;padding:10px 14px;margin:10px 0}
+.eiSourceDetails .learnblock,.eiReferencePractice .microCheck{margin-top:12px}
+.eiLessonHeader{background:#f3f8fd;border-left:4px solid #3983b0;border-radius:8px;padding:12px 16px}
+[dir="rtl"] .eiLessonHeader{border-left:0;border-right:4px solid #3983b0}
+@media(max-width:600px){.eiTeacherHero,.eiStory,.eiSteps,.eiTry{padding:13px}.eiTeacher h4{font-size:16px}.eiTeacher p{font-size:14px}}
