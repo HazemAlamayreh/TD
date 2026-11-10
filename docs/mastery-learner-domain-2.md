@@ -9,13 +9,13 @@
 
 A TD professional wants learners to construct solutions from authentic work problems. Which theory is most directly aligned?
 
-**A.** Behaviorism
+**A.** Operant punishment
 
-**B.** Constructivism
+**B.** Behaviorism
 
-**C.** Pure memorization
+**C.** Constructivism
 
-**D.** Operant punishment
+**D.** Pure memorization
 
 ### 2.1.1-M2 · Foundational Learning Theories
 
@@ -33,13 +33,13 @@ An online program teaches technicians to handle unfamiliar system failures. Lear
 
 Learners are overwhelmed by an infographic filled with unrelated detail. Which immediate redesign is strongest?
 
-**A.** Add more decorative animation
+**A.** Require faster note taking
 
-**B.** Reduce extraneous information and segment the content
+**B.** Present every exception before the main task
 
-**C.** Require faster note taking
+**C.** Add more decorative animation
 
-**D.** Present every exception before the main task
+**D.** Reduce extraneous information and segment the content
 
 ### 2.1.2-M2 · Cognitive Science and Memory
 
@@ -57,13 +57,13 @@ A compliance microlearning screen displays a detailed process graphic, running n
 
 Experienced supervisors resist an introductory lecture. What principle should guide the redesign?
 
-**A.** Ignore existing experience
+**A.** Use job-relevant problems and invite learners to draw on experience
 
-**B.** Use job-relevant problems and invite learners to draw on experience
+**B.** Require passive viewing only
 
-**C.** Require passive viewing only
+**C.** Start with a final examination
 
-**D.** Start with a final examination
+**D.** Ignore existing experience
 
 ### 2.1.3-M2 · Adult Learning Theories and Instruction
 
@@ -79,15 +79,15 @@ Experienced shift supervisors reject a new leadership lesson as too basic. Their
 
 ### 2.1.4-M1 · Communication and Multimedia Learning
 
-A narrated diagram also displays the same long script on screen, distracting learners. What is the best improvement?
+A narrated process graphic includes long paragraphs repeating every spoken word. Learners miss a critical decision. Which redesign best supports understanding?
 
-**A.** Add more animation
+**A.** Use captions but replace the diagram with a dense text transcript.
 
-**B.** Simplify redundant on-screen prose and align narration with relevant visuals
+**B.** Align short narration with relevant visual steps and make a transcript available.
 
-**C.** Remove the diagram entirely
+**C.** Add more animations so the important information is visually distinctive.
 
-**D.** Play two audio tracks
+**D.** Use the complete narration and present the diagram after the video.
 
 ### 2.1.4-M2 · Communication and Multimedia Learning
 
@@ -105,13 +105,13 @@ A safety briefing uses a narrated animation and dense paragraphs describing the 
 
 A team knows a procedure immediately after training but forgets it a month later. What is best?
 
-**A.** Assign rereading only at the end
+**A.** Eliminate feedback
 
-**B.** Schedule spaced retrieval and applied practice across several weeks
+**B.** Assign rereading only at the end
 
-**C.** Increase slide count
+**C.** Schedule spaced retrieval and applied practice across several weeks
 
-**D.** Eliminate feedback
+**D.** Increase slide count
 
 ### 2.1.5-M2 · Applying Cognitive Science to Transfer
 
@@ -131,13 +131,13 @@ Call-center employees perform a new escalation step correctly at the end of trai
 
 A sponsor requests a course because productivity fell. What should happen first?
 
-**A.** Develop a storyboard
+**A.** Buy an LMS
 
-**B.** Diagnose the performance gap and root causes
+**B.** Schedule delivery
 
-**C.** Buy an LMS
+**C.** Develop a storyboard
 
-**D.** Schedule delivery
+**D.** Diagnose the performance gap and root causes
 
 ### 2.2.1-M2 · Instructional Design Models and ADDIE
 
@@ -177,15 +177,15 @@ A sponsor says a training initiative should 'improve service quality.' Which pai
 
 ### 2.2.4-M1 · Writing Measurable Objectives
 
-Which objective is easiest to assess reliably?
+A designer must assess how supervisors give corrective feedback. Which learning objective can be judged reliably?
 
-**A.** Understand coaching
+**A.** Given a role-play, demonstrate feedback against four observable criteria.
 
-**B.** Value coaching
+**B.** Appreciate why supervisors should give feedback regularly.
 
-**C.** Given an employee scenario, select a suitable response using three rubric criteria
+**C.** Understand how effective feedback helps team development.
 
-**D.** Appreciate leadership
+**D.** Know the main principles used in coaching conversations.
 
 ### 2.2.4-M2 · Writing Measurable Objectives
 
@@ -203,13 +203,13 @@ A design team wants a measurable objective for coaching feedback, but the curren
 
 An internal course already covers the same topic. What should the designer do?
 
-**A.** Reuse it without review
+**A.** Always rebuild from scratch
 
-**B.** Evaluate alignment and quality against objectives and learners
+**B.** Ignore existing resources
 
-**C.** Always rebuild from scratch
+**C.** Reuse it without review
 
-**D.** Ignore existing resources
+**D.** Evaluate alignment and quality against objectives and learners
 
 ### 2.2.5-M2 · Evaluate Existing Instructional Content
 
@@ -227,13 +227,13 @@ The organization already owns an onboarding course similar to one requested by t
 
 Why create a storyboard before development?
 
-**A.** It replaces needs analysis
+**A.** It guarantees business impact
 
-**B.** It enables early review of sequence, activities and interface
+**B.** It replaces needs analysis
 
-**C.** It eliminates testing
+**C.** It enables early review of sequence, activities and interface
 
-**D.** It guarantees business impact
+**D.** It eliminates testing
 
 ### 2.2.6-M2 · Course Blueprints and Sequencing
 
@@ -275,13 +275,13 @@ Remote managers must learn a system process and practice difficult coaching conv
 
 What is the key benefit of a pilot during development?
 
-**A.** It removes the need for evaluation
+**A.** It reveals usability and learning problems before full deployment
 
-**B.** It reveals usability and learning problems before full deployment
+**B.** It replaces SME verification
 
-**C.** It replaces SME verification
+**C.** It guarantees 100% mastery
 
-**D.** It guarantees 100% mastery
+**D.** It removes the need for evaluation
 
 ### 2.2.8-M2 · Developing Instructional Content
 
@@ -297,15 +297,15 @@ A newly developed training module receives positive SME feedback, but learners b
 
 ### 2.2.9-M1 · Working With Subject Matter Experts
 
-A SME provides extensive technical detail unrelated to the course objectives. What should the designer do?
+An expert provides extensive technical content, but the course focuses on recognizing safety exceptions. What should the designer request?
 
-**A.** Include it all
+**A.** The complete history of the equipment and every prior incident.
 
-**B.** Use the objectives to prioritize content and confirm accuracy with the SME
+**B.** A summary of the expert's qualifications and preferred teaching style.
 
-**C.** Remove the SME from the project
+**C.** A list of all related technical terms and policy definitions.
 
-**D.** Ignore factual review
+**D.** Examples of the decisions and cues employees use for each exception.
 
 ### 2.2.9-M2 · Working With Subject Matter Experts
 
@@ -323,13 +323,13 @@ An expert presents 90 minutes of technical detail for a course whose objective i
 
 After learners complete a simulation, what best supports experiential learning?
 
-**A.** End the session immediately
+**A.** Facilitate reflection, generalization and application to work
 
-**B.** Facilitate reflection, generalization and application to work
+**B.** Provide only a score
 
-**C.** Provide only a score
+**C.** Show a longer lecture
 
-**D.** Show a longer lecture
+**D.** End the session immediately
 
 ### 2.2.10-M2 · Instructional Methods and Experiential Learning
 
@@ -371,13 +371,13 @@ The learning objective requires managers to respond appropriately when employees
 
 A learner misses two questions on assessment alignment. Which adaptive response is most useful?
 
-**A.** Repeat every lesson regardless of evidence
+**A.** Report mastery
 
-**B.** Recommend targeted alignment examples and a fresh application check
+**B.** Remove assessments
 
-**C.** Report mastery
+**C.** Repeat every lesson regardless of evidence
 
-**D.** Remove assessments
+**D.** Recommend targeted alignment examples and a fresh application check
 
 ### 2.2.12-M2 · Learning Assets, Assessment and Adaptive Learning
 
@@ -395,13 +395,13 @@ An adaptive academy shows that a learner repeatedly mistakes evaluation metrics 
 
 When is a low-fidelity prototype most useful?
 
-**A.** After official launch only
+**A.** Early, to test sequence and flow cheaply
 
-**B.** Early, to test sequence and flow cheaply
+**B.** As proof of long-term business impact
 
-**C.** As proof of long-term business impact
+**C.** To replace user feedback
 
-**D.** To replace user feedback
+**D.** After official launch only
 
 ### 2.2.13-M2 · Design Thinking and Rapid Prototyping
 
@@ -445,13 +445,13 @@ A skilled employee leaves after teaching a new process to only one colleague. Th
 
 A hybrid session starts tomorrow and remote learners have not tested access. What is the priority?
 
-**A.** Wait until the opening activity to troubleshoot.
+**A.** Run a participant technology check and distribute access instructions now.
 
-**B.** Run a participant technology check and distribute access instructions now.
+**B.** Send slides only after the session.
 
-**C.** Send slides only after the session.
+**C.** Cancel the virtual portion without consultation.
 
-**D.** Cancel the virtual portion without consultation.
+**D.** Wait until the opening activity to troubleshoot.
 
 ### 2.3.1-M2 · Plan and Coordinate Learning Events
 
@@ -469,13 +469,13 @@ A hybrid workshop starts in the morning. Three remote participants report they c
 
 Two department heads debate whose plan should win. As neutral meeting facilitator, what is best?
 
-**A.** Declare the senior manager the winner.
+**A.** Defend the facilitator’s preferred solution.
 
-**B.** Defend the facilitator’s preferred solution.
+**B.** Reframe the disagreement as shared decision criteria and invite balanced input.
 
-**C.** Reframe the disagreement as shared decision criteria and invite balanced input.
+**C.** Move directly to the next agenda item without closure.
 
-**D.** Move directly to the next agenda item without closure.
+**D.** Declare the senior manager the winner.
 
 ### 2.3.2-M2 · Facilitate Meetings and Learning Events
 
@@ -493,13 +493,13 @@ HR and Operations disagree over which performance gap a workshop should address.
 
 A virtual session has become silent after a complex explanation. What should the facilitator do?
 
-**A.** Continue lecturing more quickly.
+**A.** Assume silence means everyone understands.
 
-**B.** Assume silence means everyone understands.
+**B.** Call out the quietest person for failing to participate.
 
-**C.** Call out the quietest person for failing to participate.
+**C.** Use a targeted poll or brief small-group application and check comprehension.
 
-**D.** Use a targeted poll or brief small-group application and check comprehension.
+**D.** Continue lecturing more quickly.
 
 ### 2.3.3-M2 · Facilitation Methods and Engagement
 
@@ -517,13 +517,13 @@ A virtual class stops responding after a complex demonstration. The facilitator 
 
 Several experienced learners are reluctant to speak after a public correction. What is the best response?
 
-**A.** Repeat the correction in front of everyone.
+**A.** Require each learner to speak immediately without preparation.
 
-**B.** Avoid any practice for the rest of the event.
+**B.** Repeat the correction in front of everyone.
 
-**C.** Re-establish nonjudgmental dialogue and invite small-group participation.
+**C.** Avoid any practice for the rest of the event.
 
-**D.** Require each learner to speak immediately without preparation.
+**D.** Re-establish nonjudgmental dialogue and invite small-group participation.
 
 ### 2.3.4-M2 · Create Positive Learning Climates
 
@@ -541,13 +541,13 @@ A facilitator publicly corrects an experienced technician, and the group becomes
 
 Employees need to demonstrate a customer de-escalation skill. Which approach is most aligned?
 
-**A.** Provide a reading-only module and attendance certificate.
+**A.** Practice realistic conversations with observation, feedback and workplace reinforcement.
 
-**B.** Sort people into fixed visual and auditory learning styles.
+**B.** Use only a fact-recall quiz.
 
-**C.** Practice realistic conversations with observation, feedback and workplace reinforcement.
+**C.** Provide a reading-only module and attendance certificate.
 
-**D.** Use only a fact-recall quiz.
+**D.** Sort people into fixed visual and auditory learning styles.
 
 ### 2.3.5-M2 · Align Delivery Methods and Media
 
@@ -563,15 +563,15 @@ The learning objective is to de-escalate an angry customer call. Which practice 
 
 ### 2.3.6-M1 · Deliver Across Modalities
 
-Technicians perform a complicated procedure only once each quarter. Which support is most useful?
+Technicians perform a complex task only once every quarter. What support would most reduce avoidable errors at work?
 
-**A.** Provide a concise job aid at the point of performance with guided practice.
+**A.** A refresher lecture delivered after each quarterly maintenance cycle.
 
-**B.** Require memorization of every procedural step.
+**B.** A searchable checklist available during the task, supported by guided practice.
 
-**C.** Use a one-time motivational speech.
+**C.** A longer end-of-course quiz on infrequently used technical terms.
 
-**D.** Remove all support after initial training.
+**D.** A video that employees must watch before beginning any maintenance.
 
 ### 2.3.6-M2 · Deliver Across Modalities
 
@@ -589,13 +589,13 @@ Maintenance staff use a complex diagnostic routine only once every three months.
 
 Participants are ready to apply a skill, but the slides only describe it. What adaptation is strongest?
 
-**A.** Introduce a short role play and feedback against the objective.
+**A.** Shorten the session by removing practice.
 
-**B.** Add more background definitions.
+**B.** Read every slide aloud.
 
-**C.** Shorten the session by removing practice.
+**C.** Introduce a short role play and feedback against the objective.
 
-**D.** Read every slide aloud.
+**D.** Add more background definitions.
 
 ### 2.3.7-M2 · Adapt and Create Learning Assets
 
@@ -639,13 +639,13 @@ A new LMS launches successfully, but content updates, access problems and report
 
 Vendors offer attractive features before users have been studied. What is the best next action?
 
-**A.** Choose the tool with the most features.
+**A.** Interview representative users and document prioritized outcome-based requirements.
 
-**B.** Sign the shortest contract without IT review.
+**B.** Copy another organization’s specifications unchanged.
 
-**C.** Interview representative users and document prioritized outcome-based requirements.
+**C.** Choose the tool with the most features.
 
-**D.** Copy another organization’s specifications unchanged.
+**D.** Sign the shortest contract without IT review.
 
 ### 2.4.2-M2 · Define System Requirements
 
@@ -661,15 +661,15 @@ A vendor offers an appealing mobile learning platform, but no one has assessed t
 
 ### 2.4.3-M1 · Select E-Learning Authoring Tools
 
-The favorite authoring tool exports only a format the organization’s LMS cannot use. What should TD do?
+The selected authoring tool produces content the LMS cannot reliably launch. How should the team decide whether to procure it?
 
-**A.** Purchase it because the templates look modern.
+**A.** Convert all output files manually after course development is complete.
 
-**B.** Ask learners to install unsupported software.
+**B.** Use the tool for content design and address reporting issues at launch.
 
-**C.** Test compatible publishing alternatives and reject unsupported options if requirements cannot be met.
+**C.** Accept the vendor's plan to add support in a later version.
 
-**D.** Ignore assessment reporting requirements.
+**D.** Test supported publication formats and launch behavior in the actual LMS.
 
 ### 2.4.3-M2 · Select E-Learning Authoring Tools
 
@@ -687,13 +687,13 @@ An authoring tool produces a polished course but only exports a package the comp
 
 A vendor proposes immersive VR for a simple policy lookup task. What should the TD team do?
 
-**A.** Choose VR because it is novel.
+**A.** Compare simpler performance-support tools against the actual task requirements.
 
-**B.** Compare simpler performance-support tools against the actual task requirements.
+**B.** Assume all users own headsets.
 
-**C.** Assume all users own headsets.
+**C.** Ignore technical and financial constraints.
 
-**D.** Ignore technical and financial constraints.
+**D.** Choose VR because it is novel.
 
 ### 2.4.4-M2 · Implement Right-Fit Learning Technology
 
@@ -733,15 +733,15 @@ Developers say the LMS passes functional tests, but field employees repeatedly l
 
 ### 2.4.6-M1 · Understand the Learning Technology Ecosystem
 
-Learners must visit four portals to find one job aid. What ecosystem principle should guide improvement?
+Employees search several portals for one approved troubleshooting guide. What technology improvement should the team prioritize?
 
-**A.** Simplify the user journey and integrate or consolidate access where valuable.
+**A.** Add extra copies of the guide to each existing portal.
 
-**B.** Add a fifth standalone portal.
+**B.** Publish a navigation course explaining the four current systems.
 
-**C.** Require more navigation training first.
+**C.** Replace all knowledge resources with one large downloaded file.
 
-**D.** Stop updating the job aid.
+**D.** Provide one discoverable access route with clear content ownership.
 
 ### 2.4.6-M2 · Understand the Learning Technology Ecosystem
 
@@ -783,13 +783,13 @@ The HR team wants to synchronize LMS completions with succession records, but th
 
 A dispersed team needs short peer troubleshooting in daily work. What is the most practical approach?
 
-**A.** Build an isolated TD-only social network immediately.
+**A.** Use the existing work chat and searchable help resources.
 
-**B.** Hold lengthy mandatory webinars for every question.
+**B.** Build an isolated TD-only social network immediately.
 
-**C.** Stop informal peer exchanges.
+**C.** Hold lengthy mandatory webinars for every question.
 
-**D.** Use the existing work chat and searchable help resources.
+**D.** Stop informal peer exchanges.
 
 ### 2.4.8-M2 · Use Communication Technology for Learning
 
@@ -807,13 +807,13 @@ Newly hired support staff need quick answers from colleagues while resolving cas
 
 Users cannot find the Diagnostic Exam despite a visually polished interface. What should improve first?
 
-**A.** Add decorative graphics around the same hidden link.
+**A.** Hide the sidebar entirely without an alternative.
 
-**B.** Make the exam action prominent and test navigation with actual learners.
+**B.** Add a mandatory manual explaining every button.
 
-**C.** Hide the sidebar entirely without an alternative.
+**C.** Add decorative graphics around the same hidden link.
 
-**D.** Add a mandatory manual explaining every button.
+**D.** Make the exam action prominent and test navigation with actual learners.
 
 ### 2.4.9-M2 · Apply UI and UX Principles
 
@@ -903,13 +903,13 @@ A team requests a new learning app for branching quizzes. The current LMS includ
 
 The team wants to retain identifiable diagnostic responses forever for convenience. What is best?
 
-**A.** Share the records with every facilitator.
+**A.** Keep copies on personal devices.
 
-**B.** Apply a documented purpose, access controls and retention limits.
+**B.** Share the records with every facilitator.
 
-**C.** Remove all user consent information.
+**C.** Apply a documented purpose, access controls and retention limits.
 
-**D.** Keep copies on personal devices.
+**D.** Remove all user consent information.
 
 ### 2.4.13-M2 · Handle Talent Information in HR Systems
 
@@ -951,13 +951,13 @@ A community channel shares excellent work tips, but one widely cited procedure w
 
 A director asks for VR in all onboarding due to market hype. What should TD recommend?
 
-**A.** Commit the full budget before understanding users.
+**A.** Pilot one evidence-based use case with accessibility, safety and value measures.
 
-**B.** Assume every employee can tolerate a headset.
+**B.** Ignore device upkeep costs.
 
-**C.** Pilot one evidence-based use case with accessibility, safety and value measures.
+**C.** Commit the full budget before understanding users.
 
-**D.** Ignore device upkeep costs.
+**D.** Assume every employee can tolerate a headset.
 
 ### 2.4.15-M2 · Monitor Emerging Technology Trends
 
@@ -977,13 +977,13 @@ A director wants VR for every onboarding topic because competitors are experimen
 
 A retiring engineer is the only person who knows an exception-handling process. What is the best first KM step?
 
-**A.** Map the critical decision knowledge, interview the expert and document searchable guidance.
+**A.** Wait until after retirement to reconstruct the process.
 
-**B.** Wait until after retirement to reconstruct the process.
+**B.** Purchase a repository without identifying the knowledge.
 
-**C.** Purchase a repository without identifying the knowledge.
+**C.** Ask staff to memorize unrelated manuals.
 
-**D.** Ask staff to memorize unrelated manuals.
+**D.** Map the critical decision knowledge, interview the expert and document searchable guidance.
 
 ### 2.5.2-M2 · Map and Codify Organizational Knowledge
 
@@ -1001,13 +1001,13 @@ A senior engineer is leaving in six weeks, and no one else understands how to re
 
 Employees exchange useful tips but none are retained for new hires. What is the strongest solution?
 
-**A.** Stop informal exchange.
+**A.** Keep all practical knowledge exclusively with experts.
 
-**B.** Keep all practical knowledge exclusively with experts.
+**B.** Capture validated insights into accessible resources while preserving peer discussion.
 
-**C.** Capture validated insights into accessible resources while preserving peer discussion.
+**C.** Require everyone to search through chat history unaided.
 
-**D.** Require everyone to search through chat history unaided.
+**D.** Stop informal exchange.
 
 ### 2.5.4-M2 · Share Knowledge Across the Organization
 
@@ -1023,15 +1023,15 @@ A peer group shares useful troubleshooting techniques, but new employees cannot 
 
 ### 2.5.5-M1 · Govern Content Curation
 
-A job aid is widely used but contradicts current policy. What should the curator do?
+A widely used job aid contradicts a new safety procedure. What should the content curator do first?
 
-**A.** Leave it because engagement is high.
+**A.** Ask users which version they prefer before making changes.
 
-**B.** Remove all current policy references.
+**B.** Remove it without checking which replacement guidance is authorized.
 
-**C.** Prioritize visual formatting over correctness.
+**C.** Flag the item, validate the current policy and publish an approved correction.
 
-**D.** Flag it, verify with an accountable SME, correct or retire it, and notify users.
+**D.** Leave the item visible and schedule its regular annual review.
 
 ### 2.5.5-M2 · Govern Content Curation
 
@@ -1049,13 +1049,13 @@ A frequently used job aid contradicts a policy updated last month. The curator m
 
 Three knowledge sources give conflicting procedures for the same task. What should TD do?
 
-**A.** Publish all three without context.
+**A.** Choose the most recently emailed version without review.
 
-**B.** Use the longest document automatically.
+**B.** Publish all three without context.
 
-**C.** Resolve conflict with validated evidence and designated authorities before publishing a unified guide.
+**C.** Use the longest document automatically.
 
-**D.** Choose the most recently emailed version without review.
+**D.** Resolve conflict with validated evidence and designated authorities before publishing a unified guide.
 
 ### 2.5.6-M2 · Synthesize Multiple Knowledge Sources
 
@@ -1097,13 +1097,13 @@ A designer finds an excellent illustration online for a commercial learning modu
 
 A key employee may leave in three months and the succession plan lists only courses. What would improve it most?
 
-**A.** Add more unrelated courses.
+**A.** Wait until the vacancy is announced.
 
-**B.** Wait until the vacancy is announced.
+**B.** Add critical role knowledge mapping, expert handover and workplace practice evidence.
 
-**C.** Add critical role knowledge mapping, expert handover and workplace practice evidence.
+**C.** Use course attendance alone to confirm readiness.
 
-**D.** Use course attendance alone to confirm readiness.
+**D.** Add more unrelated courses.
 
 ### 2.5.8-M2 · Connect Knowledge to Talent Development
 
@@ -1121,13 +1121,13 @@ A succession plan lists courses for a critical technical role, but the incumbent
 
 A new community attracts members but few return or contribute. What is the best priority?
 
-**A.** Mandate daily posts from every employee.
+**A.** Ignore member needs and focus on membership totals.
 
-**B.** Clarify practical member value, simplify participation and encourage trusted peer leadership.
+**B.** Mandate daily posts from every employee.
 
-**C.** Add extra approval levels to every question.
+**C.** Clarify practical member value, simplify participation and encourage trusted peer leadership.
 
-**D.** Ignore member needs and focus on membership totals.
+**D.** Add extra approval levels to every question.
 
 ### 2.5.9-M2 · Build Communities of Practice
 
@@ -1139,7 +1139,7 @@ A new community of practice has 200 members but few useful contributions after i
 
 **C.** Expand the community to more departments before changing its purpose.
 
-**D.** Set a practical shared problem, rotate peer experts and make contributions easy to apply at work.
+**D.** Agree a shared work problem, rotate experts and simplify participation.
 
 ## 2.6 Career & Leadership Development
 
@@ -1147,13 +1147,13 @@ A new community of practice has 200 members but few useful contributions after i
 
 A skilled employee wants broader cross-functional experience without an immediate promotion. Which pathway best fits?
 
-**A.** Offer a horizontal or lattice assignment with clear development outcomes.
+**A.** Require the employee to wait for a management vacancy.
 
-**B.** Require the employee to wait for a management vacancy.
+**B.** Place the employee in an unrelated course only.
 
-**C.** Place the employee in an unrelated course only.
+**C.** Promise a promotion before assessing role requirements.
 
-**D.** Promise a promotion before assessing role requirements.
+**D.** Offer a horizontal or lattice assignment with clear development outcomes.
 
 ### 2.6.1-M2 · Career Models and Paths
 
@@ -1195,13 +1195,13 @@ A graduate of a leadership program writes 'become a better leader' as the only g
 
 A manager asks to exclude employees from promotion based only on an unvalidated personality survey. What should TD do?
 
-**A.** Reject the unsupported screening use and select validated, job-related evidence with HR review.
+**A.** Treat the survey as a measure of job performance.
 
-**B.** Use the personality score as a final promotion decision.
+**B.** Reject the unsupported screening use and select validated, job-related evidence with HR review.
 
-**C.** Share all individual responses with peers.
+**C.** Use the personality score as a final promotion decision.
 
-**D.** Treat the survey as a measure of job performance.
+**D.** Share all individual responses with peers.
 
 ### 2.6.3-M2 · Career Assessments and Ethical Debriefing
 
@@ -1219,13 +1219,13 @@ A department head wants to exclude employees from a career pathway based only on
 
 A prospective project leader understands planning theory but lacks experience coordinating stakeholders. What development fits best?
 
-**A.** Repeat the same introductory theory course.
+**A.** Assign a supervised cross-functional stretch project with coaching and feedback.
 
-**B.** Offer only a reading list.
+**B.** Defer all development until promotion.
 
-**C.** Assign a supervised cross-functional stretch project with coaching and feedback.
+**C.** Repeat the same introductory theory course.
 
-**D.** Defer all development until promotion.
+**D.** Offer only a reading list.
 
 ### 2.6.4-M2 · Career Development Methods
 
@@ -1267,13 +1267,13 @@ After reorganization, employees must apply for new internal roles but do not und
 
 A safety-critical operator must demonstrate a procedure before working alone. Which arrangement is most suitable?
 
-**A.** An attendance-only certificate without performance evidence.
+**A.** A badge for voluntary participation.
 
-**B.** A badge for voluntary participation.
+**B.** A self-reported confidence survey.
 
-**C.** A self-reported confidence survey.
+**C.** A job-specific qualification assessed against observable performance standards.
 
-**D.** A job-specific qualification assessed against observable performance standards.
+**D.** An attendance-only certificate without performance evidence.
 
 ### 2.6.6-M2 · Qualification and Credential Programs
 
@@ -1289,15 +1289,15 @@ New maintenance operators must perform a safety-critical procedure independently
 
 ### 2.6.7-M1 · Leadership Development Practices
 
-A high-potential employee is technically strong but struggles to inspire and involve others. What is the strongest intervention?
+A talented specialist lacks experience influencing colleagues outside their team. Which development intervention is most appropriate?
 
-**A.** Assume technical expertise guarantees leadership effectiveness.
+**A.** A lecture series about recognized leadership theories.
 
-**B.** Rely only on a leadership theory slideshow.
+**B.** A supervised cross-functional assignment with feedback on influence behaviors.
 
-**C.** Promote immediately without developmental support.
+**C.** An advanced technical course followed by a knowledge assessment.
 
-**D.** Provide leadership practice with feedback, coaching and opportunities to influence a real team.
+**D.** An immediate manager promotion to build decision authority.
 
 ### 2.6.7-M2 · Leadership Development Practices
 
@@ -1315,15 +1315,15 @@ A high-potential specialist is strong technically but struggles to influence col
 
 ### 2.7.1-M1 · Coaching Models and Boundaries
 
-During a coaching conversation, a leader describes a challenge. What is the best initial move?
+A manager enters a coaching session with a difficult team issue. Before suggesting solutions, what should the coach clarify?
 
-**A.** Clarify the leader’s desired outcome and explore current reality before proposing options.
+**A.** What outcome the manager wants and what is happening now.
 
-**B.** Deliver the coach’s preferred solution immediately.
+**B.** How quickly the manager wants the coach to provide advice.
 
-**C.** Replace coaching with an unrelated lecture.
+**C.** Which other team members should attend the next session.
 
-**D.** Avoid setting goals.
+**D.** Which communication framework the manager already prefers.
 
 ### 2.7.1-M2 · Coaching Models and Boundaries
 
@@ -1339,15 +1339,15 @@ A coachee describes frustration with a new supervisor. The internal coach is tem
 
 ### 2.7.3-M1 · Coaching Managers to Develop Employees
 
-An employee has the required skill but cannot perform because critical equipment is unavailable. What should the manager do?
+A capable employee misses deadlines because critical software access has not been granted. How should the manager respond?
 
-**A.** Increase coaching sessions without supplying equipment.
+**A.** Ask the employee to observe another worker instead of changing permissions.
 
-**B.** Record the employee as unmotivated.
+**B.** Schedule additional coaching about managing personal productivity.
 
-**C.** Remove the resource barrier rather than prescribing coaching as the only solution.
+**C.** Address the access barrier, then assess whether skill support is still needed.
 
-**D.** Require another knowledge quiz.
+**D.** Require a refresher course before requesting software access.
 
 ### 2.7.3-M2 · Coaching Managers to Develop Employees
 
@@ -1365,13 +1365,13 @@ A trained employee repeatedly misses a target because essential software access 
 
 An internal coaching client assumes everything will be disclosed to their supervisor. What should the coach do first?
 
-**A.** Begin sessions without discussing privacy.
+**A.** Share personal notes with the supervisor automatically.
 
-**B.** Promise unconditional secrecy without checking policy.
+**B.** Begin sessions without discussing privacy.
 
-**C.** Clarify and document confidentiality, reporting exceptions and stakeholder expectations before coaching.
+**C.** Promise unconditional secrecy without checking policy.
 
-**D.** Share personal notes with the supervisor automatically.
+**D.** Clarify and document confidentiality, reporting exceptions and stakeholder expectations before coaching.
 
 ### 2.7.4-M2 · Coaching Agreements and Readiness
 
@@ -1389,13 +1389,13 @@ A supervisor sponsors internal coaching and asks to receive the coach's notes af
 
 A coaching sponsor reports success because all sessions occurred. What is the best response?
 
-**A.** Treat attendance as proof of behavior change.
+**A.** Compare agreed outcomes and observed performance changes, while acknowledging attribution limits.
 
-**B.** Compare agreed outcomes and observed performance changes, while acknowledging attribution limits.
+**B.** Report revenue impact without evidence.
 
-**C.** Report revenue impact without evidence.
+**C.** Discard the original coaching agreement.
 
-**D.** Discard the original coaching agreement.
+**D.** Treat attendance as proof of behavior change.
 
 ### 2.7.5-M2 · Evaluate Coaching Effectiveness
 
@@ -1413,13 +1413,13 @@ An internal coaching program has delivered every planned session, but the sponso
 
 A pilot coaching program grows quickly but coaches have little time and clients report mismatches. What should TD prioritize?
 
-**A.** Assign coaches randomly with no training.
+**A.** Stop collecting client feedback.
 
-**B.** Stop collecting client feedback.
+**B.** Increase caseloads for all coaches.
 
-**C.** Increase caseloads for all coaches.
+**C.** Review coach capacity, matching criteria and support before scaling further.
 
-**D.** Review coach capacity, matching criteria and support before scaling further.
+**D.** Assign coaches randomly with no training.
 
 ### 2.7.7-M2 · Recruit and Support Coaches and Mentors
 
@@ -1463,13 +1463,13 @@ An internal coach learns confidential information that could help the coach's ow
 
 An organization wants evidence that a new coaching skill is used at work. Which instrument best directly measures the behavior?
 
-**A.** A satisfaction question about refreshments.
+**A.** A participation register alone.
 
-**B.** A participation register alone.
+**B.** A survey asking whether the course looked attractive.
 
-**C.** A survey asking whether the course looked attractive.
+**C.** A rubric-based observation checklist used during real or simulated coaching conversations.
 
-**D.** A rubric-based observation checklist used during real or simulated coaching conversations.
+**D.** A satisfaction question about refreshments.
 
 ### 2.8.4-M2 · Create Evaluation Instruments
 
@@ -1485,15 +1485,15 @@ The sponsor wants evidence that supervisors use a new coaching-feedback skill du
 
 ### 2.8.5-M1 · Research Design and Evaluation Methods
 
-A department’s sales and training hours both rise in the same quarter. What conclusion is justified?
+Sales rise after training, but pricing also changes. Which evaluation conclusion is defensible?
 
-**A.** Training definitely caused every sale.
+**A.** Training caused the rise because both changes happened together.
 
-**B.** There is an association to investigate; other variables must be considered before claiming training caused the rise.
+**B.** Sales changed; a comparison design is needed to assess training's contribution.
 
-**C.** No further measurement is needed.
+**C.** Pricing caused the rise because customers respond to lower costs.
 
-**D.** Correlation proves the program had no effect.
+**D.** Employee satisfaction is enough to estimate the training effect.
 
 ### 2.8.5-M2 · Research Design and Evaluation Methods
 
@@ -1511,13 +1511,13 @@ Sales results improved after a learning program, but product pricing also change
 
 A program earns high reaction ratings but performance indicators stay flat. What should TD report?
 
-**A.** Declare business impact achieved based on satisfaction.
+**A.** Conclude all learning was ineffective without further analysis.
 
-**B.** Exclude performance results from the report.
+**B.** Declare business impact achieved based on satisfaction.
 
-**C.** Present both findings accurately and investigate barriers to transfer before recommending next actions.
+**C.** Exclude performance results from the report.
 
-**D.** Conclude all learning was ineffective without further analysis.
+**D.** Present both findings accurately and investigate barriers to transfer before recommending next actions.
 
 ### 2.8.7-M2 · Analyze, Interpret and Communicate Impact
 
