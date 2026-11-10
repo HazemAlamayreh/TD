@@ -99,7 +99,7 @@ export function initializeEmployeeManagement(auth){
  '<div id="employeePreview" class="scroll"></div><div id="employeeResults" class="scroll"></div>'+
  '<p class="muted small">Uploads are processed only when you press Import. New employees get random temporary Firebase passwords, never their employee number. The code is deployed to GitHub Pages; backend provisioning separately requires Firebase Cloud Functions deployment.</p>';
  get("employeeTemplate").onclick=()=>{
-  const str="\uFEFFEmployee ID,Full Name,Work Email,Department\r\nEMP0001,Example Employee,employee@example.com,Sales\r\n";
+  const str="\uFEFFEmployee ID,Full Name,Work Email,Division,Department\r\nEMP0001,Example Employee,employee@example.com,Organizational Development,Talent Management Department\r\n";
   const blob=new Blob([str],{type:"text/csv;charset=utf-8"}),url=URL.createObjectURL(blob),a=document.createElement("a");
   a.href=url;a.download="ATD-Employee-Import-Template.csv";a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
  };
