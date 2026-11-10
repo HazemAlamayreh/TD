@@ -1,0 +1,202 @@
+# ATD Academy — CPTD Question Quality Audit (2026-11-10)
+
+Automated editorial screening of the **10 two-question Diagnostic banks**. This is a QA report, not a validated item analysis.
+
+## Results
+
+- 179 lesson-level question pairs / 358 questions screened.
+- **16 second questions rewritten** with specific workplace situations and four realistic choices (modules 1.1 and 1.3, selected lessons).
+- **163 remaining** generic second-question prompts require human editorial rewriting, not automated word substitution.
+- Many first-question distractors still contain artificial phrases such as `to support the immediate business need`; these must also be edited.
+- Current Mastery and Advanced Cases need a separate item-level psychometric/editorial review; this audit does not certify exam equivalence.
+
+## Editorial acceptance criteria
+
+1. Present a credible workplace situation and one clear decision appropriate to the tested capability.
+2. Exactly four answer choices for Diagnostic/Mastery, one *best* answer with clear rationale.
+3. Distractors must be plausible competing decisions, not obviously irrelevant, impossible or grammatical padding.
+4. No repeated all-purpose stems or reusable three-distractor templates across modules.
+5. Balance option length and position; do not make the correct answer conspicuously longest.
+6. Attach question ID, capability, lesson, cognitive demand, difficulty and bank version; do not silently rescore historical answers if any option changes.
+7. For Advanced Cases, use 3–4 progressive scenario steps and stage-appropriate necessary-action choices including tempting premature actions.
+
+## Flagged lesson IDs
+
+- `1.1.2` — Active listening — Artificial distractor filler
+- `1.1.3` — Informing and influencing audiences — Artificial distractor filler
+- `1.1.4` — Persuasion and stakeholder buy-in — Artificial distractor filler
+- `1.1.5` — Writing and delivering information — Artificial distractor filler
+- `1.1.6` — Professional presence, feedback and questions — Artificial distractor filler
+- `1.1.7` — Facilitating dialogue — Generic situation question; Artificial distractor filler
+- `1.1.8` — Articulating value propositions — Generic situation question; Artificial distractor filler
+- `1.2.1` — Emotional intelligence theories — Generic situation question; Artificial distractor filler
+- `1.2.2` — Managing your emotional state — Generic situation question; Artificial distractor filler
+- `1.2.3` — Recognizing personal bias — Generic situation question; Artificial distractor filler
+- `1.2.4` — Interpreting verbal and nonverbal behavior — Generic situation question; Artificial distractor filler
+- `1.2.5` — Adapting behavior to others — Generic situation question; Artificial distractor filler
+- `1.2.6` — Developing resilience — Generic situation question; Artificial distractor filler
+- `1.2.7` — Decision-making models — Generic situation question; Artificial distractor filler
+- `1.2.8` — Critical thinking and structured reasoning — Generic situation question; Artificial distractor filler
+- `1.3.1` — Relationships and group dynamics — Artificial distractor filler
+- `1.3.2` — Building collaborative networks — Artificial distractor filler
+- `1.3.3` — Building and managing high-performance teams — Artificial distractor filler
+- `1.3.4` — Integrating diverse viewpoints — Artificial distractor filler
+- `1.3.5` — Conflict management approaches — Artificial distractor filler
+- `1.3.6` — Resolving team conflict — Artificial distractor filler
+- `1.3.7` — Managing and supervising others — Artificial distractor filler
+- `1.3.8` — Delegation for development — Artificial distractor filler
+- `1.3.9` — Providing useful feedback — Artificial distractor filler
+- `1.3.10` — Leadership theories and practice — Artificial distractor filler
+- `1.4.1` — Understanding cultural differences at work — Generic situation question; Artificial distractor filler
+- `1.4.2` — Social norms, assumptions and cultural sensitivity — Generic situation question; Artificial distractor filler
+- `1.4.3` — Developing intercultural competence — Generic situation question; Artificial distractor filler
+- `1.4.4` — Adapting to diverse learning and work needs — Generic situation question; Artificial distractor filler
+- `1.4.5` — Promoting inclusion in talent development — Generic situation question; Artificial distractor filler
+- `1.4.6` — Integrating inclusion into talent strategy — Generic situation question; Artificial distractor filler
+- `1.5.2` — Project roles, priorities and meeting logistics — Generic situation question; Artificial distractor filler
+- `1.5.3` — Evaluating feasibility, risks and the project charter — Generic situation question; Artificial distractor filler
+- `1.5.4` — Building project plans and schedules — Generic situation question; Artificial distractor filler
+- `1.5.5` — Monitoring and adapting project execution — Generic situation question; Artificial distractor filler
+- `1.5.6` — Reporting milestones and closing projects — Generic situation question; Artificial distractor filler
+- `1.6.1` — Acting with integrity — Generic situation question; Artificial distractor filler
+- `1.6.2` — Establishing and reinforcing ethical standards — Generic situation question; Artificial distractor filler
+- `1.6.3` — Ethical use and protection of information — Generic situation question; Artificial distractor filler
+- `1.6.4` — Ethical and accessible instructional content — Generic situation question; Artificial distractor filler
+- `1.6.5` — Employment and talent-development requirements — Generic situation question; Artificial distractor filler
+- `1.6.6` — Permanent, contingent and dispersed workforces — Generic situation question; Artificial distractor filler
+- `1.6.7` — Regional laws and public policy — Generic situation question; Artificial distractor filler
+- `1.7.1` — Learning agility and growth mindset — Generic situation question; Artificial distractor filler
+- `1.7.2` — Career exploration and learning resources — Generic situation question; Artificial distractor filler
+- `1.7.3` — Self-directed professional development — Generic situation question; Artificial distractor filler
+- `2.1.1` — Foundational Learning Theories — Generic situation question; Artificial distractor filler
+- `2.1.2` — Cognitive Science and Memory — Generic situation question; Artificial distractor filler
+- `2.1.3` — Adult Learning Theories and Instruction — Generic situation question; Artificial distractor filler
+- `2.1.4` — Communication and Multimedia Learning — Generic situation question; Artificial distractor filler
+- `2.1.5` — Applying Cognitive Science to Transfer — Generic situation question; Artificial distractor filler
+- `2.2.1` — Instructional Design Models and ADDIE — Generic situation question; Artificial distractor filler
+- `2.2.3` — Learning and Behavioral Outcome Statements — Generic situation question; Artificial distractor filler
+- `2.2.4` — Writing Measurable Objectives — Generic situation question; Artificial distractor filler
+- `2.2.5` — Evaluate Existing Instructional Content — Generic situation question; Artificial distractor filler
+- `2.2.6` — Course Blueprints and Sequencing — Generic situation question; Artificial distractor filler
+- `2.2.7` — Instructional Modalities — Generic situation question; Artificial distractor filler
+- `2.2.8` — Developing Instructional Content — Generic situation question; Artificial distractor filler
+- `2.2.9` — Working With Subject Matter Experts — Generic situation question; Artificial distractor filler
+- `2.2.10` — Instructional Methods and Experiential Learning — Generic situation question; Artificial distractor filler
+- `2.2.11` — Align Delivery Options and Media — Generic situation question; Artificial distractor filler
+- `2.2.12` — Learning Assets, Assessment and Adaptive Learning — Generic situation question; Artificial distractor filler
+- `2.2.13` — Design Thinking and Rapid Prototyping — Generic situation question; Artificial distractor filler
+- `2.2.14` — Individual, Group and Organizational Learning — Generic situation question; Artificial distractor filler
+- `2.3.1` — Plan and Coordinate Learning Events — Generic situation question; Artificial distractor filler
+- `2.3.2` — Facilitate Meetings and Learning Events — Generic situation question; Artificial distractor filler
+- `2.3.3` — Facilitation Methods and Engagement — Generic situation question; Artificial distractor filler
+- `2.3.4` — Create Positive Learning Climates — Generic situation question; Artificial distractor filler
+- `2.3.5` — Align Delivery Methods and Media — Generic situation question; Artificial distractor filler
+- `2.3.6` — Deliver Across Modalities — Generic situation question; Artificial distractor filler
+- `2.3.7` — Adapt and Create Learning Assets — Generic situation question; Artificial distractor filler
+- `2.4.1` — Manage Learning Platforms — Generic situation question; Artificial distractor filler
+- `2.4.2` — Define System Requirements — Generic situation question; Artificial distractor filler
+- `2.4.3` — Select E-Learning Authoring Tools — Generic situation question; Artificial distractor filler
+- `2.4.4` — Implement Right-Fit Learning Technology — Generic situation question; Artificial distractor filler
+- `2.4.5` — Test Usability and Functionality — Generic situation question; Artificial distractor filler
+- `2.4.6` — Understand the Learning Technology Ecosystem — Generic situation question; Artificial distractor filler
+- `2.4.7` — Connect HR Technology and Business Processes — Generic situation question; Artificial distractor filler
+- `2.4.8` — Use Communication Technology for Learning — Generic situation question; Artificial distractor filler
+- `2.4.9` — Apply UI and UX Principles — Generic situation question; Artificial distractor filler
+- `2.4.10` — Use AI and Immersive Tools Ethically — Generic situation question; Artificial distractor filler
+- `2.4.11` — Produce Effective E-Learning — Generic situation question; Artificial distractor filler
+- `2.4.12` — Select Practical Technology Applications — Generic situation question; Artificial distractor filler
+- `2.4.13` — Handle Talent Information in HR Systems — Generic situation question; Artificial distractor filler
+- `2.4.14` — Support Social Learning and Curation — Generic situation question; Artificial distractor filler
+- `2.4.15` — Monitor Emerging Technology Trends — Generic situation question; Artificial distractor filler
+- `2.5.2` — Map and Codify Organizational Knowledge — Generic situation question; Artificial distractor filler
+- `2.5.4` — Share Knowledge Across the Organization — Generic situation question; Artificial distractor filler
+- `2.5.5` — Govern Content Curation — Generic situation question; Artificial distractor filler
+- `2.5.6` — Synthesize Multiple Knowledge Sources — Generic situation question; Artificial distractor filler
+- `2.5.7` — Curate Instructional Content and Resources — Generic situation question; Artificial distractor filler
+- `2.5.8` — Connect Knowledge to Talent Development — Generic situation question; Artificial distractor filler
+- `2.5.9` — Build Communities of Practice — Generic situation question; Artificial distractor filler
+- `2.6.1` — Career Models and Paths — Generic situation question
+- `2.6.2` — Career Planning and Individual Development Plans — Generic situation question; Artificial distractor filler
+- `2.6.3` — Career Assessments and Ethical Debriefing — Generic situation question; Artificial distractor filler
+- `2.6.4` — Career Development Methods — Generic situation question; Artificial distractor filler
+- `2.6.5` — Career Guidance Across Transitions — Generic situation question; Artificial distractor filler
+- `2.6.6` — Qualification and Credential Programs — Generic situation question; Artificial distractor filler
+- `2.6.7` — Leadership Development Practices — Generic situation question; Artificial distractor filler
+- `2.7.1` — Coaching Models and Boundaries — Generic situation question; Artificial distractor filler
+- `2.7.3` — Coaching Managers to Develop Employees — Generic situation question; Artificial distractor filler
+- `2.7.4` — Coaching Agreements and Readiness — Generic situation question; Artificial distractor filler
+- `2.7.5` — Evaluate Coaching Effectiveness — Generic situation question; Artificial distractor filler
+- `2.7.7` — Recruit and Support Coaches and Mentors — Generic situation question; Artificial distractor filler
+- `2.7.8` — Coaching Ethics and Professional Standards — Generic situation question; Artificial distractor filler
+- `2.8.4` — Create Evaluation Instruments — Generic situation question; Artificial distractor filler
+- `2.8.5` — Research Design and Evaluation Methods — Generic situation question; Artificial distractor filler
+- `2.8.7` — Analyze, Interpret and Communicate Impact — Generic situation question; Artificial distractor filler
+- `3.1.1` — Business models, processes and outputs — Generic situation question; Artificial distractor filler
+- `3.1.2` — Competitive strategy and environmental scanning — Generic situation question; Artificial distractor filler
+- `3.1.3` — Customer service and value propositions — Generic situation question; Artificial distractor filler
+- `3.1.4` — TD contribution and integrated talent management — Generic situation question; Artificial distractor filler
+- `3.1.5` — Financial statements and business acumen — Generic situation question; Artificial distractor filler
+- `3.1.6` — Budgeting and resource management — Generic situation question; Artificial distractor filler
+- `3.1.7` — Evidence-based TD business cases — Generic situation question; Artificial distractor filler
+- `3.1.8` — Executive financial communication — Generic situation question; Artificial distractor filler
+- `3.2.1` — Trusted advisor and consulting process — Generic situation question; Artificial distractor filler
+- `3.2.2` — Cross-functional partnering for talent needs — Generic situation question; Artificial distractor filler
+- `3.2.3` — Stakeholder relationships and governance — Generic situation question; Artificial distractor filler
+- `3.2.4` — Needs assessment methods — Generic situation question; Artificial distractor filler
+- `3.2.5` — Synthesis and stakeholder buy-in — Generic situation question; Artificial distractor filler
+- `3.2.6` — Communicating recommendations — Generic situation question; Artificial distractor filler
+- `3.2.7` — Sourcing and external partnerships — Generic situation question; Artificial distractor filler
+- `3.2.8` — Overcoming resistance and implementation barriers — Generic situation question; Artificial distractor filler
+- `3.3.1` — OD foundations and open systems — Generic situation question; Artificial distractor filler
+- `3.3.2` — Designing and implementing OD strategy — Generic situation question; Artificial distractor filler
+- `3.3.3` — Systems and change theories — Generic situation question; Artificial distractor filler
+- `3.3.4` — Formal and informal influence networks — Generic situation question; Artificial distractor filler
+- `3.3.5` — Organizational management and structures — Generic situation question; Artificial distractor filler
+- `3.3.6` — Reporting structures and authority — Generic situation question; Artificial distractor filler
+- `3.3.7` — Building and sustaining a learning organization — Generic situation question
+- `3.3.8` — Learning culture and collaboration — Generic situation question; Artificial distractor filler
+- `3.3.9` — Culture principles, values and competencies — Generic situation question; Artificial distractor filler
+- `3.3.10` — Engagement, retention and outcomes — Generic situation question; Artificial distractor filler
+- `3.3.11` — Employee engagement assessment — Generic situation question; Artificial distractor filler
+- `3.3.12` — Implementing employee engagement strategies — Generic situation question
+- `3.3.13` — Organizational well-being — Generic situation question; Artificial distractor filler
+- `3.4.1` — Integrated talent management functions — Generic situation question
+- `3.4.2` — Aligning talent strategy and business strategy — Generic situation question
+- `3.4.3` — Aligning talent strategy to organizational results — Generic situation question
+- `3.4.4` — Strategic planning for talent development — Generic situation question
+- `3.4.5` — Forecasting constraints and risks — Generic situation question
+- `3.4.6` — Marketing talent development services — Generic situation question
+- `3.4.7` — TD communication strategy — Generic situation question
+- `3.4.8` — Communicating TD business value — Generic situation question
+- `3.4.9` — The business case for lifelong learning — Generic situation question
+- `3.4.10` — Strategic workforce planning — Generic situation question
+- `3.4.11` — Succession planning and talent reviews — Generic situation question
+- `3.4.12` — High-potential talent identification and development — Generic situation question
+- `3.4.13` — Job, task and competency analysis — Generic situation question
+- `3.4.14` — Talent acquisition and employee experience — Generic situation question
+- `3.4.15` — Six Bs: talent sourcing decisions — Generic situation question
+- `3.4.16` — Performance management strategy — Generic situation question
+- `3.5.1` — Human performance improvement models — Generic situation question
+- `3.5.2` — Business, gap, process and cause analysis — Generic situation question
+- `3.5.3` — Influences on workplace performance — Generic situation question
+- `3.5.4` — Conducting performance analysis — Generic situation question
+- `3.5.5` — Selecting and designing performance solutions — Generic situation question
+- `3.5.6` — Designing performance support systems — Generic situation question
+- `3.5.7` — Systems thinking and human performance — Generic situation question
+- `3.6.1` — Change management theories and models — Generic situation question
+- `3.6.2` — Human reactions and drivers of change — Generic situation question
+- `3.6.3` — Change risk, resistance and consequences — Generic situation question
+- `3.6.4` — Designing and executing change strategies — Generic situation question
+- `3.7.1` — People analytics foundations — Generic situation question
+- `3.7.2` — Gathering and organizing analytics data — Generic situation question
+- `3.7.3` — Stakeholder analytics requirements — Generic situation question
+- `3.7.4` — Interpreting and communicating data — Generic situation question
+- `3.7.5` — Data visualization principles — Generic situation question
+- `3.7.6` — Selecting an effective chart — Generic situation question
+- `3.7.7` — Statistics and responsible interpretation — Generic situation question
+- `3.8.1` — Factors shaping future talent needs — Generic situation question
+- `3.8.2` — Environmental scanning process — Generic situation question
+- `3.8.3` — Innovation and creativity techniques — Generic situation question
+- `3.8.4` — Emerging learning technologies — Generic situation question
+- `3.8.5` — Finding and evaluating credible information — Generic situation question
+- `3.8.6` — Learning agility and transfer — Generic situation question
