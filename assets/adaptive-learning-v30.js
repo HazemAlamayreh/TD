@@ -143,7 +143,14 @@
   return '<section class="panel adaptivePathPanel"><div class="adaptiveTeacherTop"><div><span class="adaptiveEyebrow">'+t("YOUR ADAPTIVE PATH","مسارك التكيفي")+'</span><h2>'+t("Study what the evidence says you need","ادرس ما تشير الأدلة أنك تحتاجه")+'</h2></div><span class="adaptiveGapCount">'+p.priorityGaps.length+" "+t("priority gaps","فجوات أولوية")+'</span></div>'+body+'</section>';
  }
  function enhanceDashboard(m){
-  const root=document.getElementById("body");if(!root||root.querySelector(".adaptivePathPanel"))return;
+  const root=document.getElementById("body");if(!root)return;
+  const p=window.ATDRules?.profile(m);
+  if(p){
+   const resolved=p.lessons.filter(x=>x.resolved).length,total=p.lessons.length,pct=total?Math.round(100*resolved/total):0;
+   const ring=root.querySelector(".progressRing");if(ring){ring.style.setProperty("--val",pct+"%");ring.innerHTML="<span>"+pct+"%<small>"+t("evidence","دليل")+"</small></span>";}
+   const metrics=root.querySelectorAll(".dashMetric");if(metrics[1]){const strong=metrics[1].querySelector("strong"),small=metrics[1].querySelector("small");if(strong)strong.textContent=resolved+"/"+total;if(small)small.textContent=t("Evidence-resolved lessons","دروس أغلقت بالدليل");}
+  }
+  if(root.querySelector(".adaptivePathPanel"))return;
   const html=adaptivePath(m);if(!html)return;
   const wrap=document.createElement("div");wrap.innerHTML=html;
   const hero=root.querySelector(".dashHero");if(hero)hero.insertAdjacentElement("afterend",wrap.firstElementChild);else root.prepend(wrap.firstElementChild);
@@ -152,6 +159,13 @@
    const ev=evidence(id),status=line.querySelector("span");
    if(status){status.textContent=window.ATDRules.levelLabel(ev.level,state.lang);status.className=ev.resolved?"good":"warn";}
   });
+ }
+ function enhanceHome(){
+  const root=document.getElementById("body");if(!root)return;
+  const profiles=window.ATDRules?.profileAll?.()||[];
+  const resolved=profiles.reduce((n,p)=>n+p.lessons.filter(x=>x.resolved).length,0);
+  const metrics=root.querySelectorAll(".homeMetric");
+  if(metrics[3]){const strong=metrics[3].querySelector("strong"),span=metrics[3].querySelector("span");if(strong)strong.textContent=resolved;if(span)span.textContent=t("Evidence-resolved units","وحدات أغلقت بالدليل");}
  }
  function enhanceReview(m){
   const root=document.getElementById("body");if(!root||root.querySelector(".adaptiveReviewSummary"))return;
@@ -193,8 +207,14 @@
   if(!window.ATDRules)return;
   const m=typeof mod==="function"?mod():null;if(!m)return;
   if(state.view==="material"){
-   const root=document.getElementById("body");if(root){enhanceLessonButtons(root,m);root.querySelectorAll(".lesson").forEach(enhanceLesson);}
+   const root=document.getElementById("body");if(root){
+    enhanceLessonButtons(root,m);root.querySelectorAll(".lesson").forEach(enhanceLesson);
+    const p=window.ATDRules.profile(m),resolved=p.lessons.filter(x=>x.resolved).length,total=p.lessons.length,percent=total?Math.round(100*resolved/total):0;
+    const bar=root.querySelector(".materialIntro .progress div");if(bar)bar.style.width=percent+"%";
+    const summary=root.querySelector(".materialIntro p.small.muted");if(summary)summary.textContent=resolved+"/"+total+" "+t("evidence-resolved lessons","دروس أغلقت بالدليل");
+   }
   }
+  if(state.view==="home")enhanceHome();
   if(state.view==="dashboard")enhanceDashboard(m);
   if(state.view==="review")enhanceReview(m);
   if(state.view==="analytics")enhanceAnalytics();
