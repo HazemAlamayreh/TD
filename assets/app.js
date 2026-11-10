@@ -69,18 +69,18 @@ const safeJson=x=>JSON.stringify(x).replace(/</g,'\\u003c');
 const reviewed=id=>!!state.done[id];
 const relatedQs=m=>getQs(m,'diagnostic');
 const currentMissed=m=>{let a=state.attempts[m.id+':diagnostic'];if(!a)return[];return [...new Set(relatedQs(m).filter(q=>a.missed?.includes(q.id)).map(q=>q.target))].filter(id=>lessonFor(id));};
-const outstanding=m=>currentMissed(m).filter(id=>!reviewed(id));
-const canMaster=m=>!!state.attempts[m.id+':diagnostic'] && !outstanding(m).length;
-const canAdvanced=m=>(state.attempts[m.id+':mastery']?.score??0)>.75;
+const outstanding=m=>window.ATDRules?window.ATDRules.priorityGaps(m):currentMissed(m).filter(id=>!reviewed(id));
+const canMaster=m=>window.ATDRules?window.ATDRules.canMaster(m):(!!state.attempts[m.id+':diagnostic']&&!outstanding(m).length);
+const canAdvanced=m=>window.ATDRules?window.ATDRules.canAdvanced(m):((state.attempts[m.id+':mastery']?.score??0)>.75);
  // Stage badges reflect completion, not simply opening a tab. Keep existing progress storage intact.
- const stageDone=(m,stage)=>{const a=state.attempts;switch(stage){
+ const stageDone=(m,stage)=>window.ATDRules?window.ATDRules.stagePassed(m,stage):(()=>{const a=state.attempts;switch(stage){
  case 'diagnostic':return !!a[m.id+':diagnostic'];
  case 'review':return !!a[m.id+':diagnostic']&&!outstanding(m).length;
  case 'material':return !m.preview&&m.lessons.length>0&&m.lessons.every(l=>reviewed(l[0]));
  case 'mastery':return (a[m.id+':mastery']?.score??0)>.75;
  case 'advanced':return (a[m.id+':advanced']?.score??0)>.70;
  default:return false;
- }};
+ }})();
 const resumeLabel=()=>{let x=state.lastResume;return x&&DATA.modules.find(m=>m.id===x.mid)?`${x.mid} · ${x.stage}${x.pos!=null?' · Q'+(x.pos+1):''}`:null;};
 const colorScore=s=>s>=.8?'good':s>=.5?'warn':'bad';
 const appChart=(vals)=>`<div class="domainBars">${vals.map(x=>`<div class="domainBarRow"><span>${esc(x.label)}</span><div class="domainBarTrack"><div style="width:${Math.max(0,Math.min(100,x.val))}%"></div></div><strong>${x.val}%</strong></div>`).join('')}</div>`;
