@@ -8,6 +8,8 @@ function atdSelectQuestions(m,stage){
  if(stage==="diagnostic"){
   if(!m.lessons.length)return ATD_OLD_GETQS(m,stage);
   return m.lessons.flatMap(l=>{
+   const special=typeof CPTD_EI_ITEMS!=="undefined"?CPTD_EI_ITEMS[l[0]]:null;
+   if(special?.d?.length===2)return special.d.map((x,i)=>({id:l[0]+"-d24-"+(i+1),target:l[0],title:l[1],q:x[0],opts:x[1].slice(),answer:x[2],why:x[3],bankVersion:ATD_DIAGNOSTIC_BANK_VERSION,domain:l[0].split(".")[0],capability:m.id,capabilityStatement:m.id==="1.2"?"1.2.A":null,cognitiveDemand:"Apply / Analyze",difficulty:"Medium"}));
    const q=TWO_QUESTION_BANK[l[0]]||[];
    return q.length===2?q.map((v,i)=>({...v,id:l[0]+"-d24-"+(i+1),target:l[0],title:l[1],opts:v.opts.slice(),bankVersion:ATD_DIAGNOSTIC_BANK_VERSION})):[];
   });
@@ -15,16 +17,19 @@ function atdSelectQuestions(m,stage){
  if(stage==="mastery"){
   return m.lessons.flatMap(l=>{
    const [id,title,concept,work,q,opts,answer,why]=l;
+   const special=typeof CPTD_EI_ITEMS!=="undefined"?CPTD_EI_ITEMS[id]:null;
+   if(special?.m?.length===2)return special.m.map((x,i)=>({id:id+"-m24-"+(i+1),target:id,title,q:x[0],opts:x[1].slice(),answer:x[2],why:x[3],bankVersion:ATD_MASTERY_BANK_VERSION,capability:m.id,capabilityStatement:m.id==="1.2"?"1.2.A":null,cognitiveDemand:"Analyze / Evaluate",difficulty:"Hard"}));
+
    if(!Array.isArray(opts)||opts.length!==4||!Number.isInteger(answer))return [];
    const casePrompt="A talent development professional is supporting a workplace initiative involving "+title.toLowerCase()+". "+q+" Which response is MOST appropriate in this situation?";
    const first={id:id+"-m24-1",target:id,title,q:casePrompt,opts:opts.slice(),answer,why,bankVersion:ATD_MASTERY_BANK_VERSION};
    const applied=String(work||"").replace(/\s+/g," ").trim().replace(/[.!?]+$/,"");
    const context="A team is preparing to apply "+title.toLowerCase()+" to a live business challenge. The proposed task is: "+applied+". Before declaring the approach effective, which evidence-based action should the TD professional take?";
    const possibilities=[
-    "Agree on observable success criteria, apply the proposed work task in context, and collect evidence of whether it improved the intended behavior.",
-    "Launch the work task organization-wide before defining the behavior to be observed, then use positive comments as sufficient evidence.",
-    "Focus assessment on whether participants can repeat the definition of "+title.toLowerCase()+", regardless of their workplace decisions.",
-    "Choose the approach preferred by senior stakeholders and avoid collecting evidence that could challenge the initial assumptions."
+    "Define observable success criteria, test the proposed task in its workplace context, and gather credible evidence of behavioral improvement.",
+    "Run a carefully scoped pilot and incorporate participant feedback, but postpone checking whether the targeted job behavior changed.",
+    "Agree on the intended behavior and obtain management support, but base the effectiveness claim primarily on how useful participants found the activity.",
+    "Analyze the available operating data and stakeholder preferences, but scale the intervention before validating the specific performance criteria."
    ];
    const offset=(id.split(".").reduce((n,s)=>n+Number(s||0),0)+1)%4;
    const secondOptions=possibilities.map((_,i)=>possibilities[(i+offset)%4]);
