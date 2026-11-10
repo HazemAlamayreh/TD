@@ -145,6 +145,9 @@ const EI_TEACHER={
  function sectionHtml(id){
   const data=EI_TEACHER[id];if(!data)return "";
   const t=data[state.lang==="ar"?"ar":"en"],ar=state.lang==="ar",choice=answers[id];
+  const offset=(Number(id.split(".").pop())-1)%t.choices.length;
+  const shownChoices=t.choices.map((_,i)=>t.choices[(i+offset)%t.choices.length]);
+  const correctIndex=(t.correct-offset+t.choices.length)%t.choices.length;
   const list=t.steps.map((x,i)=>'<li><b>'+String(i+1)+'.</b> '+esc(x)+'</li>').join("");
   return '<section class="eiTeacher" data-ei-lesson="'+id+'">'+
    '<div class="eiTeacherHero"><div class="eiEyebrow">'+translated("GUIDED LESSON · THINK LIKE A TALENT DEVELOPMENT PARTNER","درس تفاعلي · فكّر كأخصائي تطوير مواهب")+'</div>'+
@@ -155,8 +158,8 @@ const EI_TEACHER={
    '<div class="eiSteps"><h4>'+translated("How to apply it at work","كيف تطبّق الفكرة في عملك")+'</h4><ol>'+list+'</ol></div>'+
    '<details class="eiDeep"><summary>'+translated("Want more detail? Open the deeper explanation","بدك تفاصيل أكثر؟ افتح الشرح المتقدم")+'</summary><p>'+esc(t.deep)+'</p></details>'+
    '<div class="eiTry"><div class="eiStoryTag">'+translated("YOUR TURN · DECIDE","دورك الآن · خذ القرار")+'</div><p class="eiQuestion">'+esc(t.ask)+'</p>'+
-   t.choices.map((x,i)=>'<button class="eiChoice '+(choice===i?(i===t.correct?"eiCorrect":"eiWrong"):"")+'" type="button" data-ei-answer="'+id+':'+i+'">'+String.fromCharCode(65+i)+'. '+esc(x)+'</button>').join("")+
-   (Number.isInteger(choice)?'<div class="eiFeedback" role="status"><b>'+ (choice===t.correct?translated("Good decision.","قرار مناسب."):translated("Consider the evidence and try again.","فكّر بالأدلة وجرب مرة ثانية."))+'</b> '+esc(t.feedback)+'</div>':'')+
+   shownChoices.map((x,i)=>'<button class="eiChoice '+(choice===i?(i===correctIndex?"eiCorrect":"eiWrong"):"")+'" type="button" data-ei-answer="'+id+':'+i+'">'+String.fromCharCode(65+i)+'. '+esc(x)+'</button>').join("")+
+   (Number.isInteger(choice)?'<div class="eiFeedback" role="status"><b>'+ (choice===correctIndex?translated("Good decision.","قرار مناسب."):translated("Consider the evidence and try again.","فكّر بالأدلة وجرب مرة ثانية."))+'</b> '+esc(t.feedback)+'</div>':'')+
    '<p class="eiNote">'+translated("Practice only — does not change exam scores or completion.","هذا تمرين تعليمي فقط، لا يغيّر نتيجة الامتحان أو حالة الإكمال.")+'</p></div></section>';
  }
  function enrich(){
