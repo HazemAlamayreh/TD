@@ -21,7 +21,7 @@ const cleanId=v=>String(v||"").trim().toUpperCase();
 const normalizedEmail=v=>String(v||"").trim().toLowerCase();
 const cleanText=(v,max)=>String(v||"").trim().slice(0,max);
 function inputRow(x){
- const employeeId=cleanId(x?.employeeId),email=normalizedEmail(x?.email),name=cleanText(x?.name,120),department=cleanText(x?.department,100);
+ const employeeId=cleanId(x?.employeeId),email=normalizedEmail(x?.email),name=cleanText(x?.name,120),division=cleanText(x?.division,100),department=cleanText(x?.department,100);
  if(!EMP_ID.test(employeeId)||!EMAIL.test(email)||!name||name.length<2)throw new HttpsError("invalid-argument","Valid Employee ID, full name and work email are required.");
  if(email.endsWith("@"+LOGIN_DOMAIN))throw new HttpsError("invalid-argument","The work email cannot use the reserved login domain.");
  return {employeeId,email,name,department,division};
