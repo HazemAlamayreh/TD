@@ -140,3 +140,56 @@ button{transition:background-color .2s,box-shadow .2s,transform .2s,border-color
 .eiLessonHeader{background:#f3f8fd;border-left:4px solid #3983b0;border-radius:8px;padding:12px 16px}
 [dir="rtl"] .eiLessonHeader{border-left:0;border-right:4px solid #3983b0}
 @media(max-width:600px){.eiTeacherHero,.eiStory,.eiSteps,.eiTry{padding:13px}.eiTeacher h4{font-size:16px}.eiTeacher p{font-size:14px}}
+
+
+/* v28: Strong, unambiguous completed-lesson state.
+   Completion is sourced from state.done, not an assessment score or visit. */
+#body .moduleLessonBtn.atdLessonCompleted,
+#body .moduleLessonBtn.done,
+#body .moduleLessonBtn.atdLessonCompleted.atdCptdClearedLesson,
+#body .moduleLessonBtn.done.atdCptdClearedLesson{
+ background:#176b46!important;
+ border:2px solid #0d5637!important;
+ color:#fff!important;
+ box-shadow:0 2px 7px rgba(10,79,50,.20)!important;
+}
+#body .moduleLessonBtn.atdLessonCompleted small,
+#body .moduleLessonBtn.done small,
+#body .moduleLessonBtn.atdLessonCompleted .atdDoneMarker,
+#body .moduleLessonBtn.done .atdDoneMarker{
+ color:#fff!important;
+}
+#body .moduleLessonBtn.atdLessonCompleted .atdDoneMarker,
+#body .moduleLessonBtn.done .atdDoneMarker{
+ background:#0f5637!important;
+ border:1px solid #9fe1bc!important;
+ font-size:11px;
+ font-weight:800;
+ padding:4px 8px;
+}
+#body .moduleLessonBtn.atdLessonCompleted.active,
+#body .moduleLessonBtn.done.active{
+ outline:3px solid #6ec5f4!important;
+ outline-offset:2px;
+}
+#body .moduleLessonBtn:not(.atdLessonCompleted):not(.done){
+ background:#fff!important;
+ color:#334155!important;
+ border-color:#cbd5e1!important;
+}
+#body .lesson.atdLessonCompleted,
+#body .lesson.atdLessonCompleted.atdCptdClearedLesson{
+ border:2px solid #209260!important;
+ background:linear-gradient(180deg,#e5f7eb 0%,#fff 155px)!important;
+ box-shadow:inset 5px 0 0 #176b46!important;
+}
+#body .lesson.atdLessonCompleted .atdDoneFlag{
+ background:#176b46!important;
+ color:#fff!important;
+ border-color:#0d5637!important;
+ font-size:11px;
+}
+@media(prefers-contrast:more){
+ #body .moduleLessonBtn.atdLessonCompleted,
+ #body .moduleLessonBtn.done{border-width:3px!important}
+}
