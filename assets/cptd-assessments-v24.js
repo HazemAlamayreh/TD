@@ -2,6 +2,8 @@
    Original authored practice items; not official ATD examination questions. */
 const ATD_DIAGNOSTIC_BANK_VERSION="diagnostic-pair-v24";
 const ATD_MASTERY_BANK_VERSION="mastery-scenario-v24";
+function atdMasteryBankVersion(m){return ["1.1","1.3"].includes(m.id)?"mastery-editorial-v26":ATD_MASTERY_BANK_VERSION;}
+
 function atdDiagnosticBankVersion(m){return ["1.1","1.3"].includes(m.id)?"diagnostic-quality-v25":ATD_DIAGNOSTIC_BANK_VERSION;}
 function atdDiagnosticQuestionSuffix(m){return ["1.1","1.3"].includes(m.id)?"d25":"d24";}
 const ATD_PASS={diagnostic:.80,mastery:.75,advanced:.70};
@@ -19,6 +21,8 @@ function atdSelectQuestions(m,stage){
  if(stage==="mastery"){
   return m.lessons.flatMap(l=>{
    const [id,title,concept,work,q,opts,answer,why]=l;
+   const reviewed=typeof MASTERY_EDITORIAL_V1!=="undefined"?MASTERY_EDITORIAL_V1[id]:null;
+   if(reviewed?.length===2)return reviewed.map((x,i)=>({id:id+"-m26-"+(i+1),target:id,title,q:x[0],opts:x[1].slice(),answer:x[2],why:x[3],bankVersion:atdMasteryBankVersion(m),capability:m.id,cognitiveDemand:"Apply / Evaluate",difficulty:"Hard",editorialStatus:"reviewed"}));
    const special=typeof CPTD_EI_ITEMS!=="undefined"?CPTD_EI_ITEMS[id]:null;
    if(special?.m?.length===2)return special.m.map((x,i)=>({id:id+"-m24-"+(i+1),target:id,title,q:x[0],opts:x[1].slice(),answer:x[2],why:x[3],bankVersion:ATD_MASTERY_BANK_VERSION,capability:m.id,capabilityStatement:m.id==="1.2"?"1.2.A":null,cognitiveDemand:"Analyze / Evaluate",difficulty:"Hard"}));
 
@@ -45,7 +49,7 @@ getQs=function(m,stage){return atdSelectQuestions(m,stage);};
 function atdVersionMatches(a,stage,m){
  if(!a)return false;
  if(stage==="diagnostic")return a.bankVersion===atdDiagnosticBankVersion(m)&&a.questionCount===getQs(m,stage).length;
- if(stage==="mastery")return a.bankVersion===ATD_MASTERY_BANK_VERSION&&a.questionCount===getQs(m,stage).length;
+ if(stage==="mastery")return a.bankVersion===atdMasteryBankVersion(m)&&a.questionCount===getQs(m,stage).length;
  return a.caseVersion==="case-v24"&&a.questionCount===caseQuestions(m).length*4;
 }
 function atdDiagnosticCleared(m){
@@ -100,7 +104,7 @@ nextQuestion=function(){
  if(completing){
   const a=state.attempts[mid+":mastery"],m=DATA.modules.find(x=>x.id===mid);
   if(a&&m){
-   a.bankVersion=ATD_MASTERY_BANK_VERSION;
+   a.bankVersion=atdMasteryBankVersion(m);
    a.questionCount=getQs(m,"mastery").length;
    save();render();
   }
