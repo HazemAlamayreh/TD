@@ -43,15 +43,15 @@ function records(s){
  for(const [k,v] of Object.entries(s.attempts||{}))if(v?.ts){
   let evidence={};try{
    const [mid,stage]=k.split(":"),m=DATA.modules.find(x=>x.id===mid);
-   if(m&&Array.isArray(v.answers)&&typeof getQs==="function"&&["diagnostic","mastery"].includes(stage)){
+   if(m&&Array.isArray(v.answers)&&typeof getQs==="function"&&["diagnostic","mastery"].includes(stage)&&((stage==="diagnostic"&&v.bankVersion===ATD_DIAGNOSTIC_BANK_VERSION)||(stage==="mastery"&&v.bankVersion===ATD_MASTERY_BANK_VERSION))){
     const qs=getQs(m,stage);
-    if(qs.length===v.answers.length)evidence.questionSnapshots=qs.map((q,i)=>({id:q.id,target:q.target,prompt:q.q,options:q.opts,correctIndex:q.answer,explanation:q.why,selectedIndex:v.answers[i]??null}));
+    if(qs.length===v.answers.length)evidence.questionSnapshots=qs.map((q,i)=>({id:q.id,target:q.target,prompt:q.q,options:q.opts,correctIndex:q.answer,explanation:q.why,selectedIndex:v.answers[i]??null,bankVersion:v.bankVersion,capability:m.id,skillTag:q.skillTag||null}));
    }
-   if(m&&stage==="advanced"&&Array.isArray(v.history)&&typeof caseQuestions==="function"&&typeof caseStepData==="function"){
+   if(m&&stage==="advanced"&&Array.isArray(v.history)&&typeof caseQuestions==="function"&&typeof caseStepData==="function"&&["case-v19","case-v22","case-v24"].includes(v.caseVersion)){
     const cases=caseQuestions(m);
     evidence.caseStepSnapshots=v.history.map(entry=>{
      const q=cases[entry.caseIndex];if(!q)return null;
-     const step=caseStepData(q,entry.step);
+     const step=caseStepData(q,entry.step,v.caseVersion);
      return {caseIndex:entry.caseIndex,step:entry.step,prompt:q.q,decisionPrompt:step.prompt,options:step.options.map(o=>o.text),
       correctIndices:step.options.map((o,i)=>o.correct?i:-1).filter(i=>i>=0),selectedIndices:entry.choices||[],delta:entry.delta,explanation:q.why};
     }).filter(Boolean);
