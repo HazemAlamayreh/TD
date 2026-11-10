@@ -193,3 +193,37 @@ button{transition:background-color .2s,box-shadow .2s,transform .2s,border-color
  #body .moduleLessonBtn.atdLessonCompleted,
  #body .moduleLessonBtn.done{border-width:3px!important}
 }
+
+
+/* Module stage states: completed work is green, passed checks are vivid green,
+   submitted assessments below threshold remain amber (never false-positive). */
+#top .atdPathwayCompact .atdPathChip.atdStagePassed,
+#top .atdPathwayCompact .atdPathChip.done.atdStagePassed,
+#top .atdPathwayCompact .atdPathChip.active.atdStagePassed{
+ background:#176b46!important;
+ border:1.5px solid #115334!important;
+ color:#fff!important;
+ box-shadow:0 1px 4px rgba(17,83,52,.18);
+}
+#top .atdPathwayCompact .atdPathChip.atdStagePassed b,
+#top .atdPathwayCompact .atdPathChip.atdStagePassed span{color:#fff!important}
+#top .atdPathwayCompact .atdPathChip.atdStageNeedsPass,
+#top .atdPathwayCompact .atdPathChip.done.atdStageNeedsPass{
+ background:#fff2d9!important;
+ border:1.5px solid #c18120!important;
+ color:#77490f!important;
+}
+#top .atdPathwayCompact .atdPathChip.atdStageNeedsPass b,
+#top .atdPathwayCompact .atdPathChip.atdStageNeedsPass span{color:#77490f!important}
+#top .atdPathwayCompact .atdPathChip.active{
+ outline:2px solid #2979c4!important;
+ outline-offset:2px;
+}
+#top .tabs button:has(+ button):focus-visible,
+#top .atdPathChip:focus-visible{outline:3px solid #1f7eb8;outline-offset:2px}
+.atdModuleReason{margin:7px 0 10px;padding:8px 12px;border:1px solid #efcd98;border-radius:9px;background:#fff8eb;color:#75480f;font-size:12px;line-height:1.7}
+.atdModuleReason summary{font-weight:700;cursor:pointer}
+.atdModuleReason div{margin-top:6px}
+.atdModuleReason ul{padding-inline-start:20px;margin:6px 0}
+.atdCptdOverall.pending{background:#fff0d5!important;color:#77490f!important}
+.atdCptdOverall.passed{background:#176b46!important;color:#fff!important}
