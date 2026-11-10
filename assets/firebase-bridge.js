@@ -97,7 +97,7 @@ function records(s){
  for(const [k,v] of Object.entries(s.attempts||{}))if(v?.ts){
   let evidence={};try{
    const [mid,stage]=k.split(":"),m=DATA.modules.find(x=>x.id===mid);
-   if(m&&Array.isArray(v.answers)&&typeof getQs==="function"&&["diagnostic","mastery"].includes(stage)&&((stage==="diagnostic"&&v.bankVersion===ATD_DIAGNOSTIC_BANK_VERSION)||(stage==="mastery"&&v.bankVersion===ATD_MASTERY_BANK_VERSION))){
+   if(m&&Array.isArray(v.answers)&&typeof getQs==="function"&&["diagnostic","mastery"].includes(stage)&&((stage==="diagnostic"&&v.bankVersion===atdDiagnosticBankVersion(m))||(stage==="mastery"&&v.bankVersion===ATD_MASTERY_BANK_VERSION))){
     const qs=getQs(m,stage);
     if(qs.length===v.answers.length)evidence.questionSnapshots=qs.map((q,i)=>({id:q.id,target:q.target,prompt:q.q,options:q.opts,correctIndex:q.answer,explanation:q.why,selectedIndex:v.answers[i]??null,bankVersion:v.bankVersion,capability:m.id,skillTag:q.skillTag||null}));
    }
