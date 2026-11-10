@@ -8,7 +8,9 @@ Automated editorial screening of the **10 two-question Diagnostic banks**. This 
 - **16 second questions rewritten** with specific workplace situations and four realistic choices (modules 1.1 and 1.3, selected lessons).
 - **163 remaining** generic second-question prompts require human editorial rewriting, not automated word substitution.
 - Many first-question distractors still contain artificial phrases such as `to support the immediate business need`; these must also be edited.
-- Current Mastery and Advanced Cases need a separate item-level psychometric/editorial review; this audit does not certify exam equivalence.
+- **Mastery scan:** 358 questions across 179 lessons. Emotional Intelligence includes 16 individually authored items; **342 additional Mastery questions** are derived from two recurring generator formats and need item-level scenario/distractor editing.
+- **Advanced scan:** 67 base scenarios across 23 modules. No exact duplicate base question texts or out-of-range answer keys found; nevertheless, repeated step templates and distractor quality require a separate human content review.
+- **Total screening scope:** 358 Diagnostic items + 358 Mastery items + 67 Advanced base prompts = **783 base items**, excluding the generated sequential scenario steps. This is a structural and repetition audit, not psychometric validation or certification exam equivalence.
 
 ## Editorial acceptance criteria
 
