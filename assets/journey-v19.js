@@ -251,7 +251,7 @@ const ATD_ADVANCED_FOLLOWUP={
 "3.8":["A new automation tool changes responsibilities across hybrid teams.","Map emerging capability and workflow needs with affected staff.","Pilot adaptable learning formats with accessible alternatives.","The technology trend changes before the rollout finishes.","Review real adoption and performance evidence regularly.","Revise the capability roadmap instead of following vendor hype."]
 };
 function caseStepData(q,step,version){
- if(version!=="case-v22")return legacyCaseStepData(q,step);
+ if(!["case-v22","case-v24"].includes(version))return legacyCaseStepData(q,step);
  const id=String(q.id||"").split("-")[0],v=ATD_ADVANCED_FOLLOWUP[id]||ATD_ADVANCED_FOLLOWUP["2.1"];
  const main=q.opts[q.answer],wrong=q.opts.filter((_,i)=>i!==q.answer),ar=state.lang==="ar";
  let prompt,options;
@@ -261,9 +261,19 @@ function caseStepData(q,step,version){
  }else if(step===1){
   prompt=(ar?"تطور جديد في الحالة: ":"Situation update: ")+v[0]+" "+(ar?"الحالة الأصلية: ":"Original situation: ")+q.q+" "+(ar?"اختر إجراءين.":"Choose TWO next actions.");
   options=[v[1],v[2],...wrong.slice(0,3)];
- }else{
+ }else if(step===2){
   prompt=(ar?"نتائج المتابعة: ":"Follow-up evidence: ")+v[3]+" "+(ar?"الحالة الأصلية: ":"Original situation: ")+q.q+" "+(ar?"اختر إجراءين.":"Choose TWO evidence-led responses.");
   options=[v[4],v[5],"Assume this evidence proves complete success: "+v[3],"Ignore the implications for the original case: "+q.q,"Continue with the original decision without considering this follow-up: "+v[3]];
+ }
+ if(step===3&&version==="case-v24"){
+  prompt=(ar?"التقييم النهائي: ":"Evaluation & next decision: ")+v[3]+" "+(ar?"بعد مراجعة الأدلة وقيود المؤسسة، أي الإجراءات ضرورية الآن؟":"After reviewing implementation evidence and organizational constraints, which actions are necessary NOW?");
+  options=[
+   "Document the observed impact and its limits against the original outcomes for this specific case.",
+   "Agree with accountable stakeholders on adjustments and a follow-up measurement checkpoint.",
+   "Request additional general training immediately, without determining whether the actual barriers were knowledge, workflow or incentives.",
+   "Publish a success claim using participant reaction scores before the workplace evidence is verified.",
+   "Commission an unrelated long-term talent strategy study before addressing the case's immediate outcome gaps."
+  ];
  }
  const offset=(step+String(q.id).length)%options.length;
  const shuffled=options.map((text,i)=>({text,correct:i<2}));
@@ -273,13 +283,13 @@ function caseStepData(q,step,version){
 function initializeCase(m){
  if(sess&&sess.stage==='advanced-case'&&sess.mid===m.id)return;
  const previous=state.caseDraft;
- sess={mid:m.id,stage:'advanced-case',caseIndex:0,step:0,selected:[],submitted:false,points:0,maxPoints:0,history:[],finished:false,caseVersion:'case-v22'};
- if(previous?.mid===m.id&&['case-v19','case-v22'].includes(previous.version)){
+ sess={mid:m.id,stage:'advanced-case',caseIndex:0,step:0,selected:[],submitted:false,points:0,maxPoints:0,history:[],finished:false,caseVersion:'case-v24'};
+ if(previous?.mid===m.id&&['case-v19','case-v22','case-v24'].includes(previous.version)){
   Object.assign(sess,previous);sess.caseVersion=previous.version;sess.finished=false;
  }
 }
 function persistCase(){
- state.caseDraft={mid:sess.mid,stage:sess.stage,caseIndex:sess.caseIndex,step:sess.step,selected:sess.selected.slice(),submitted:sess.submitted,points:sess.points,maxPoints:sess.maxPoints,history:sess.history.slice(),version:sess.caseVersion||'case-v22'};save();
+ state.caseDraft={mid:sess.mid,stage:sess.stage,caseIndex:sess.caseIndex,step:sess.step,selected:sess.selected.slice(),submitted:sess.submitted,points:sess.points,maxPoints:sess.maxPoints,history:sess.history.slice(),version:sess.caseVersion||'case-v24'};save();
 }
 function showAdvanced(m){
  const qs=caseQuestions(m);
@@ -288,29 +298,29 @@ function showAdvanced(m){
  if(sess.finished){showCaseResult(m);return;}
  const q=qs[sess.caseIndex],item=caseStepData(q,sess.step,sess.caseVersion),ar=state.lang==='ar';
  const chosen=sess.selected||[],selectedSet=new Set(chosen);
- const stageLabels=[msg('Situation & initial decision','الموقف والقرار الأول'),msg('Stakeholder constraints','قيود أصحاب العلاقة'),msg('Measure & adjust','قياس الأثر والتعديل')];
+ const stageLabels=[msg('Diagnose & decide','التشخيص والقرار'),msg('New stakeholder evidence','معطيات أصحاب العلاقة'),msg('Implementation challenge','تحديات التطبيق'),msg('Evaluate & adjust','التقييم والتحسين')];
  let context=sess.step===0?q.q:sess.step===1?
   msg('The team has considered its initial response. Affected stakeholders are now asking how the approach will fit operational constraints and employees’ needs.','ناقش الفريق الاستجابة الأولية. ويسأل أصحاب العلاقة الآن عن مدى ملاءمتها لقيود التشغيل واحتياجات الموظفين.'):
   msg('The action has been introduced. Early learner feedback is positive, but changes in job performance are not yet consistent.','تم تنفيذ الإجراء. كانت انطباعات المتعلمين إيجابية، لكن التحسن في الأداء الوظيفي لم يكن ثابتاً حتى الآن.');
- $('body').innerHTML='<div class="panel qBox"><span class="pill">'+msg('ADVANCED · CASE MANAGEMENT PRACTICE','المتقدم · تدريب إدارة الحالات')+'</span><h1>'+msg('Applied Talent Development Decisions','قرارات تطبيقية في تطوير المواهب')+'</h1><p class="muted">'+msg('Select TWO suitable actions per step. +1 for each suitable choice and −1 for each unsuitable choice. Once you proceed, you cannot change a previous step. Independent ATD-style practice, not an official exam.','اختر إجراءين مناسبين لكل خطوة. نقطة للإجراء المناسب وخصم نقطة للإجراء غير المناسب. لا يمكن تغيير الخطوات السابقة بعد الانتقال. تدريب مستقل وليس اختبار ATD رسمياً.')+'</p>'+
+ $('body').innerHTML='<div class="panel qBox"><span class="pill">'+msg('ADVANCED · CASE MANAGEMENT PRACTICE','المتقدم · تدريب إدارة الحالات')+'</span><h1>'+msg('Applied Talent Development Decisions','قرارات تطبيقية في تطوير المواهب')+'</h1><p class="muted">'+msg('Select every action NECESSARY at this stage; avoid useful but premature actions. +1 per suitable selection, −1 per unsuitable selection. You cannot revisit submitted steps. Original CPTD-style practice, not an official ATD examination.','اختر جميع الإجراءات الضرورية في هذه المرحلة، وتجنب الإجراءات المبكرة أو غير الضرورية. نقطة لكل اختيار مناسب، وخصم نقطة لكل اختيار غير مناسب. لا يمكنك العودة للخطوات السابقة. هذا تدريب مستقل وليس اختبار ATD رسمياً.')+'</p>'+
  (ar?'<p class="translationNotice">نص الحالة وخياراتها المهنية الأصلية باللغة الإنجليزية؛ الإرشادات والنتائج متاحة بالعربية. لا توجد ترجمة عربية معتمدة لهذه الحالات بعد.</p>':'')+
- '<div class="questionMeta"><span>'+msg('Case ','الحالة ')+(sess.caseIndex+1)+' / '+qs.length+' · '+msg('Step ','خطوة ')+(sess.step+1)+' / 3</span><span class="skillTag">'+esc(stageLabels[sess.step])+'</span></div><div class="barOuter"><div class="barInner" style="width:'+(100*(sess.caseIndex*3+sess.step+1)/(qs.length*3))+'%"></div></div>'+
+ '<div class="questionMeta"><span>'+msg('Case ','الحالة ')+(sess.caseIndex+1)+' / '+qs.length+' · '+msg('Step ','خطوة ')+(sess.step+1)+' / 3</span><span class="skillTag">'+esc(stageLabels[sess.step])+'</span></div><div class="barOuter"><div class="barInner" style="width:'+(100*(sess.caseIndex*(sess.caseVersion==='case-v24'?4:3)+sess.step+1)/(qs.length*(sess.caseVersion==='case-v24'?4:3)))+'%"></div></div>'+
  '<h2 class="chapter">'+esc(context)+'</h2><h3>'+esc(item.prompt)+'</h3>'+
  item.options.map((opt,i)=>'<button class="answer '+(selectedSet.has(i)?'selected ':'')+(sess.submitted&&opt.correct?'correct':'')+'" '+(sess.submitted?'disabled':'')+' onclick="toggleCaseOption('+i+')"><b>'+(selectedSet.has(i)?'☑':'☐')+'</b> '+esc(opt.text)+'</button>').join('')+
  (sess.submitted?'<div class="feedback"><b>'+msg('Decision feedback','تفسير القرار')+'</b><p>'+esc(q.why||'Choose actions supported by evidence and measurable outcomes.')+'</p><p>'+msg('Suitable actions: ','الإجراءات المناسبة: ')+esc(item.options.filter(x=>x.correct).map(x=>x.text).join(' | '))+'</p><p>'+msg('This step: ','نتيجة الخطوة: ')+sess.lastDelta+' / 2</p></div>':'')+
  '<div class="testTools">'+(sess.submitted?
- '<button class="btn primary" onclick="advanceCase()">'+(sess.caseIndex===qs.length-1&&sess.step===2?msg('Finish cases','إنهاء الحالات'):msg('Continue to next step →','الخطوة التالية'))+'</button>':
+ '<button class="btn primary" onclick="advanceCase()">'+(sess.caseIndex===qs.length-1&&sess.step===(sess.caseVersion==='case-v24'?3:2)?msg('Finish cases','إنهاء الحالات'):msg('Continue to next step →','الخطوة التالية'))+'</button>':
  '<button class="btn primary" '+(chosen.length!==2?'disabled':'')+' onclick="submitCaseStep()">'+msg('Submit two decisions','تأكيد القرارين')+'</button>')+
  '<button class="btn" onclick="restartCases()">'+msg('Restart cases','إعادة الحالات')+'</button></div></div>';
 }
 function toggleCaseOption(i){
  if(!sess||sess.submitted)return;
  let a=sess.selected||[];
- sess.selected=a.includes(i)?a.filter(x=>x!==i):a.length<2?[...a,i]:a;
+ sess.selected=a.includes(i)?a.filter(x=>x!==i):(sess.caseVersion==='case-v24'||a.length<2)?[...a,i]:a;
  persistCase();render();
 }
 function submitCaseStep(){
- if(!sess||sess.selected.length!==2||sess.submitted)return;
+ if(!sess||sess.submitted||(sess.caseVersion==='case-v24'?sess.selected.length<1:sess.selected.length!==2))return;
  const m=DATA.modules.find(x=>x.id===sess.mid),q=caseQuestions(m)[sess.caseIndex],step=caseStepData(q,sess.step);
  const delta=sess.selected.reduce((n,i)=>n+(step.options[i].correct?1:-1),0);
  sess.points+=delta;sess.maxPoints+=2;sess.lastDelta=delta;
@@ -320,13 +330,13 @@ function submitCaseStep(){
 function advanceCase(){
  if(!sess?.submitted)return;
  const m=DATA.modules.find(x=>x.id===sess.mid),n=caseQuestions(m).length;
- if(sess.step<2)sess.step++;
+ if(sess.step<(sess.caseVersion==='case-v24'?3:2))sess.step++;
  else if(sess.caseIndex<n-1){sess.caseIndex++;sess.step=0;}
  else {
   sess.finished=true;
   const score=Math.max(0,sess.points)/Math.max(1,sess.maxPoints);
   const previous=state.attempts[m.id+':advanced'];if(previous)state.attemptHistory.push({capability:m.id,stage:'advanced',...previous});
-  const a={score,rawPoints:sess.points,maxPoints:sess.maxPoints,questionCount:sess.history.length,caseVersion:sess.caseVersion||'case-v22',ts:new Date().toISOString(),history:sess.history.slice()};
+  const a={score,rawPoints:sess.points,maxPoints:sess.maxPoints,questionCount:sess.history.length,caseVersion:sess.caseVersion||'case-v24',ts:new Date().toISOString(),history:sess.history.slice()};
   state.attempts[m.id+':advanced']=a;state.caseHistory.push({mid:m.id,...a});
   delete state.caseDraft;
   state.view='advanced';
