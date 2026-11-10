@@ -63,7 +63,7 @@
 
 - **1.2.7-M1 — C.** A decision matrix is only as sound as the evidence and constraints it reflects.
 
-- **1.2.7-M2 — A.** Structured decision processes balance evidence, accountability, time and participation.
+- **1.2.7-M2 — D.** Structured decision processes balance evidence, accountability, time and participation.
 
 - **1.2.8-M1 — C.** Critical reasoning weighs evidence quality and contextual relevance before causal claims.
 
@@ -113,33 +113,33 @@
 
 ## 1.4 Cultural Awareness & Inclusion
 
-- **1.4.1-M1 — B.** Broad cultural frameworks do not establish how an individual or specific team behaves.
+- **1.4.1-M1 — A.** Broad cultural frameworks do not establish how an individual or specific team behaves.
 
 - **1.4.1-M2 — B.** Learner consultation avoids stereotyping while preserving shared job outcomes.
 
-- **1.4.2-M1 — B.** Context-aware language and checking understanding reduce unintended barriers.
+- **1.4.2-M1 — D.** Context-aware language and checking understanding reduce unintended barriers.
 
 - **1.4.2-M2 — C.** Inclusive design removes avoidable ambiguity and validates the revised material with the audience.
 
-- **1.4.3-M1 — B.** Sustained practice, dialogue and accountability help translate awareness into behavior.
+- **1.4.3-M1 — A.** Sustained practice, dialogue and accountability help translate awareness into behavior.
 
 - **1.4.3-M2 — A.** Sustained intercultural competence requires authentic interaction and reinforcement, not facts alone.
 
-- **1.4.4-M1 — B.** Accessibility is a design responsibility, not an individual deficit.
+- **1.4.4-M1 — D.** Accessibility is a design responsibility, not an individual deficit.
 
 - **1.4.4-M2 — D.** Accessibility should be designed and tested as a requirement, not provided only after exclusion.
 
-- **1.4.5-M1 — B.** Transparent access criteria can reveal inequities in development opportunities.
+- **1.4.5-M1 — A.** Transparent access criteria can reveal inequities in development opportunities.
 
 - **1.4.5-M2 — B.** An access analysis needs denominators, selection criteria and representation, not only participant feedback.
 
-- **1.4.6-M1 — B.** Outcome and access indicators assess whether initiatives reach and benefit employees.
+- **1.4.6-M1 — D.** Outcome and access indicators assess whether initiatives reach and benefit employees.
 
 - **1.4.6-M2 — C.** Inclusion is reflected in equitable access and outcomes; reporting must also protect sensitive data.
 
 ## 1.5 Project Management
 
-- **1.5.2-M1 — B.** The sponsor authorizes the project and its high-level direction and resources.
+- **1.5.2-M1 — C.** The sponsor authorizes the project and its high-level direction and resources.
 
 - **1.5.2-M2 — A.** Formal sponsorship and authority enable accountable project initiation.
 
@@ -147,29 +147,29 @@
 
 - **1.5.3-M2 — D.** A charter establishes the decision framework and authorization, not the full instructional detail.
 
-- **1.5.4-M1 — B.** Task dependencies determine sequencing and timing.
+- **1.5.4-M1 — A.** Task dependencies determine sequencing and timing.
 
 - **1.5.4-M2 — B.** Dependencies and ownership make schedule risks visible before they become rework.
 
-- **1.5.5-M1 — B.** Changes need impact analysis and an agreed approval route.
+- **1.5.5-M1 — D.** Changes need impact analysis and an agreed approval route.
 
 - **1.5.5-M2 — C.** Controlled change requires assessing impacts and explicit authorization rather than informal scope growth.
 
-- **1.5.6-M1 — B.** Formal acceptance precedes operational handover and closeout tasks.
+- **1.5.6-M1 — C.** Formal acceptance precedes operational handover and closeout tasks.
 
 - **1.5.6-M2 — A.** Formal closure includes accepted deliverables, operations transition and documented learning.
 
 ## 1.6 Compliance & Ethical Behavior
 
-- **1.6.1-M1 — B.** Integrity requires honest, transparent communication and accurate evidence.
+- **1.6.1-M1 — C.** Integrity requires honest, transparent communication and accurate evidence.
 
 - **1.6.1-M2 — D.** Professional integrity requires truthful reporting and constructive handling of uncertainty.
 
-- **1.6.2-M1 — B.** Disclosure and a documented process protect fairness and trust.
+- **1.6.2-M1 — D.** Disclosure and a documented process protect fairness and trust.
 
 - **1.6.2-M2 — B.** Disclosure and governed conflict management protect the fairness of the decision.
 
-- **1.6.3-M1 — B.** Access should be lawful, purposeful and limited to authorized need.
+- **1.6.3-M1 — A.** Access should be lawful, purposeful and limited to authorized need.
 
 - **1.6.3-M2 — C.** Minimum necessary access protects privacy while supporting a legitimate decision.
 
@@ -177,15 +177,15 @@
 
 - **1.6.4-M2 — A.** Attribution and a different format do not automatically grant reproduction rights.
 
-- **1.6.5-M1 — B.** Employment assessments require careful validation and applicable legal review.
+- **1.6.5-M1 — C.** Employment assessments require careful validation and applicable legal review.
 
 - **1.6.5-M2 — D.** High-impact talent decisions must rest on defensible job-related evidence and applicable requirements.
 
-- **1.6.6-M1 — B.** Contract and data controls must be assessed before access is granted.
+- **1.6.6-M1 — D.** Contract and data controls must be assessed before access is granted.
 
 - **1.6.6-M2 — B.** Contractual duties and data minimization are essential, while properly aggregated insights may still be useful.
 
-- **1.6.7-M1 — B.** Legal duties depend on jurisdiction and current requirements.
+- **1.6.7-M1 — A.** Legal duties depend on jurisdiction and current requirements.
 
 - **1.6.7-M2 — C.** Applicable local requirements need verification; a generic disclaimer does not ensure compliance.
 
@@ -195,10 +195,10 @@
 
 - **1.7.1-M2 — A.** Learning agility involves experimentation, feedback and transfer, not merely exposure to content.
 
-- **1.7.2-M1 — B.** Career exploration requires individual insight and realistic role information.
+- **1.7.2-M1 — A.** Career exploration requires individual insight and realistic role information.
 
 - **1.7.2-M2 — D.** Career exploration combines motivation, capability evidence and role demands rather than guessing.
 
-- **1.7.3-M1 — B.** Clear practice, evidence and review checkpoints support self-directed learning.
+- **1.7.3-M1 — D.** A measurable development plan combines real practice, structured feedback and review of performance.
 
 - **1.7.3-M2 — B.** A measurable plan requires applied practice, feedback and review against evidence.
