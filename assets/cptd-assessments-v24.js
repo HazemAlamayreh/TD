@@ -2,7 +2,7 @@
    Original authored practice items; not official ATD examination questions. */
 const ATD_DIAGNOSTIC_BANK_VERSION="diagnostic-pair-v24";
 const ATD_MASTERY_BANK_VERSION="mastery-scenario-v24";
-function atdMasteryBankVersion(m){return ["1.1","1.3"].includes(m.id)?"mastery-editorial-v26":ATD_MASTERY_BANK_VERSION;}
+function atdMasteryBankVersion(m){return m.id==="1.2"?ATD_MASTERY_BANK_VERSION:"mastery-editorial-v26";}
 
 function atdDiagnosticBankVersion(m){return ["1.1","1.3"].includes(m.id)?"diagnostic-quality-v25":ATD_DIAGNOSTIC_BANK_VERSION;}
 function atdDiagnosticQuestionSuffix(m){return ["1.1","1.3"].includes(m.id)?"d25":"d24";}
@@ -26,6 +26,12 @@ function atdSelectQuestions(m,stage){
    const special=typeof CPTD_EI_ITEMS!=="undefined"?CPTD_EI_ITEMS[id]:null;
    if(special?.m?.length===2)return special.m.map((x,i)=>({id:id+"-m24-"+(i+1),target:id,title,q:x[0],opts:x[1].slice(),answer:x[2],why:x[3],bankVersion:ATD_MASTERY_BANK_VERSION,capability:m.id,capabilityStatement:m.id==="1.2"?"1.2.A":null,cognitiveDemand:"Analyze / Evaluate",difficulty:"Hard"}));
 
+   const authored=typeof MASTERY_FOLLOWUPS_V26!=="undefined"?MASTERY_FOLLOWUPS_V26[id]:null;
+   if(authored?.length===4&&Array.isArray(opts)&&opts.length===4&&Number.isInteger(answer)){
+    const first={id:id+"-m26-1",target:id,title,q:String(q||"").trim(),opts:opts.slice(),answer,why,bankVersion:atdMasteryBankVersion(m),capability:m.id,cognitiveDemand:"Apply / Evaluate",difficulty:"Hard",editorialStatus:"source-item-retained"};
+    const second={id:id+"-m26-2",target:id,title,q:authored[0],opts:authored[1].slice(),answer:authored[2],why:authored[3],bankVersion:atdMasteryBankVersion(m),capability:m.id,cognitiveDemand:"Apply / Evaluate",difficulty:"Hard",editorialStatus:"scenario-edited"};
+    return [first,second];
+   }
    if(!Array.isArray(opts)||opts.length!==4||!Number.isInteger(answer))return [];
    const casePrompt="A talent development professional is supporting a workplace initiative involving "+title.toLowerCase()+". "+q+" Which response is MOST appropriate in this situation?";
    const first={id:id+"-m24-1",target:id,title,q:casePrompt,opts:opts.slice(),answer,why,bankVersion:ATD_MASTERY_BANK_VERSION};
