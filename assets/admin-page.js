@@ -12,16 +12,23 @@ const pct=v=>typeof v==="number"&&Number.isFinite(v)?Math.round(v*100)+"%":"—"
 const hrs=s=>typeof s==="number"&&s>0?(s>=3600?(s/3600).toFixed(1)+" h":Math.ceil(s/60)+" min"):"Not tracked";
 const modules=Array.isArray(window.ATD_COURSE_MODULES)?window.ATD_COURSE_MODULES:[];
 const lessonTotal=modules.reduce((n,m)=>n+m.lessons.length,0);
-const stages={diagnostic:"Diagnostic",mastery:"Mastery",advanced:"Advanced case"};
+const stages={diagnostic:"Diagnostic",mastery:"Mastery",advanced:"Advanced case"};;
+const passThreshold={diagnostic:.80,mastery:.75,advanced:.70};
+const attemptPass=a=>{const stage=String(a?.assessmentKey||"").split(":")[1],cut=passThreshold[stage];return typeof cut==="number"&&typeof a?.score==="number"&&a.score>cut;};
 let current=null,learners=[],filter="",epoch=0,loading=false;
 const ALL_QUESTIONS="Question-level details are available only for attempts synchronized with the updated evidence capture. Historical records without saved question snapshots cannot be reconstructed reliably.";
 function access(title,description){$("dashboard").classList.add("hidden");$("access").classList.remove("hidden");$("access").innerHTML="<h2>"+esc(title)+"</h2><p>"+esc(description)+"</p><a href='./'>Sign in at the Academy</a>";}
 function status(s,error=false){$("status").textContent=s;$("status").classList.toggle("error",error);}
-function moduleSummary(x){return modules.map(m=>{const completed=m.lessons.filter(l=>x.lessonIds.has(l[0])).length;const mastered=m.lessons.filter(l=>x.masteryIds.has(l[0])).length;return {id:m.id,name:m.name,completed,total:m.lessons.length,mastered,finished:m.lessons.length>0&&completed===m.lessons.length};});}
+function moduleSummary(x){return modules.map(m=>{
+ const completed=m.lessons.filter(l=>x.lessonIds.has(l[0])).length,mastered=m.lessons.filter(l=>x.masteryIds.has(l[0])).length;
+ const stageAttempts={};for(const a of x.attempts.filter(a=>String(a.assessmentKey||"").startsWith(m.id+":")).sort((a,b)=>Number(asDate(a.ts)?.valueOf()||0)-Number(asDate(b.ts)?.valueOf()||0)))stageAttempts[String(a.assessmentKey).split(":")[1]]=a;
+ const passed=["diagnostic","mastery","advanced"].every(stage=>attemptPass(stageAttempts[stage]));
+ return {id:m.id,name:m.name,completed,total:m.lessons.length,mastered,finished:m.lessons.length>0&&completed===m.lessons.length&&passed,stageAttempts};
+});}
 function getStats(x){
  const m=moduleSummary(x),attempts=x.attempts.slice().sort((a,b)=>Number(asDate(a.ts)?.valueOf()||0)-Number(asDate(b.ts)?.valueOf()||0));
  const first=new Map();for(const a of attempts)if(a.assessmentKey&&!first.has(a.assessmentKey))first.set(a.assessmentKey,a);
- const initial=[...first.values()],passing=initial.filter(a=>Number(a.score)>=.8).length,failed=initial.filter(a=>typeof a.score==="number"&&a.score<.8).length;
+ const initial=[...first.values()],passing=initial.filter(attemptPass).length,failed=initial.filter(a=>typeof a.score==="number"&&!attemptPass(a)).length;
  const validScores=attempts.map(a=>a.score).filter(v=>typeof v==="number"&&Number.isFinite(v));
  const questionEvidence=attempts.flatMap(a=>Array.isArray(a.questionSnapshots)?a.questionSnapshots:[]);
  const answered=questionEvidence.filter(q=>Number.isInteger(q.selectedIndex)),correct=answered.filter(q=>q.selectedIndex===q.correctIndex),incorrect=answered.filter(q=>q.selectedIndex!==q.correctIndex);
@@ -32,7 +39,7 @@ function getStats(x){
 function filtered(){return learners.filter(x=>(x.name+" "+x.email+" "+x.uid+" "+(x.employeeId||"")+" "+(x.department||"")+" "+(x.division||"")).toLowerCase().includes(filter.toLowerCase()));}
 function metrics(){
  const s=learners.reduce((r,x)=>{const a=getStats(x);r.lessons+=a.completed;r.modules+=a.modulesComplete;r.attempts+=x.attempts.length;r.minutes+=x.seconds;r.firstPass+=a.firstPass;return r;},{lessons:0,modules:0,attempts:0,minutes:0,firstPass:0});
- const cards=[["Synced learners",learners.length],["Completed lessons",s.lessons],["Modules completed",s.modules],["Assessment attempts",s.attempts],["First assessments ≥80%",s.firstPass],["Foreground time tracked",hrs(s.minutes)]];
+ const cards=[["Synced learners",learners.length],["Completed lessons",s.lessons],["Modules completed",s.modules],["Assessment attempts",s.attempts],["First assessments passed",s.firstPass],["Foreground time tracked",hrs(s.minutes)]];
  $("metrics").innerHTML=cards.map(([name,value])=>'<div class="metric"><strong>'+esc(value)+'</strong>'+esc(name)+'</div>').join("");
 }
 function render(){
@@ -156,7 +163,7 @@ function detail(uid){
  '<div class="metrics">'+[
  ["Lessons completed",a.completed+" / "+lessonTotal],["Modules completed",a.modulesComplete+" / "+modules.length],
  ["Lessons mastered",a.mastered],["Total attempts",attempts.length],
- ["First assessments ≥80%",a.firstPass],["First assessments below 80%",a.firstFail],
+ ["First assessments passed",a.firstPass],["First assessments not passed",a.firstFail],
  ["Correct saved answers",a.correct],["Incorrect saved answers",a.incorrect],
  ["Skipped saved answers",a.skipped],["First saved item responses correct",a.firstItem.right],
  ["First saved item responses incorrect",a.firstItem.wrong],["Pages opened (tracked)",x.views||"Not tracked"],
