@@ -92,7 +92,7 @@ export function initializeEmployeeManagement(auth){
  let rows=[],ready=false,busy=false;
  const get=id=>document.getElementById(id);
  const notice=(message,error=false)=>{get("employeeImportStatus").textContent=message;get("employeeImportStatus").style.color=error?"#b42335":"#294f71";};
- container.innerHTML='<div class="skillSectionHeader"><div><h2>Employee Management · Bulk Import</h2><p class="muted small">Add Employee IDs, contact emails, departments and names. Existing email accounts keep their UID and learning results.</p></div><button type="button" id="employeeTemplate">Download CSV template</button></div>'+
+ container.innerHTML='<div class="skillSectionHeader"><div><h2>Employee Management · Bulk Import</h2><p class="muted small">Add Employee Codes, work emails, divisions, departments and names. Existing email accounts keep their UID and learning results.</p></div><button type="button" id="employeeTemplate">Download CSV template</button></div>'+
  '<div class="skillLegend"><b>Security:</b> Employee Code is an HR reference, <b>never a password</b>. New employees sign in with their work email and a password they set using a secure invitation link. Only verified admins can provision accounts; a deployed Firebase Cloud Function and SMTP configuration are required.</div>'+
  '<div class="toolbar"><input id="employeeFile" type="file" accept=".csv,.xlsx" aria-label="Select employee roster CSV or Excel" style="flex:1"><button id="employeeValidate" type="button">Preview & validate</button><button id="employeeSubmit" type="button" class="primary" disabled>Import employees</button></div>'+
  '<p id="employeeImportStatus" role="status" class="muted small">No file selected. Required headers: Employee ID, Full Name. Work Email must be completed before import. Optional: Division, Department.</p>'+
@@ -131,7 +131,7 @@ export function initializeEmployeeManagement(auth){
   try{
    for(let i=0;i<rows.length;i+=25){
     notice("Provisioning "+Math.min(i+25,rows.length)+" / "+rows.length+" employee records…");
-    const slice=rows.slice(i,i+25).map(({employeeId,name,email,department})=>({employeeId,name,email,department}));
+    const slice=rows.slice(i,i+25).map(({employeeId,name,email,department,division})=>({employeeId,name,email,department,division}));
     const answer=await provision({employees:slice});
     results.push(...(answer.data?.results||[]));
    }
