@@ -203,15 +203,59 @@ render=function(){
  if(bar){
   const old=bar.querySelector(".atdCptdOverall");if(old)old.remove();
   const badge=document.createElement("span");badge.className="atdCptdOverall "+(s.completed?"passed":"pending");
-  badge.textContent=s.completed?msg("✓ Module completed","✓ الموديول مكتمل"):msg("Module not yet passed","الموديول لم يجتز المتطلبات");
-  bar.append(badge);
   const stages=atdStageCompletion(m);
+  const issues=[];
+  for(const st of stages){
+   if(!["diagnostic","mastery","advanced"].includes(st.view)||st.passed===true)continue;
+   const attempt=state.attempts?.[m.id+":"+st.view];
+   const label=state.lang==="ar"?st.ar:st.en;
+   const cutoff=Math.round(100*ATD_PASS[st.view]);
+   const valid=atdVersionMatches(attempt,st.view,m);
+   if(valid&&typeof attempt.score==="number"){
+    issues.push(label+": "+Math.round(100*attempt.score)+"% ("+msg("required > ","المطلوب أكثر من ")+cutoff+"%)");
+   }else if(attempt){
+    issues.push(label+": "+msg("a new attempt is required after the assessment update","يلزم محاولة جديدة بعد تحديث بنك الأسئلة"));
+   }else{
+    issues.push(label+": "+msg("not submitted yet","لم يتم تسليمه بعد"));
+   }
+  }
+  if(!s.lessons){
+   const n=m.lessons.filter(l=>state.done?.[l[0]]===true||cleared.has(l[0])).length;
+   issues.push(msg("Lessons completed: ","الدروس المكتملة: ")+n+"/"+m.lessons.length);
+  }
+  badge.textContent=s.completed?msg("✓ Module completed","✓ الموديول مكتمل"):
+   msg("Module not yet passed","الموديول لم يجتز شروط النجاح");
+  badge.title=s.completed?msg("All module requirements passed","تم اجتياز جميع متطلبات الموديول"):issues.join(" | ");
+  bar.append(badge);
   bar.querySelectorAll(".atdPathChip").forEach((b,i)=>{
    const x=stages[i];if(!x)return;
-   b.classList.toggle("atdCptdPass",x.passed===true);
-   b.classList.toggle("atdCptdFail",x.status==="below-threshold");
-   if(x.status==="below-threshold")b.title=msg("Assessment submitted; minimum result not met","تم التقييم لكن لم يتحقق الحد المطلوب");
+   const submitted=x.progress===100;
+   const passed=x.view==="review"||x.view==="material"?submitted:x.passed===true;
+   const unmet=["diagnostic","mastery","advanced"].includes(x.view)&&submitted&&!x.passed;
+   b.classList.toggle("atdCptdPass",passed);
+   b.classList.toggle("atdCptdFail",unmet);
+   b.classList.toggle("atdStagePassed",passed);
+   b.classList.toggle("atdStageNeedsPass",unmet);
+   if(unmet){
+    const score=state.attempts?.[m.id+":"+x.view]?.score;
+    b.title=(state.lang==="ar"?x.ar:x.en)+": "+(typeof score==="number"?Math.round(score*100)+"%":"")+
+     " · "+msg("completed, but pass requirement not met or the attempt version changed","مكتمل، لكن علامة النجاح غير محققة أو نسخة المحاولة تغيرت");
+   }else if(passed){b.title=(state.lang==="ar"?x.ar:x.en)+" · "+msg("Completed","مكتمل");}
   });
+  bar.querySelectorAll(".atdModuleReason").forEach(x=>x.remove());
+  if(!s.completed){
+   const details=document.createElement("details");details.className="atdModuleReason";
+   const summary=document.createElement("summary");summary.textContent=msg("Why is this module not passed?","ليش الموديول لسه مش ناجح؟");
+   details.append(summary);
+   const explanation=document.createElement("div");
+   explanation.textContent=msg("100% indicates stage progress, not exam score. The module requires Diagnostic >80%, Mastery >75%, Advanced >70%, and all lessons completed.","100% تعني إكمال المرحلة، وليست علامة الامتحان. النجاح يتطلب Diagnostic أعلى من 80% وMastery أعلى من 75% وAdvanced أعلى من 70% وإكمال الدروس.");
+   details.append(explanation);
+   const ul=document.createElement("ul");
+   issues.forEach(issue=>{const li=document.createElement("li");li.textContent=issue;ul.append(li);});
+   details.append(ul);bar.insertAdjacentElement("afterend",details);
+  }else{
+   const previous=top.querySelector(".atdModuleReason");if(previous)previous.remove();
+  }
  }
  if(state.view==="material"){
   $("body").querySelectorAll(".moduleLessonBtn").forEach(b=>{
