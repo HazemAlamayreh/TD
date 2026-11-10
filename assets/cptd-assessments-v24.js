@@ -242,6 +242,14 @@ render=function(){
      " · "+msg("completed, but pass requirement not met or the attempt version changed","مكتمل، لكن علامة النجاح غير محققة أو نسخة المحاولة تغيرت");
    }else if(passed){b.title=(state.lang==="ar"?x.ar:x.en)+" · "+msg("Completed","مكتمل");}
   });
+  top.querySelectorAll(".tabs button").forEach((tab,i)=>{
+   const x=stages[i];if(!x)return;
+   const complete=x.view==="review"||x.view==="material"?x.progress===100:x.passed===true;
+   const needsPass=["diagnostic","mastery","advanced"].includes(x.view)&&x.progress===100&&!x.passed;
+   tab.classList.toggle("atdTabPassed",complete);
+   tab.classList.toggle("atdTabNeedsPass",needsPass);
+   if(complete)tab.setAttribute("aria-label",(state.lang==="ar"?x.ar:x.en)+" — "+msg("completed","مكتمل"));
+  });
   bar.querySelectorAll(".atdModuleReason").forEach(x=>x.remove());
   if(!s.completed){
    const details=document.createElement("details");details.className="atdModuleReason";
