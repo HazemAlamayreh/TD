@@ -1,7 +1,7 @@
 import {initializeApp} from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
 import {getAuth,setPersistence,browserLocalPersistence,onAuthStateChanged,createUserWithEmailAndPassword,signInWithEmailAndPassword,sendPasswordResetEmail,updatePassword,signOut} from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
 import {getFirestore,doc,getDoc,getDocs,setDoc,collection,serverTimestamp,increment} from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
-import {initializeAdminDashboard} from "./admin-dashboard.js";
+import {initializeAdminDashboard} from "./admin-dashboard.js?v=20261110-role-refresh";
 const app=initializeApp({apiKey:"AIzaSyBxuLsolggWnoGuTASnnWvz7OwvRdnIxZE",authDomain:"atd-master-talent-development.firebaseapp.com",projectId:"atd-master-talent-development",storageBucket:"atd-master-talent-development.firebasestorage.app",messagingSenderId:"882331359053",appId:"1:882331359053:web:a51c003529af5ae9c90904"});
 const auth=getAuth(app),db=getFirestore(app),h=window.ATDHost,readyAuth=setPersistence(auth,browserLocalPersistence);
 initializeAdminDashboard(auth,db);
