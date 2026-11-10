@@ -39,7 +39,7 @@ function atdVersionMatches(a,stage,m){
  if(!a)return false;
  if(stage==="diagnostic")return a.bankVersion===ATD_DIAGNOSTIC_BANK_VERSION&&a.questionCount===getQs(m,stage).length;
  if(stage==="mastery")return a.bankVersion===ATD_MASTERY_BANK_VERSION&&a.questionCount===getQs(m,stage).length;
- return !!a;
+ return a.caseVersion==="case-v24"&&a.questionCount===caseQuestions(m).length*4;
 }
 function atdDiagnosticCleared(m){
  const a=state.attempts?.[m.id+":diagnostic"];
@@ -55,7 +55,7 @@ function atdModuleStatus(m){
  const d=state.attempts?.[m.id+":diagnostic"],ma=state.attempts?.[m.id+":mastery"],ad=state.attempts?.[m.id+":advanced"];
  const diag=atdVersionMatches(d,"diagnostic",m)&&typeof d.score==="number"&&d.score>ATD_PASS.diagnostic;
  const mastery=atdVersionMatches(ma,"mastery",m)&&typeof ma.score==="number"&&ma.score>ATD_PASS.mastery;
- const advanced=typeof ad?.score==="number"&&ad.score>ATD_PASS.advanced;
+ const advanced=atdVersionMatches(ad,"advanced",m)&&typeof ad.score==="number"&&ad.score>ATD_PASS.advanced;
  const lessons=m.lessons.length>0&&m.lessons.every(l=>state.done?.[l[0]]===true||atdDiagnosticCleared(m).has(l[0]));
  return {diag,mastery,advanced,lessons,completed:diag&&mastery&&advanced&&lessons};
 }
@@ -110,19 +110,20 @@ function atdStartNewAssessment(mid,stage){
   delete state.attempts[key];
  }
  if(state.draft?.mid===mid&&state.draft?.stage===stage)delete state.draft;
+ if(stage==="advanced"&&state.caseDraft?.mid===mid)delete state.caseDraft;
  sess=null;save();view(stage);
 }
 function atdCompatibilityNotice(m,stage){
  const a=state.attempts?.[m.id+":"+stage];
  if(!a||atdVersionMatches(a,stage,m))return false;
- const title=stage==="diagnostic"?"New two-question-per-lesson Diagnostic":"New scenario-based Mastery Check";
+ const title=stage==="diagnostic"?"New two-question-per-lesson Diagnostic":stage==="mastery"?"New scenario-based Mastery Check":"New four-step CPTD-style Advanced Cases";
  const oldMark=typeof a.score==="number"?Math.round(a.score*100)+"%":"—";
  $("body").innerHTML='<section class="panel"><h2>'+esc(title)+'</h2><p>'+msg("Your earlier result ("+oldMark+") is preserved. It was based on a different question bank and cannot be used to clear lessons or certify the new requirements.","نتيجتك السابقة ("+oldMark+") محفوظة، لكنها من بنك أسئلة مختلف ولا يمكن اعتمادها للاجتياز الجديد.")+'</p><p>'+msg("Start the updated assessment to receive a comparable result.","ابدأ التقييم المحدّث للحصول على نتيجة متوافقة.")+'</p><button class="btn primary" onclick="atdStartNewAssessment(\''+m.id+'\',\''+stage+'\')">'+msg("Start updated assessment","ابدأ التقييم الجديد")+'</button></section>';
  return true;
 }
 const ATD_V24_TEST=testScreen;
 testScreen=function(m,stage){
- if((stage==="diagnostic"||stage==="mastery")&&atdCompatibilityNotice(m,stage))return;
+ if(["diagnostic","mastery","advanced"].includes(stage)&&atdCompatibilityNotice(m,stage))return;
  return ATD_V24_TEST(m,stage);
 };
 const ATD_V24_DIAGNOSTIC_SCREEN=showDiagnosticResult;
@@ -145,6 +146,10 @@ showDiagnosticResult=function(m){
 const ATD_V24_STAGE_PROGRESS=atdStageCompletion;
 atdStageCompletion=function(m){
  const stages=ATD_V24_STAGE_PROGRESS(m),status=atdModuleStatus(m);
+ const ca=state.caseDraft;const advanced=stages.find(x=>x.view==="advanced");
+ if(advanced&&!state.attempts?.[m.id+":advanced"]&&ca?.mid===m.id&&ca.version==="case-v24"){
+  advanced.progress=Math.min(99,Math.round(100*((ca.history||[]).length/Math.max(1,caseQuestions(m).length*4))));
+ }
  const values={diagnostic:status.diag,mastery:status.mastery,advanced:status.advanced};
  for(const s of stages)if(Object.hasOwn(values,s.view)){
   s.passed=values[s.view];s.status=s.progress===100?(s.passed?"passed":"below-threshold"):"incomplete";
@@ -156,6 +161,20 @@ render=function(){
  ATD_V24_RENDER();
  if(["home","analytics","saved","domain-dashboard"].includes(state.view))return;
  const m=mod(),s=atdModuleStatus(m),cleared=atdDiagnosticCleared(m);
+ const currentStage=state.view,a=state.attempts?.[m.id+":"+currentStage];
+ const isAssessment=["diagnostic","mastery","advanced"].includes(currentStage);
+ if(isAssessment&&a&&atdVersionMatches(a,currentStage,m)){
+  const completedBox=$("body")?.querySelector(".qBox");
+  if(completedBox&&!completedBox.querySelector(".atdCptdRetake")){
+   const wrapper=document.createElement("div");wrapper.className="atdCptdRetake actionBar";
+   const passed=currentStage==="diagnostic"?s.diag:currentStage==="mastery"?s.mastery:s.advanced;
+   const threshold=Math.round(100*ATD_PASS[currentStage]);
+   wrapper.innerHTML='<p class="muted">'+(passed?msg("Required score achieved.","العلامة المطلوبة محققة."):msg("Minimum required: above "+threshold+"%. Your result: "+Math.round(100*a.score)+"%. Try again after targeted study.","المطلوب أعلى من "+threshold+"%. نتيجتك "+Math.round(100*a.score)+"%. راجع المحتوى وأعد المحاولة."))+'</p>'+
+    '<button class="btn" onclick="atdStartNewAssessment(\''+m.id+'\',\''+currentStage+'\')">'+msg("Retake (save previous attempt)","إعادة المحاولة مع حفظ السابقة")+'</button>';
+   completedBox.append(wrapper);
+  }
+ }
+
  const top=$("top");
  const bar=top?.querySelector(".atdPathwayCompact");
  if(bar){
