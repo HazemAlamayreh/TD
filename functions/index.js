@@ -60,7 +60,7 @@ async function sendSetupEmail({authEmail,email,name,employeeId,existing=false},m
 }
 async function linkVerifiedAccount(row,user,ref){
  await ref.set({uid:user.uid,loginEmail:user.email,status:"linked",linkedExistingAccount:true,updatedAt:FieldValue.serverTimestamp()},{merge:true});
- await db.doc("learners/"+user.uid).set({employeeId:row.employeeId,name:row.name,email:row.email,department:row.department,division:row.division,updatedAt:FieldValue.serverTimestamp()},{merge:true});
+ await db.doc("learners/"+user.uid).set({employeeId:row.employeeId,name:row.name,email:row.email,division:row.division||"",department:row.department,updatedAt:FieldValue.serverTimestamp()},{merge:true});
  return {employeeId:row.employeeId,status:"linked",message:"Verified existing account linked; original UID, password and progress retained."};
 }
 async function importOne(row,mailer,adminUid){
@@ -104,7 +104,7 @@ async function importOne(row,mailer,adminUid){
   }
   await ref.set({uid:user.uid,loginEmail:user.email,status:existing?"linked":"invite_pending",linkedExistingAccount:existing,updatedAt:FieldValue.serverTimestamp()},{merge:true});
   // Retain existing UID and progress; never replace or delete a learner.
-  await db.doc("learners/"+user.uid).set({employeeId:row.employeeId,name:row.name,email:row.email,department:row.department,updatedAt:FieldValue.serverTimestamp()},{merge:true});
+  await db.doc("learners/"+user.uid).set({employeeId:row.employeeId,name:row.name,email:row.email,division:row.division||"",department:row.department,updatedAt:FieldValue.serverTimestamp()},{merge:true});
   if(existing)return {employeeId:row.employeeId,status:"linked",message:"Existing email account linked; previous password and learning history retained."};
   try{
    await sendSetupEmail({...row,authEmail:user.email},mailer);
