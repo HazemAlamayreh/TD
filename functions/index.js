@@ -47,7 +47,7 @@ async function rateLimit(ip,kind,max,minutes){
  });
 }
 async function sendSetupEmail({authEmail,email,name,employeeId,existing=false},mailer){
- const link=await auth.generatePasswordResetLink(authEmail,{url:ORIGIN+"/",handleCodeInApp:false});
+ const link=await auth.generatePasswordResetLink(authEmail);
  await mailer.sendMail({
   from:JSON.parse(SMTP_CONFIG.value()).from,to:email,
   subject:existing?"ATD Academy — reset your password":"ATD Academy — activate your employee account",
@@ -70,7 +70,7 @@ async function importOne(row,mailer,adminUid){
     return {employeeId:row.employeeId,status:"invited",message:"Pending invitation resent."};
    }catch(err){return {employeeId:row.employeeId,status:"invite_pending",message:"Email delivery failed. Check SMTP and retry this row."};}
   }
-  return {employeeId:row.employeeId,status:"existing",message:"Already imported; no duplicate account created."};
+  return {employeeId:row.employeeId,status:e.status==="provision_failed"?"error":"existing",message:e.status==="provision_failed"?"A prior provisioning failure needs admin review; no extra account was created.":"Already imported; no duplicate account created."};
  }
  const existingEmail=await db.collection("employees").where("email","==",row.email).limit(1).get();
  if(!existingEmail.empty)return {employeeId:row.employeeId,status:"conflict",message:"Work email is already linked to another employee ID."};
@@ -121,8 +121,9 @@ exports.resolveEmployeeLogin=onCall({...OPTIONS,timeoutSeconds:15},async request
  const id=cleanId(request.data?.employeeId);
  if(!EMP_ID.test(id))throw new HttpsError("invalid-argument","Enter a valid Employee ID.");
  const doc=await db.doc("employees/"+id).get();
- // Do not return the work email. An unknown ID resolves to a non-existent random alias.
- // Authentication must still succeed with a separate secret password.
+ // New accounts use a random opaque alias. Linked legacy email/password accounts
+ // retain their real Auth login email so existing passwords and UIDs continue to work.
+ // This endpoint is rate-limited; enable App Check before exposing high-volume access.
  const loginEmail=doc.exists&&doc.get("loginEmail")?doc.get("loginEmail"):
   "missing-"+crypto.randomBytes(12).toString("hex")+"@"+LOGIN_DOMAIN;
  return {loginEmail};
@@ -131,6 +132,7 @@ exports.resetEmployeePassword=onCall({...OPTIONS,secrets:[SMTP_CONFIG],timeoutSe
  await rateLimit(request.rawRequest?.ip,"reset",20,60);
  const id=cleanId(request.data?.employeeId);
  if(!EMP_ID.test(id))throw new HttpsError("invalid-argument","Enter a valid Employee ID.");
+ await rateLimit(id,"resetAccount",3,1440);
  const snap=await db.doc("employees/"+id).get();
  const generic={message:"If this Employee ID is registered, password setup instructions will be emailed."};
  if(!snap.exists||!snap.get("loginEmail")||!snap.get("email"))return generic;
