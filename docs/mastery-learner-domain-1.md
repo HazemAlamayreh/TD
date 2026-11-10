@@ -227,13 +227,13 @@ Two managers have equal EI inventory scores. One consistently de-escalates dispu
 
 An executive challenges an L&D proposal in public. The TD lead feels embarrassed and wants to defend their professional credibility. Which response is BEST?
 
-**A.** Provide every available technical detail to prove the executive is mistaken.
+**A.** Explain the proposal's evidence and ask the executive to reconsider the criticism.
 
-**B.** Acknowledge the concern, ask about the evidence behind it and propose an appropriate follow-up while managing the emotional response.
+**B.** Acknowledge the concern, ask about the evidence and arrange a suitable follow-up.
 
-**C.** Agree to the executive's preferred solution without checking implications.
+**C.** Accept the preferred solution but ask later whether it achieved the expected result.
 
-**D.** Ask other participants to vote immediately on which person is correct.
+**D.** Invite other members to summarize their views before responding to the executive.
 
 ### 1.2.2-M2 · Managing your emotional state
 
@@ -323,13 +323,13 @@ In a heated committee debate, one member repeatedly interrupts others. The facil
 
 A second pilot again fails to improve performance, even after learners rate the course highly. A TD manager wants to show determination by expanding it. What is the most appropriate decision?
 
-**A.** Expand immediately to demonstrate confidence.
+**A.** Expand the pilot using its strong satisfaction evidence.
 
-**B.** Discontinue measurement because repeated setbacks undermine motivation.
+**B.** Pause measurement until more managers finish the training.
 
-**C.** Investigate whether the work system or intervention is misaligned, revise hypotheses and test a targeted adjustment before scaling.
+**C.** Investigate barriers, revise the hypothesis and test a targeted change.
 
-**D.** Replace team members without checking the causes of weak results.
+**D.** Replace the delivery team and repeat the pilot without redesign.
 
 ### 1.2.6-M2 · Developing resilience
 
@@ -347,37 +347,37 @@ Following an unexpected budget reduction, the TD team proposes eliminating the e
 
 A weighted vendor matrix gives Supplier A the highest score, but its accessibility evidence is incomplete and the rollout deadline is fixed. What should the TD team do?
 
-**A.** Award the contract because the aggregate number is highest.
+**A.** Approve the highest-scoring vendor and document the risk.
 
-**B.** Exclude accessibility from the matrix to preserve the ranking.
+**B.** Adjust the matrix to account for the delivery deadline.
 
-**C.** Validate the missing critical evidence and test whether the ranking changes before making an irreversible decision.
+**C.** Validate accessibility evidence before confirming the vendor ranking.
 
-**D.** Replace weighted scoring with a show-of-hands vote.
+**D.** Consult the sponsor and select their preferred vendor.
 
 ### 1.2.7-M2 · Decision-making models
 
 A cross-functional steering group cannot agree whether to pilot a learning intervention. The decision is high-impact, and stakeholder acceptance matters. Which action is BEST?
 
-**A.** Secure relevant expertise, clarify decision rights and use a structured participation approach appropriate to the urgency.
+**A.** Use the steering group's majority vote to confirm the pilot.
 
-**B.** Let the project sponsor decide without seeing available evidence.
+**B.** Ask the sponsor to decide and share the decision rationale.
 
-**C.** Collect unstructured opinions indefinitely before acting.
+**C.** Gather opinions until stakeholders agree without a formal vote.
 
-**D.** Treat unanimous enthusiasm as a substitute for defined decision criteria.
+**D.** Clarify authority, involve relevant expertise and use a structured decision process.
 
 ### 1.2.8-M1 · Critical thinking and structured reasoning
 
 Two credible studies disagree on whether a microlearning approach improves long-term transfer. The sponsor wants an immediate yes-or-no claim. What is the strongest recommendation?
 
-**A.** Choose the study with the larger headline improvement.
+**A.** Choose the study reporting the larger improvement.
 
-**B.** Reject both studies because inconsistent findings are always invalid.
+**B.** Reject both studies because their findings differ.
 
-**C.** Compare populations, outcome measures and study quality, describe uncertainty and pilot the relevant application with predefined measures.
+**C.** Compare methods and learners, explain uncertainty and pilot with clear measures.
 
-**D.** Select the vendor with the strongest testimonials.
+**D.** Select the study most similar to the sponsor's preferred approach.
 
 ### 1.2.8-M2 · Critical thinking and structured reasoning
 
@@ -639,13 +639,13 @@ An experienced specialist is taking on a new system they have never used, while 
 
 A regional team behaves differently from the norms described by a national culture model. What should you do?
 
-**A.** Treat the model as an infallible individual profile
+**A.** Ask the team about its own needs, practices and preferences
 
-**B.** Ask the team about its own needs, practices and preferences
+**B.** Require everyone to follow a stereotype
 
-**C.** Require everyone to follow a stereotype
+**C.** Cancel the learning program
 
-**D.** Cancel the learning program
+**D.** Treat the model as an infallible individual profile
 
 ### 1.4.1-M2 · Understanding cultural differences at work
 
@@ -663,13 +663,13 @@ Two regional teams receive identical onboarding, but one reports that examples a
 
 A facilitator learns that a familiar gesture may carry a different meaning for some learners. What is the best response?
 
-**A.** Assume everyone understands the intended meaning
+**A.** Tell learners to adapt without explanation
 
-**B.** Avoid the gesture and clarify meaning with participants
+**B.** Use more slang
 
-**C.** Tell learners to adapt without explanation
+**C.** Assume everyone understands the intended meaning
 
-**D.** Use more slang
+**D.** Avoid the gesture and clarify meaning with participants
 
 ### 1.4.2-M2 · Social norms, assumptions and cultural sensitivity
 
@@ -687,13 +687,13 @@ A facilitator learns that an everyday gesture used in a training video has an of
 
 Which initiative is most likely to strengthen sustained cultural awareness?
 
-**A.** One awareness email with no follow-up
+**A.** Structured dialogue, peer learning and leader accountability
 
-**B.** Structured dialogue, peer learning and leader accountability
+**B.** Mandatory country stereotypes posters
 
-**C.** Mandatory country stereotypes posters
+**C.** Only changing a logo
 
-**D.** Only changing a logo
+**D.** One awareness email with no follow-up
 
 ### 1.4.3-M2 · Developing intercultural competence
 
@@ -711,13 +711,13 @@ Employees attend cultural-awareness training but continue misinterpreting collea
 
 A learner cannot access an uncaptioned training video. What is the best design response?
 
-**A.** Ask the learner to skip the lesson
+**A.** Lower the learner’s grade
 
-**B.** Provide an accessible equivalent and update the design standard
+**B.** Assume the issue affects no one else
 
-**C.** Lower the learner’s grade
+**C.** Ask the learner to skip the lesson
 
-**D.** Assume the issue affects no one else
+**D.** Provide an accessible equivalent and update the design standard
 
 ### 1.4.4-M2 · Adapting to diverse learning and work needs
 
@@ -735,13 +735,13 @@ An academy video teaches a critical task but has no captions, and several learne
 
 A learning program is attended mostly by employees nominated informally. What should TD examine?
 
-**A.** Whether its promotional poster looks attractive
+**A.** Selection criteria and whether nomination practices create access barriers
 
-**B.** Selection criteria and whether nomination practices create access barriers
+**B.** Only the catering budget
 
-**C.** Only the catering budget
+**C.** Whether all participants share the same job title
 
-**D.** Whether all participants share the same job title
+**D.** Whether its promotional poster looks attractive
 
 ### 1.4.5-M2 · Promoting inclusion in talent development
 
@@ -759,13 +759,13 @@ Most leadership-course participants were selected through informal manager nomin
 
 Which measure best evaluates inclusion in development programs?
 
-**A.** Number of posters printed
+**A.** Number of slide transitions
 
-**B.** Participation, accessibility and advancement outcomes across relevant groups
+**B.** Whether everyone attended the same webinar
 
-**C.** Number of slide transitions
+**C.** Number of posters printed
 
-**D.** Whether everyone attended the same webinar
+**D.** Participation, accessibility and advancement outcomes across relevant groups
 
 ### 1.4.6-M2 · Integrating inclusion into talent strategy
 
@@ -785,13 +785,13 @@ The organization wants evidence that its new talent-development policy improves 
 
 Who should formally approve the project charter and authorize the learning initiative?
 
-**A.** Any participant in the first workshop
+**A.** The external trainer
 
-**B.** The project sponsor
+**B.** Any participant in the first workshop
 
-**C.** The instructional designer alone
+**C.** The project sponsor
 
-**D.** The external trainer
+**D.** The instructional designer alone
 
 ### 1.5.2-M2 · Project roles, priorities and meeting logistics
 
@@ -833,13 +833,13 @@ The sponsor wants a platform pilot to begin immediately, but expected benefits, 
 
 An e-learning storyboard review must finish before the authoring team starts production. What should the plan show?
 
-**A.** Both tasks as unrelated
+**A.** A dependency between review approval and production
 
-**B.** A dependency between review approval and production
+**B.** Only a final launch date
 
-**C.** Only a final launch date
+**C.** No task owner
 
-**D.** No task owner
+**D.** Both tasks as unrelated
 
 ### 1.5.4-M2 · Building project plans and schedules
 
@@ -857,13 +857,13 @@ An e-learning team schedules development before the SME approves storyboards. Th
 
 A stakeholder requests an unplanned feature after the baseline is approved. What should the project manager do?
 
-**A.** Implement immediately without assessing impact
+**A.** Delete other requirements silently
 
-**B.** Evaluate the change impact and follow the agreed change process
+**B.** Refuse any change under all circumstances
 
-**C.** Delete other requirements silently
+**C.** Implement immediately without assessing impact
 
-**D.** Refuse any change under all circumstances
+**D.** Evaluate the change impact and follow the agreed change process
 
 ### 1.5.5-M2 · Monitoring and adapting project execution
 
@@ -881,13 +881,13 @@ Halfway through the approved build, the sponsor requests two additional learning
 
 The learning solution has been accepted by its business owner. What remains for the project manager?
 
-**A.** Nothing; all documentation can be discarded
+**A.** Stop communicating with the sponsor immediately
 
-**B.** Complete project closure, lessons learned and archive the approved documents
+**B.** Nothing; all documentation can be discarded
 
-**C.** Restart the charter
+**C.** Complete project closure, lessons learned and archive the approved documents
 
-**D.** Stop communicating with the sponsor immediately
+**D.** Restart the charter
 
 ### 1.5.6-M2 · Reporting milestones and closing projects
 
@@ -907,13 +907,13 @@ The business owner signs off on a newly delivered learning platform. What should
 
 A project sponsor asks you to report unverified impact numbers. What should you do?
 
-**A.** Report them because the sponsor requested it
+**A.** Invent a supporting testimonial
 
-**B.** Explain the uncertainty and report only verified evidence
+**B.** Report them because the sponsor requested it
 
-**C.** Remove all evaluation findings
+**C.** Explain the uncertainty and report only verified evidence
 
-**D.** Invent a supporting testimonial
+**D.** Remove all evaluation findings
 
 ### 1.6.1-M2 · Acting with integrity
 
@@ -931,13 +931,13 @@ A program sponsor asks the TD team to publish a higher improvement percentage th
 
 An instructional designer identifies a potential conflict of interest in a vendor evaluation. What should happen first?
 
-**A.** Conceal the relationship
+**A.** Let the vendor choose the evaluator
 
-**B.** Disclose the conflict and use the appropriate review process
+**B.** Destroy the evaluation records
 
-**C.** Let the vendor choose the evaluator
+**C.** Conceal the relationship
 
-**D.** Destroy the evaluation records
+**D.** Disclose the conflict and use the appropriate review process
 
 ### 1.6.2-M2 · Establishing and reinforcing ethical standards
 
@@ -955,13 +955,13 @@ A member of the learning-platform vendor committee reveals that a family member 
 
 A manager requests every employee’s confidential assessment responses. What is the best next step?
 
-**A.** Send everything immediately
+**A.** Verify purpose, authority, privacy rules and minimum necessary access
 
-**B.** Verify purpose, authority, privacy rules and minimum necessary access
+**B.** Publish the records to the entire department
 
-**C.** Publish the records to the entire department
+**C.** Delete all learning data without checking retention rules
 
-**D.** Delete all learning data without checking retention rules
+**D.** Send everything immediately
 
 ### 1.6.3-M2 · Ethical use and protection of information
 
@@ -1003,13 +1003,13 @@ A designer wants to reproduce a copyrighted figure from a paid textbook in a com
 
 An organization uses an unvalidated quiz score as the sole promotion criterion. What should the TD professional do?
 
-**A.** Accept the decision without question
+**A.** Lower scores for some applicants
 
-**B.** Escalate for HR/legal review and evidence of validity and fairness
+**B.** Accept the decision without question
 
-**C.** Conceal the test’s purpose
+**C.** Escalate for HR/legal review and evidence of validity and fairness
 
-**D.** Lower scores for some applicants
+**D.** Conceal the test’s purpose
 
 ### 1.6.5-M2 · Employment and talent-development requirements
 
@@ -1027,13 +1027,13 @@ An organization plans to make an unvalidated online quiz the only criterion for 
 
 A contractor needs access to confidential employee records to deliver a workshop. What should happen?
 
-**A.** Give unrestricted access immediately
+**A.** Use a shared personal account
 
-**B.** Confirm contractual role, authorized purpose and minimal secure access
+**B.** Email the full database
 
-**C.** Use a shared personal account
+**C.** Give unrestricted access immediately
 
-**D.** Email the full database
+**D.** Confirm contractual role, authorized purpose and minimal secure access
 
 ### 1.6.6-M2 · Permanent, contingent and dispersed workforces
 
@@ -1051,13 +1051,13 @@ A contractor delivering a workshop requests access to individual employee assess
 
 You are rolling out one compliance course to several countries. What should you do first?
 
-**A.** Assume US law applies everywhere
+**A.** Identify applicable local requirements and confirm them with appropriate specialists
 
-**B.** Identify applicable local requirements and confirm them with appropriate specialists
+**B.** Use outdated regulatory screenshots
 
-**C.** Use outdated regulatory screenshots
+**C.** Disable localization
 
-**D.** Disable localization
+**D.** Assume US law applies everywhere
 
 ### 1.6.7-M2 · Regional laws and public policy
 
@@ -1101,13 +1101,13 @@ A manager receives feedback that their usual facilitation method is not working 
 
 An employee wants to explore a different career path. What is the most useful first step?
 
-**A.** Assign one predetermined career using a personality label
+**A.** Explore motivations, skills, interests and role requirements together
 
-**B.** Explore motivations, skills, interests and role requirements together
+**B.** Discourage exploration
 
-**C.** Discourage exploration
+**C.** Promise a promotion after one webinar
 
-**D.** Promise a promotion after one webinar
+**D.** Assign one predetermined career using a personality label
 
 ### 1.7.2-M2 · Career exploration and learning resources
 
@@ -1123,15 +1123,15 @@ A TD analyst is considering a move into organization development but is unsure h
 
 ### 1.7.3-M1 · Self-directed professional development
 
-Which development plan is most actionable?
+A learning specialist wants to improve difficult-conversation facilitation over 90 days. Which development plan provides the clearest evidence of progress?
 
-**A.** Read whenever you have time
+**A.** Attend four webinars and report the total learning hours completed.
 
-**B.** Practice a facilitation skill in two sessions, get feedback and review results at day 30
+**B.** Ask a manager for general feedback about professional confidence.
 
-**C.** Attend as many webinars as possible with no goal
+**C.** Read three relevant books and submit a reflection at the end.
 
-**D.** Wait for the manager to select a course
+**D.** Practice two live conversations, get rubric feedback and compare results.
 
 ### 1.7.3-M2 · Self-directed professional development
 
