@@ -58,14 +58,6 @@ async function sendSetupEmail({authEmail,email,name,employeeId,existing=false},m
     "If you did not expect this message, contact your Academy administrator.\n\nATD Academy"
  });
 }
-async function sendVerifyEmail(row,mailer){
- const link=await auth.generateEmailVerificationLink(row.email);
- await mailer.sendMail({from:JSON.parse(SMTP_CONFIG.value()).from,to:row.email,
-  subject:"ATD Academy — verify existing employee account",
-  text:"Hello "+row.name+",\n\nYour existing ATD Academy email must be verified before an administrator can link your Employee ID. Please open this secure verification link: "+link+
-   "\n\nThen ask your Academy administrator to re-import Employee ID "+row.employeeId+" to finish linking. This will keep your original account and learning results.\n\nATD Academy"
- });
-}
 async function linkVerifiedAccount(row,user,ref){
  await ref.set({uid:user.uid,loginEmail:user.email,status:"linked",linkedExistingAccount:true,updatedAt:FieldValue.serverTimestamp()},{merge:true});
  await db.doc("learners/"+user.uid).set({employeeId:row.employeeId,name:row.name,email:row.email,department:row.department,updatedAt:FieldValue.serverTimestamp()},{merge:true});
@@ -79,10 +71,7 @@ async function importOne(row,mailer,adminUid){
   if(e.email!==row.email)return {employeeId:row.employeeId,status:"conflict",message:"This employee ID is already linked to a different email."};
   if(e.status==="verification_required"){
    let u;try{u=await auth.getUserByEmail(row.email);}catch(err){return {employeeId:row.employeeId,status:"error",message:"Original account not found. Contact an administrator."};}
-   if(!u.emailVerified){
-    try{await sendVerifyEmail(row,mailer);}catch(err){return {employeeId:row.employeeId,status:"verification_required",message:"Verification email could not be delivered."};}
-    return {employeeId:row.employeeId,status:"verification_required",message:"Awaiting work-email verification. Message resent."};
-   }
+   if(!u.emailVerified)return {employeeId:row.employeeId,status:"verification_required",message:"Existing learner must verify their email from their own signed-in account, then re-import."};
    return await linkVerifiedAccount(row,u,ref);
   }
   if(e.status==="invite_pending"){
@@ -111,9 +100,7 @@ async function importOne(row,mailer,adminUid){
   }
   if(existing&&!user.emailVerified){
    await ref.set({status:"verification_required",linkedExistingAccount:true,updatedAt:FieldValue.serverTimestamp()},{merge:true});
-   try{await sendVerifyEmail(row,mailer);
-    return {employeeId:row.employeeId,status:"verification_required",message:"Existing account must verify ownership of this work email; re-import after verification. No credentials or progress changed."};
-   }catch(err){return {employeeId:row.employeeId,status:"verification_required",message:"Existing account needs email verification; SMTP could not deliver link."};}
+   return {employeeId:row.employeeId,status:"verification_required",message:"Existing account must verify its work email while signed in; then re-import to link the original UID."};
   }
   await ref.set({uid:user.uid,loginEmail:user.email,status:existing?"linked":"invite_pending",linkedExistingAccount:existing,updatedAt:FieldValue.serverTimestamp()},{merge:true});
   // Retain existing UID and progress; never replace or delete a learner.
