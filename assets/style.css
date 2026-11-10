@@ -93,3 +93,19 @@ button{transition:background-color .2s,box-shadow .2s,transform .2s,border-color
 .atdDoneMarker{margin-left:auto;white-space:nowrap}
 #sidebar .sideBtn.atdModuleCompleted{border-left:4px solid #258752!important;background:#eaf7ef!important;color:#185a38!important}
 #sidebar .sideBtn.atdModuleCompleted .sideSub{color:#28724b!important}
+
+
+/* Assessment v24: evidence-based diagnostic clearance versus final module completion. */
+.atdCptdResult{margin:8px 0 20px}
+.atdCptdLessonMap{display:grid;grid-template-columns:repeat(auto-fit,minmax(235px,1fr));gap:7px;margin-top:10px}
+.atdCptdLessonMap>div{border:1px solid #d8e2eb;border-radius:9px;padding:10px;display:flex;flex-direction:column;gap:5px;background:#fff;font-size:12px}
+.atdCptdLessonMap span{font-size:11px}
+.atdCptdLessonMap .atdCptdCleared{border-color:#a7d9bd;background:#eff8f2;color:#155a36}
+.atdCptdLessonMap .atdCptdReview{border-color:#f0c7a8;background:#fff7ed;color:#81511e}
+.atdCptdOverall{font-size:10px;font-weight:750;border-radius:14px;padding:5px 9px;white-space:nowrap}
+.atdCptdOverall.passed{background:#d9f2e2;color:#126639}
+.atdCptdOverall.pending{background:#fff0d5;color:#8a5c13}
+.atdPathChip.atdCptdPass{border-color:#9bd0ac;background:#ecfaf1}
+.atdPathChip.atdCptdFail{border-color:#edd1a2;background:#fff7e8}
+.moduleLessonBtn.atdCptdClearedLesson{background:#edf7fd!important;border-color:#90c5e5!important;color:#145f8b!important}
+.lesson.atdCptdClearedLesson{border-left:4px solid #2486b8!important;background:#f5faff!important}
