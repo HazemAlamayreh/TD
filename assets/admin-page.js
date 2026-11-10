@@ -1,4 +1,4 @@
-import {initializeEmployeeManagement} from "./admin-employees.js?v=20261110-adaptive-v30";
+import {initializeEmployeeManagement} from "./admin-employees.js?v=20261110-adaptive-v30b";
 import {analyzeLearnerSkills,cohortSkillSummary,skillDefinitions} from "./skill-analytics.js?v=20261110-skills-v1";
 import {initializeApp} from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
 import {getAuth,onAuthStateChanged} from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
