@@ -42,10 +42,29 @@ export function initializeAdminDashboard(auth,db){
   }catch(err){error="Unable to load reports: "+String(err.code||err.message)+". Check published Firestore rules and admin role.";}
   finally{loading=false;paint();}
  }
+ let checkedUid=null,checking=false;
+ async function checkAdminAccess(){
+  const user=auth.currentUser;
+  if(!user){checkedUid=null;admin=false;shell();return;}
+  if(checking)return;
+  checking=true;
+  try{
+   const role=await getDoc(doc(db,"admins",user.uid));
+   if(auth.currentUser?.uid!==user.uid)return;
+   checkedUid=user.uid;
+   admin=role.exists()&&role.data().active===true;
+  }catch(err){
+   if(auth.currentUser?.uid===user.uid){admin=false;console.warn("Admin verification failed",err.code||err.message);}
+  }finally{checking=false;shell();}
+ }
  onAuthStateChanged(auth,async user=>{
   admin=false;open=false;loaded=false;rows=[];shell();
-  if(!user)return;
-  try{const p=await getDoc(doc(db,"admins",user.uid));if(auth.currentUser?.uid!==user.uid)return;admin=p.exists()&&p.data().active===true;}catch(err){admin=false;}
-  shell();
+  if(!user){checkedUid=null;return;}
+  await checkAdminAccess();
  });
+ // Firestore admin roles may be created while a learner's existing session
+ // is open. Refresh authorization when the user returns to the academy tab.
+ document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="visible")checkAdminAccess();});
+ window.addEventListener("focus",()=>checkAdminAccess());
+ window.ATDRecheckAdminAccess=checkAdminAccess;
 }
