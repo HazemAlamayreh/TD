@@ -6,7 +6,20 @@
 body{margin:0}header{background:#123b6a;color:#fff;padding:22px max(22px,calc((100vw - 1240px)/2));display:flex;justify-content:space-between;align-items:center;gap:15px;flex-wrap:wrap}
 header small{opacity:.76;letter-spacing:.1em}h1{font-size:25px;margin:4px 0}h2{font-size:19px;margin:0 0 13px}
 main{max-width:1240px;margin:25px auto;padding:0 20px}a{color:inherit}header a{color:#fff}button,input{font:inherit}button{cursor:pointer;border:1px solid #c7d4e2;border-radius:8px;padding:10px 14px;background:white;color:#173956}
-button.primary{background:#135e9b;color:#fff;border-color:#135e9b}button:disabled{opacity:.5;cursor:not-allowed}
+button.primary{background:#135e9b;color:#fff;border-color:#135e9b}
+.skillSectionHeader{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.skillGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(265px,1fr));gap:12px;margin-top:14px}
+.skillCard{background:#fafcff;border:1px solid #dfe8f2;border-radius:12px;padding:15px}
+.skillCardHeader{display:flex;justify-content:space-between;align-items:baseline;gap:9px}
+.skillCard h4{font-size:14px;margin:0}.skillCard strong{font-size:20px;color:#183e6a}
+.skillMeter{height:8px;border-radius:10px;background:#e4eaf1;overflow:hidden;margin:10px 0 6px}
+.skillMeter span{display:block;height:100%;background:#397db7}
+.skillMeter.strong span{background:#258257}.skillMeter.priority span{background:#c17f2c}
+.skillTag{display:inline-block;padding:3px 7px;border-radius:6px;background:#eaf0f7;color:#33526f;font-size:11px}
+.skillFootnote{color:#61748a;font-size:12px;line-height:1.6}
+.skillSubhead{font-size:15px;margin:19px 0 8px}
+.skillLegend{margin:12px 0;padding:12px;border:1px solid #e2e8f0;border-radius:9px;background:#f9fbfe}
+.skillEmpty{background:#f7f9fc;border:1px dashed #c7d5e4;border-radius:9px;padding:14px;color:#607287;font-size:13px}button:disabled{opacity:.5;cursor:not-allowed}
 input{border:1px solid #cbd7e4;padding:11px;border-radius:8px;min-width:190px;flex:1}
 .panel{background:#fff;border:1px solid #e0e7ef;border-radius:13px;padding:22px;margin-bottom:17px;box-shadow:0 2px 9px #163e6310}
 .muted{color:#64758c}.small{font-size:12px}.hidden{display:none!important}.metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(175px,1fr));gap:13px;margin-bottom:18px}
@@ -23,6 +36,7 @@ table{border-collapse:collapse;width:100%;min-width:750px}th,td{padding:12px;tex
 <section id="access" class="panel"><h2>Verifying administrator access…</h2><p class="muted">Sign in to the Academy using the authorized administrator account.</p></section>
 <div id="dashboard" class="hidden">
 <div class="metrics" id="metrics"></div>
+<section class="panel" id="skillsOverview"><div class="skillSectionHeader"><div><h2>Workplace Skills Analytics</h2><p class="muted small">Evidence-based skill indicators from saved assessment responses, not an official competency certification.</p></div><button id="exportSkills" type="button">Export Skills CSV</button></div><div id="skillsCohort"></div></section>
 <section class="panel"><div class="toolbar"><input id="search" type="search" placeholder="Search name, email or learner UID" aria-label="Search learners"><button class="primary" id="reload">Refresh</button><button id="export">Export CSV</button></div>
 <p id="status" role="status"></p><div class="scroll"><table><thead><tr><th>Learner</th><th>Completed lessons</th><th>Mastered lessons</th><th>Assessment attempts</th><th>Average result</th><th>Modules complete</th><th>First attempts ≥80%</th><th>Tracked time</th><th>Details</th></tr></thead><tbody id="learnerRows"></tbody></table></div>
 <p class="muted small">Only data saved to Cloud Firestore is included. Missing records do not prove that a learner did no work. This is a read-only dashboard.</p>
@@ -54,5 +68,5 @@ table{border-collapse:collapse;width:100%;min-width:750px}th,td{padding:12px;tex
 <script src="./assets/module-22.js"></script>
 <script src="./assets/module-23.js"></script>
 <script>window.ATD_COURSE_MODULES=DATA.modules;</script>
-<script type="module" src="./assets/admin-page.js?v=20261109-permission-diagnostic"></script>
+<script type="module" src="./assets/admin-page.js?v=20261110-skills-v1"></script>
 </body></html>
