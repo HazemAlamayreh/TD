@@ -92,7 +92,7 @@ function ui(){
 }
 function records(s){
  const out=[],id=v=>String(v).replace(/[^a-zA-Z0-9_.-]/g,"_");
- for(const [k,v] of Object.entries(s.done||{}))if(v)out.push(["lessonProgress",id(k),{lessonId:k,completed:true}]);
+ for(const [k,v] of Object.entries(s.done||{}))if(v){const ev=window.ATDRules?.lessonEvidence?.(k);out.push(["lessonProgress",id(k),{lessonId:k,studied:true,completed:ev?ev.resolved:true,evidenceResolved:ev?ev.resolved:true,evidenceLevel:ev?.level||"legacy-completed"}]);}
  for(const [k,v] of Object.entries(s.mastered||{}))if(v)out.push(["lessonMastery",id(k),{lessonId:k,mastered:true}]);
  for(const [k,v] of Object.entries(s.attempts||{}))if(v?.ts){
   let evidence={};try{
@@ -135,7 +135,7 @@ async function restore(){
   const docs=await getDocs(collection(db,"learners",uid,sub));
   for(const d of docs.docs){
    known.add(sub+"/"+d.id);const a=d.data();
-   if(sub==="lessonProgress"&&a.completed)s.done[a.lessonId]=true;
+   if(sub==="lessonProgress"&&(a.studied||a.completed))s.done[a.lessonId]=true;
    if(sub==="lessonMastery"&&a.mastered)s.mastered[a.lessonId]=true;
    if(sub==="assessmentAttempts"&&a.assessmentKey){const old=s.attempts[a.assessmentKey];if(!old||String(a.ts||"")>String(old.ts||"")){const {updatedAt,assessmentKey,...attempt}=a;s.attempts[a.assessmentKey]=attempt;}}
   }
@@ -147,8 +147,10 @@ async function upload(manual=false,source=null){
  busy=true;
  try{
   for(const [sub,id,data] of records(source||h.getState())){
-   const key=sub+"/"+id;if(known.has(key))continue;
+   const key=sub+"/"+id;
    const ref=doc(db,"learners",user.uid,sub,id);
+   // Lesson evidence changes as the learner progresses; refresh this derived record even when it already exists.
+   if(sub!=="lessonProgress"&&known.has(key))continue;
    if(manual&&(await getDoc(ref)).exists()){known.add(key);continue;}
    await setDoc(ref,{...data,updatedAt:serverTimestamp()},{merge:true});known.add(key);
   }
