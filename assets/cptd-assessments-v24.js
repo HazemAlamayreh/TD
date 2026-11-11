@@ -250,19 +250,38 @@ render=function(){
    tab.classList.toggle("atdTabNeedsPass",needsPass);
    if(complete)tab.setAttribute("aria-label",(state.lang==="ar"?x.ar:x.en)+" — "+msg("completed","مكتمل"));
   });
-  bar.querySelectorAll(".atdModuleReason").forEach(x=>x.remove());
+  top.querySelectorAll(".atdModuleReasonTrigger").forEach(x=>x.remove());
+  document.querySelectorAll(".atdModuleReasonModal").forEach(x=>x.remove());
   if(!s.completed){
-   const details=document.createElement("details");details.className="atdModuleReason";
-   const summary=document.createElement("summary");summary.textContent=msg("Why is this module not passed?","ليش الموديول لسه مش ناجح؟");
-   details.append(summary);
-   const explanation=document.createElement("div");
-   explanation.textContent=msg("100% indicates stage progress, not exam score. The module requires Diagnostic >80%, Mastery >75%, Advanced >70%, and all lessons completed.","100% تعني إكمال المرحلة، وليست علامة الامتحان. النجاح يتطلب Diagnostic أعلى من 80% وMastery أعلى من 75% وAdvanced أعلى من 70% وإكمال الدروس.");
-   details.append(explanation);
-   const ul=document.createElement("ul");
-   issues.forEach(issue=>{const li=document.createElement("li");li.textContent=issue;ul.append(li);});
-   details.append(ul);bar.insertAdjacentElement("afterend",details);
-  }else{
-   const previous=top.querySelector(".atdModuleReason");if(previous)previous.remove();
+   const trigger=document.createElement("button");
+   trigger.type="button";
+   trigger.className="atdModuleReasonTrigger";
+   trigger.textContent=msg("Why not passed?","ليش لسه مش ناجح؟");
+   trigger.setAttribute("aria-haspopup","dialog");
+   trigger.title=msg("Show the requirements that are still missing","اعرض شروط النجاح التي ما زالت ناقصة");
+   trigger.onclick=()=>{
+    document.querySelectorAll(".atdModuleReasonModal").forEach(x=>x.remove());
+    const dialog=document.createElement("dialog");
+    dialog.className="atdModuleReasonModal";
+    dialog.setAttribute("aria-labelledby","atdModuleReasonTitle");
+    const close=document.createElement("button");
+    close.type="button";close.className="atdModuleReasonClose";close.setAttribute("aria-label",msg("Close","إغلاق"));close.textContent="×";
+    const title=document.createElement("h3");title.id="atdModuleReasonTitle";title.textContent=msg("Why is this module not passed?","ليش الموديول لسه مش ناجح؟");
+    const explanation=document.createElement("p");
+    explanation.textContent=msg("Stage progress and assessment pass status are different. To complete the module you need Diagnostic >80%, Mastery >75%, Advanced >70%, and all required lesson evidence completed.","نسبة التقدم تختلف عن حالة النجاح. لإكمال الموديول تحتاج Diagnostic أعلى من 80% وMastery أعلى من 75% وAdvanced أعلى من 70% وإكمال دليل التعلم المطلوب للدروس.");
+    const ul=document.createElement("ul");
+    issues.forEach(issue=>{const li=document.createElement("li");li.textContent=issue;ul.append(li);});
+    const done=document.createElement("button");done.type="button";done.className="btn primary atdModuleReasonDone";done.textContent=msg("Got it","فهمت");
+    dialog.append(close,title,explanation,ul,done);
+    document.body.append(dialog);
+    const shut=()=>dialog.open?dialog.close():dialog.remove();
+    close.onclick=shut;done.onclick=shut;
+    dialog.addEventListener("close",()=>dialog.remove(),{once:true});
+    dialog.addEventListener("click",e=>{if(e.target===dialog)shut();});
+    dialog.showModal();
+    close.focus();
+   };
+   bar.append(trigger);
   }
  }
  if(state.view==="material"){
