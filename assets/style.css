@@ -221,10 +221,40 @@ button{transition:background-color .2s,box-shadow .2s,transform .2s,border-color
 }
 #top .tabs button:has(+ button):focus-visible,
 #top .atdPathChip:focus-visible{outline:3px solid #1f7eb8;outline-offset:2px}
-.atdModuleReason{margin:7px 0 10px;padding:8px 12px;border:1px solid #efcd98;border-radius:9px;background:#fff8eb;color:#75480f;font-size:12px;line-height:1.7}
-.atdModuleReason summary{font-weight:700;cursor:pointer}
-.atdModuleReason div{margin-top:6px}
-.atdModuleReason ul{padding-inline-start:20px;margin:6px 0}
+.atdModuleReasonTrigger{
+ margin-inline-start:4px;
+ padding:5px 9px;
+ border:1px solid #dfbd7a;
+ border-radius:999px;
+ background:#fff8eb;
+ color:#75480f;
+ font-size:11px;
+ font-weight:750;
+ white-space:nowrap;
+ cursor:pointer;
+}
+.atdModuleReasonTrigger:hover,.atdModuleReasonTrigger:focus-visible{background:#fff1d6;border-color:#c58d2f;outline:2px solid #c58d2f33}
+.atdModuleReasonModal{
+ width:min(520px,calc(100vw - 28px));
+ border:0;
+ border-radius:14px;
+ padding:22px;
+ color:#24384b;
+ background:#fff;
+ box-shadow:0 20px 70px rgba(16,39,61,.28);
+}
+.atdModuleReasonModal::backdrop{background:rgba(15,31,46,.48)}
+.atdModuleReasonModal h3{margin:0 34px 9px 0;color:#173a5a;font-size:19px}
+[dir="rtl"] .atdModuleReasonModal h3{margin:0 0 9px 34px}
+.atdModuleReasonModal p{font-size:13px;line-height:1.7;color:#52677c}
+.atdModuleReasonModal ul{margin:12px 0 18px;padding-inline-start:22px;font-size:13px;line-height:1.7}
+.atdModuleReasonClose{
+ position:absolute;top:10px;inset-inline-end:10px;
+ width:32px;height:32px;border:0;border-radius:50%;
+ background:#eef3f7;color:#38516a;font-size:22px;line-height:1;cursor:pointer;
+}
+.atdModuleReasonClose:hover,.atdModuleReasonClose:focus-visible{background:#dde8f1;outline:2px solid #287ac044}
+.atdModuleReasonDone{min-width:92px}
 .atdCptdOverall.pending{background:#fff0d5!important;color:#77490f!important}
 .atdCptdOverall.passed{background:#176b46!important;color:#fff!important}
 
