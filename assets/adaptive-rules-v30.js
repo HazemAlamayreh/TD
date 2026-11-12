@@ -124,7 +124,7 @@
   if(stage==="advanced"){
    if(validAttempt(m,stage))return 100;
    const d=state.caseDraft;if(d?.mid!==m.id)return 0;
-   let total=1;try{total=Math.max(1,Math.min(3,caseQuestions(m).length)*3);}catch{}
+   let total=1;try{total=Math.max(1,Math.min(3,caseQuestions(m).length)*4);}catch{}
    return Math.min(99,Math.round(100*((d.history||[]).length/total)));
   }
   return 0;
