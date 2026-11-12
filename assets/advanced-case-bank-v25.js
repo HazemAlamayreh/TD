@@ -96,7 +96,7 @@
    "The next planning cycle begins. The team must decide what to retain, what to modify, and what evidence is still needed before claiming success.",
    "The intervention has reached a decision point. Stakeholders need a transparent recommendation that links the original issue to observed outcomes and remaining gaps."
   ][(seed+5)%8];
-  return {stage2:stage2+" Case focus: "+t+".",stage3:stage3+" The original response was: "+a+".",stage4:stage4+" Decision principle: "+r+"."};
+  return {stage2:stage2+" Case focus: "+t+".",stage3:stage3+" The original response was: "+a+".",stage4:stage4+" Case focus: "+t+". Decision principle: "+r+"."};
  }
  function stage1Choices(topic,action,seed){
   const t=short(topic,54),a=short(action,82);
