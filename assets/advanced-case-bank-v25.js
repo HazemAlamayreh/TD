@@ -56,11 +56,12 @@
  function initialChoices(m,q,target,seed){
   const correct=clean(q.opts?.[q.answer]||"Review the evidence and choose the response that best addresses the stated performance need.");
   const original=(q.opts||[]).filter((_,i)=>i!==q.answer).map(clean).filter(Boolean);
-  const fallback=genericInitialMistakes(titleFor(m,target),correct,seed);
+  const fallback=genericInitialMistakes(titleFor(m,target),correct,seed),correctWords=correct.split(/\s+/).length;
   const distractors=[];
   for(let i=0;i<3;i++){
-   const candidate=original[i];
-   distractors.push(candidate&&!badDistractor.test(candidate)&&candidate.split(/\s+/).length>=5?candidate:fallback[i]);
+   const candidate=original[i],candidateWords=candidate?candidate.split(/\s+/).length:0;
+   const comparable=candidateWords>=Math.max(7,correctWords-5)&&candidateWords<=correctWords+8;
+   distractors.push(candidate&&!badDistractor.test(candidate)&&comparable?candidate:fallback[i]);
   }
   return [correct,...distractors];
  }
