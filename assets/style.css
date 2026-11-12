@@ -324,3 +324,12 @@ button{transition:background-color .2s,box-shadow .2s,transform .2s,border-color
 .adaptiveLevelSummary>div{border:1px solid #dce6ee;border-radius:10px;background:#fff;padding:11px;text-align:center}
 .adaptiveLevelSummary strong{display:block;font-size:23px;color:#173a5a}.adaptiveLevelSummary span{display:block;font-size:11px;color:#64758c;margin-top:3px}
 @media(max-width:700px){.adaptiveLevelSummary{grid-template-columns:repeat(2,minmax(120px,1fr))}}
+
+
+/* Advanced Case Bank v25 */
+.advancedV25 .advancedCaseTarget{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin:12px 0;padding:10px 12px;border:1px solid #cfe0ec;border-radius:9px;background:#f6fafe;font-size:12px}
+.advancedV25 .advancedCaseTarget span{display:inline-flex;padding:4px 8px;border-radius:999px;background:#fff0d8;border:1px solid #dfbd7a;color:#75480f;font-weight:800;font-size:10px}
+.advancedV25 .answer.wrong{border-color:#cf8a72!important;background:#fff0eb!important}
+.advancedV25 .answer.correct{border-color:#66ad83!important;background:#e8f6ed!important}
+.advancedReview{margin-top:14px}
+.advancedReview h4{margin:7px 0;color:#173a5a}
