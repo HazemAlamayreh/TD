@@ -156,13 +156,23 @@
   BANK[m.id]=src.slice(0,3).map((x,i)=>buildCase(m,x,i,globalIndex++));
  }
  function priorityIds(m){try{return window.ATDRules?.priorityGaps?.(m)||[];}catch{return [];}}
+ function gapRelevance(c,m,gaps){
+  if(!gaps.length)return 0;
+  const caseWords=new Set(words(c.sourceStem+" "+c.why+" "+c.title));
+  let best=0;
+  for(const id of gaps){
+   const l=m.lessons.find(x=>x[0]===id);if(!l)continue;
+   const gapWords=words([l[1],l[2],l[3],l[4],l[7]].join(" "));
+   let overlap=0;for(const w of gapWords)if(caseWords.has(w))overlap++;
+   if(id===c.target)overlap+=20;
+   best=Math.max(best,overlap);
+  }
+  return best;
+ }
  function orderedCases(m){
-  const bank=(BANK[m.id]||[]).slice(),gaps=priorityIds(m);
-  if(!gaps.length)return bank;
-  return bank.sort((a,b)=>{
-   const ai=gaps.indexOf(a.target),bi=gaps.indexOf(b.target),as=ai<0?999:ai,bs=bi<0?999:bi;
-   return as-bs||a.id.localeCompare(b.id);
-  });
+  const gaps=priorityIds(m);
+  return (BANK[m.id]||[]).map(c=>({...c,adaptiveScore:gapRelevance(c,m,gaps)}))
+   .sort((a,b)=>b.adaptiveScore-a.adaptiveScore||a.id.localeCompare(b.id));
  }
  caseQuestions=function(m){return orderedCases(m);};
  function ensureSession(m){
@@ -183,13 +193,13 @@
   ensureSession(m);
   if(sess.finished){showCaseResult(m);return;}
   const {c,stage}=stageOf(m);if(!c||!stage)return;
-  const priority=priorityIds(m),isGap=priority.includes(c.target),chosen=sess.selected;
+  const priority=priorityIds(m),isGap=priority.includes(c.target),isAdaptive=!isGap&&priority.length>0&&c.adaptiveScore>0,chosen=sess.selected;
   $("body").innerHTML='<div class="panel qBox advancedV25"><span class="pill">'+msg("ADVANCED · CASE BANK v25","المتقدم · بنك الحالات v25")+'</span>'+
    '<h1>'+msg("Applied Talent Development Decisions","قرارات تطبيقية في تطوير المواهب")+'</h1>'+
    '<p class="muted">'+msg("Each case evolves through four different decisions. Select ONE best response at each stage. Cases related to your unresolved learning gaps are shown first when available.","كل حالة تتطور عبر أربعة قرارات مختلفة. اختر إجابة واحدة هي الأفضل في كل مرحلة. تظهر الحالات المرتبطة بفجواتك غير المغلقة أولاً عندما تكون متاحة.")+'</p>'+
    '<div class="questionMeta"><span>'+msg("Case ","الحالة ")+(sess.caseIndex+1)+" / "+cases.length+" · "+msg("Stage ","المرحلة ")+(sess.step+1)+' / 4</span><span class="skillTag">'+esc(stage.label)+'</span></div>'+
    '<div class="barOuter"><div class="barInner" style="width:'+(100*(sess.caseIndex*4+sess.step+1)/(cases.length*4))+'%"></div></div>'+
-   '<div class="advancedCaseTarget"><b>'+esc(c.target+" · "+c.title)+'</b>'+(isGap?'<span>'+msg("Priority gap match","مرتبط بفجوة أولوية")+'</span>':'')+'</div>'+
+   '<div class="advancedCaseTarget"><b>'+esc(c.target+" · "+c.title)+'</b>'+(isGap?'<span>'+msg("Priority gap match","مرتبط بفجوة أولوية")+'</span>':isAdaptive?'<span>'+msg("Prioritized from your gaps","مُرتّب حسب فجواتك")+'</span>':'')+'</div>'+
    '<h2 class="chapter">'+esc(stage.context)+'</h2><h3>'+esc(stage.prompt)+'</h3>'+
    stage.choices.map((opt,i)=>'<button class="answer '+(chosen===i?"selected ":"")+(sess.submitted&&i===stage.answer?"correct ":"")+(sess.submitted&&chosen===i&&i!==stage.answer?"wrong ":"")+'" '+(sess.submitted?"disabled":"")+' onclick="selectAdvancedV25('+i+')"><b>'+String.fromCharCode(65+i)+'.</b> '+esc(opt)+'</button>').join("")+
    (sess.submitted?'<div class="feedback"><b>'+msg("Decision feedback","تفسير القرار")+'</b><p>'+esc(stage.why)+'</p><p><b>'+msg("Best response: ","أفضل استجابة: ")+'</b>'+esc(stage.choices[stage.answer])+'</p><p>'+msg("This stage: ","نتيجة المرحلة: ")+(chosen===stage.answer?"1 / 1":"0 / 1")+'</p></div>':"")+
@@ -238,5 +248,5 @@
    '<p class="muted">'+msg("This score reflects four-stage simulated decisions. It is independent practice, not an official ATD examination score.","هذه النتيجة تقيس قرارات محاكاة عبر أربع مراحل. وهي تدريب مستقل وليست نتيجة رسمية لامتحان ATD.")+'</p>'+
    rows+'<div class="actionBar"><button class="btn" onclick="atdStartNewAssessment(\''+m.id+'\',\'advanced\')">'+msg("Practice a new v25 attempt","بدء محاولة v25 جديدة")+'</button><button class="btn" onclick="view(\'material\')">'+msg("Open lessons","فتح الدروس")+'</button></div></div>';
  };
- window.ATDAdvancedCaseV25={version:VERSION,bank:BANK,casesFor:orderedCases,semanticTarget};
+ window.ATDAdvancedCaseV25={version:VERSION,bank:BANK,casesFor:orderedCases,semanticTarget,gapRelevance};
 })();
