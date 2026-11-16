@@ -2,7 +2,7 @@
    Original authored practice items; not official ATD examination questions. */
 const ATD_DIAGNOSTIC_BANK_VERSION="diagnostic-pair-v24";
 const ATD_MASTERY_BANK_VERSION="mastery-scenario-v24";
-function atdMasteryBankVersion(m){return ["1.1","1.3"].includes(m.id)?"mastery-editorial-v26":"mastery-audited-v27";}
+function atdMasteryBankVersion(m){return "mastery-applied-v28";}
 
 function atdDiagnosticBankVersion(m){return ["1.1","1.3"].includes(m.id)?"diagnostic-quality-v25":ATD_DIAGNOSTIC_BANK_VERSION;}
 function atdDiagnosticQuestionSuffix(m){return ["1.1","1.3"].includes(m.id)?"d25":"d24";}
@@ -62,7 +62,7 @@ function atdVersionMatches(a,stage,m){
  if(!a)return false;
  if(stage==="diagnostic")return a.bankVersion===atdDiagnosticBankVersion(m)&&a.questionCount===getQs(m,stage).length;
  if(stage==="mastery")return a.bankVersion===atdMasteryBankVersion(m)&&a.questionCount===getQs(m,stage).length;
- return a.caseVersion==="case-v25"&&a.questionCount===caseQuestions(m).length*4;
+ return a.caseVersion==="case-v26"&&a.questionCount===caseQuestions(m).length*4;
 }
 function atdDiagnosticCleared(m){
  const a=state.attempts?.[m.id+":diagnostic"];
@@ -139,7 +139,7 @@ function atdStartNewAssessment(mid,stage){
 function atdCompatibilityNotice(m,stage){
  const a=state.attempts?.[m.id+":"+stage];
  if(!a||atdVersionMatches(a,stage,m))return false;
- const title=stage==="diagnostic"?"New two-question-per-lesson Diagnostic":stage==="mastery"?"New scenario-based Mastery Check":"New adaptive four-stage Advanced Case Bank v25";
+ const title=stage==="diagnostic"?"New two-question-per-lesson Diagnostic":stage==="mastery"?"New scenario-based Mastery Check":"New five-scenario Advanced Applied Judgment v26";
  const oldMark=typeof a.score==="number"?Math.round(a.score*100)+"%":"—";
  $("body").innerHTML='<section class="panel"><h2>'+esc(title)+'</h2><p>'+msg("Your earlier result ("+oldMark+") is preserved. It was based on a different question bank and cannot be used to clear lessons or certify the new requirements.","نتيجتك السابقة ("+oldMark+") محفوظة، لكنها من بنك أسئلة مختلف ولا يمكن اعتمادها للاجتياز الجديد.")+'</p><p>'+msg("Start the updated assessment to receive a comparable result.","ابدأ التقييم المحدّث للحصول على نتيجة متوافقة.")+'</p><button class="btn primary" onclick="atdStartNewAssessment(\''+m.id+'\',\''+stage+'\')">'+msg("Start updated assessment","ابدأ التقييم الجديد")+'</button></section>';
  return true;
@@ -170,7 +170,7 @@ const ATD_V24_STAGE_PROGRESS=atdStageCompletion;
 atdStageCompletion=function(m){
  const stages=ATD_V24_STAGE_PROGRESS(m),status=atdModuleStatus(m);
  const ca=state.caseDraft;const advanced=stages.find(x=>x.view==="advanced");
- if(advanced&&!state.attempts?.[m.id+":advanced"]&&ca?.mid===m.id&&ca.version==="case-v25"){
+ if(advanced&&!state.attempts?.[m.id+":advanced"]&&ca?.mid===m.id&&ca.version==="case-v26"){
   advanced.progress=Math.min(99,Math.round(100*((ca.history||[]).length/Math.max(1,caseQuestions(m).length*4))));
  }
  const values={diagnostic:status.diag,mastery:status.mastery,advanced:status.advanced};
