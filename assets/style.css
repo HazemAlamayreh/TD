@@ -333,3 +333,14 @@ button{transition:background-color .2s,box-shadow .2s,transform .2s,border-color
 .advancedV25 .answer.correct{border-color:#66ad83!important;background:#e8f6ed!important}
 .advancedReview{margin-top:14px}
 .advancedReview h4{margin:7px 0;color:#173a5a}
+
+
+/* Assessment split v32: simplified one-decision Advanced v26 */
+.advancedV26 .advancedSituation{margin:14px 0;padding:15px 17px;border:1px solid #cedfeb;border-radius:11px;background:#f7fbfe}
+.advancedV26 .advancedSituation>span{display:inline-block;font-size:10px;font-weight:850;letter-spacing:.07em;color:#2c668b;margin-bottom:5px}
+.advancedV26 .advancedSituation p{margin:4px 0;font-size:15px;line-height:1.75;color:#263f55}
+.advancedV26 .advancedDecision{font-size:18px;line-height:1.5;margin:15px 0 10px;color:#163b59}
+.advancedV26 .advancedCaseTarget{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin:12px 0;padding:9px 11px;border:1px solid #cfe0ec;border-radius:9px;background:#f6fafe;font-size:12px}
+.advancedV26 .advancedCaseTarget span{display:inline-flex;padding:4px 8px;border-radius:999px;background:#fff0d8;border:1px solid #dfbd7a;color:#75480f;font-weight:800;font-size:10px}
+.advancedV26 .answer.correct{border-color:#66ad83!important;background:#e8f6ed!important}
+.advancedV26 .answer.wrong{border-color:#cf8a72!important;background:#fff0eb!important}
