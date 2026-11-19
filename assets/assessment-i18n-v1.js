@@ -312,22 +312,28 @@
 
  function audit(lang="ar"){
   const previous=state.lang;state.lang=lang;
-  const rows=[];
+  const missing=[],generated=[],authored=[];
   try{
    for(const m of DATA.modules){
     for(const stage of ["diagnostic","mastery"]){
      for(const q of getQs(m,stage)||[]){
-      if(q.translationMissing?.length)rows.push({type:"question",module:m.id,stage,id:q.id,target:q.target,missing:q.translationMissing.slice()});
+      const row={type:"question",module:m.id,stage,id:q.id,target:q.target};
+      if(q.translationMissing?.length)missing.push({...row,missing:q.translationMissing.slice()});
+      else if(q.translationSource==="generated-ar-fallback")generated.push(row);
+      else authored.push(row);
      }
     }
     if(typeof caseQuestions==="function"){
      for(const c of caseQuestions(m)||[]){
-      if(c.translationMissing?.length)rows.push({type:"case",module:m.id,stage:"advanced",id:c.id,target:c.target,missing:c.translationMissing.slice()});
+      const row={type:"case",module:m.id,stage:"advanced",id:c.id,target:c.target};
+      if(c.translationMissing?.length)missing.push({...row,missing:c.translationMissing.slice()});
+      else if(c.translationSource==="generated-ar-fallback")generated.push(row);
+      else authored.push(row);
      }
     }
    }
   }finally{state.lang=previous;}
-  return rows;
+  return {missing,generated,authored,summary:{missing:missing.length,generated:generated.length,authored:authored.length,total:missing.length+generated.length+authored.length}};
  }
 
  window.ATDAssessmentI18N={
