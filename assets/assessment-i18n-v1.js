@@ -47,16 +47,49 @@
   return missing;
  }
 
+ function questionArabicFallback(item,stage,slot){
+  const title=lessonTitle(item.target,item.title);
+  const summary=(typeof AR_LESSONS!=="undefined"&&AR_LESSONS?.[item.target]?.[1])||"طبّق المفهوم باستخدام أدلة العمل والسياق الفعلي قبل اختيار الإجراء.";
+  const correct=stage==="mastery"
+   ?"حدّد احتياج العمل والأدلة المتاحة، عالج السبب أو القيد المرتبط بالموقف، ثم اختر إجراءً مناسباً وحدد كيف ستتحقق من النتيجة."
+   :"اربط المفهوم باحتياج العمل والأدلة المتاحة، ثم اختر الإجراء الأكثر ملاءمة للسياق قبل التنفيذ.";
+  const distractors=stage==="mastery"?[
+   "ابدأ بتنفيذ الحل الأكثر شيوعاً مباشرةً، ثم ابحث عن أدلة تؤيده بعد ظهور النتائج.",
+   "اعتمد تفضيل صاحب المصلحة الأعلى نفوذاً باعتباره بديلاً عن تحليل الأدلة والسياق.",
+   "أجّل أي قرار إلى أن تختفي جميع أوجه عدم اليقين، من دون تحديد تجربة أو معيار للتحقق."
+  ]:[
+   "اختر الخيار الأكثر شيوعاً حتى لو لم يرتبط مباشرةً باحتياج العمل أو الأدلة.",
+   "اعتمد على الانطباع الأول وحده، ثم عدّل القرار فقط إذا ظهرت مشكلة واضحة.",
+   "ركّز على سرعة التنفيذ أكثر من فحص السياق والسبب والأدلة المرتبطة بالموقف."
+  ];
+  const opts=Array(4),answer=Number.isInteger(item.answer)?item.answer:0;
+  opts[answer]=correct;let w=0;for(let i=0;i<4;i++)if(i!==answer)opts[i]=distractors[w++];
+  const stem=stage==="mastery"
+   ?"يعمل مختص تطوير المواهب على «"+title+"». المعطيات الحالية ترتبط بهذه الفكرة: "+summary+" ما الإجراء المهني الأنسب في هذا الموقف؟"
+   :(slot%2===0
+     ?"أي تطبيق يعكس مفهوم «"+title+"» بصورة أدق في بيئة العمل؟"
+     :"في موقف عملي مرتبط بـ«"+title+"»، ما الاستجابة الأكثر اتساقاً مع المبدأ التالي: "+summary);
+  return {
+   title,
+   q:stem,
+   opts,
+   why:"الإجابة الأقوى تربط القرار بالمفهوم وبالأدلة واحتياج العمل والسياق الفعلي، بدلاً من الاعتماد على التفضيل أو السرعة وحدهما.",
+   translationSource:"generated-ar-fallback"
+  };
+ }
+
  function localizeQuestion(item,stage,slot){
   if(!item||state.lang!=="ar")return item;
   const slotKey=item.target+"|"+stage+"|"+slot;
-  const t=registry.ar.questions[item.id]||registry.ar.questionSlots[slotKey]||{};
+  const exact=registry.ar.questions[item.id]||registry.ar.questionSlots[slotKey];
+  const t=exact||questionArabicFallback(item,stage,slot);
   const out={...item,
    title:t.title??lessonTitle(item.target,item.title),
    q:t.q??item.q,
    opts:Array.isArray(t.opts)?t.opts.slice():copy(item.opts),
    why:t.why??item.why,
-   language:"ar"
+   language:"ar",
+   translationSource:t.translationSource||(exact?"authored-ar":"generated-ar-fallback")
   };
   const missing=missingQuestionFields(out);
   if(missing.length){out.translationMissing=missing;out.translationStatus="partial";}
