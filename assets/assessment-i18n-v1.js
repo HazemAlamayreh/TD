@@ -197,12 +197,116 @@
   if(translated.length===sess.qs.length&&translated.every((q,i)=>q.id===sess.qs[i].id))sess.qs=translated;
  }
 
+ const MODULE_AR={
+  "Communication":"التواصل",
+  "Emotional Intelligence & Decision Making":"الذكاء العاطفي واتخاذ القرار",
+  "Collaboration & Leadership":"التعاون والقيادة",
+  "Cultural Awareness & Inclusion":"الوعي الثقافي والشمول",
+  "Project Management":"إدارة المشاريع",
+  "Compliance & Ethical Behavior":"الامتثال والسلوك الأخلاقي",
+  "Lifelong Learning":"التعلم مدى الحياة",
+  "Learning Sciences":"علوم التعلم",
+  "Instructional Design":"التصميم التعليمي",
+  "Training Delivery & Facilitation":"تقديم التدريب والتيسير",
+  "Technology Application":"تطبيق التكنولوجيا",
+  "Knowledge Management":"إدارة المعرفة",
+  "Career & Leadership Development":"التطوير المهني والقيادي",
+  "Coaching":"التوجيه المهني",
+  "Evaluating Impact":"تقييم الأثر",
+  "Business Insight":"فهم الأعمال",
+  "Consulting & Business Partnering":"الاستشارات والشراكة مع الأعمال",
+  "Organization Development & Culture":"التطوير التنظيمي والثقافة",
+  "Talent Strategy & Management":"استراتيجية وإدارة المواهب",
+  "Performance Improvement":"تحسين الأداء",
+  "Change Management":"إدارة التغيير",
+  "Data & Analytics":"البيانات والتحليلات",
+  "Future Readiness":"الاستعداد للمستقبل"
+ };
+ const UI_AR={
+  "Completed":"مكتمل",
+  "Mastered":"متقن",
+  "Diagnostic":"التشخيص",
+  "Mastery":"الإتقان",
+  "Advanced":"المتقدم",
+  "In progress":"قيد التقدم",
+  "Not started":"لم يبدأ",
+  "Dashboard":"لوحة التقدم",
+  "Course Overview":"نظرة عامة على الدورة",
+  "Learning Analytics":"تحليلات التعلم",
+  "All modules":"جميع القدرات",
+  "DOMAIN 1":"المجال ١",
+  "DOMAIN 2":"المجال ٢",
+  "DOMAIN 3":"المجال ٣",
+  "BUILDING PERSONAL CAPABILITY":"بناء القدرات الشخصية",
+  "DEVELOPING PROFESSIONAL CAPABILITY":"تطوير القدرات المهنية",
+  "IMPACTING ORGANIZATIONAL CAPABILITY":"التأثير في القدرات التنظيمية",
+  "FULL LEARNING PATH":"مسار التعلم الكامل",
+  "DIAGNOSTIC READY":"التقييم التشخيصي جاهز",
+  "CONTENT AVAILABLE":"المحتوى متاح",
+  "CONTENT PLACEHOLDER":"المحتوى قيد الإعداد",
+  "Developed by":"تطوير",
+  "Primary reference: ATD Book":"المرجع الأساسي: كتاب ATD",
+  "Self-paced adaptive learning.":"تعلم تكيفي ذاتي السرعة.",
+  "Independent instructional adaptation of user-provided subject matter.":"معالجة تعليمية مستقلة للمادة العلمية المقدمة من المستخدم.",
+  "Not an official ATD credential.":"ليست اعتماداً رسمياً من ATD.",
+  "Local browser progress only.":"يُحفظ التقدم محلياً في المتصفح فقط."
+ };
+ const INTRO_AR={
+  "Connect with learners, leaders and stakeholders through clear messaging, active listening, influence and dialogue.":"تواصل مع المتعلمين والقادة وأصحاب المصلحة من خلال الرسائل الواضحة والاستماع الفعّال والتأثير والحوار.",
+  "Regulate your own responses, interpret others with care, recognize bias, develop resilience and make well-reasoned decisions.":"نظّم استجاباتك، وافهم الآخرين بعناية، وتعرّف إلى التحيز، وطوّر المرونة، واتخذ قرارات مدروسة.",
+  "Build professional relationships, align diverse teams, manage conflict, delegate effectively and lead for organizational outcomes.":"ابنِ علاقات مهنية، ووحّد الفرق المتنوعة، وأدر النزاع، وفوّض بفاعلية، وقد لتحقيق نتائج تنظيمية.",
+  "Recognize cultural influences, adapt respectfully, remove barriers to learning and create inclusive development opportunities.":"تعرّف إلى التأثيرات الثقافية، وتكيّف باحترام، وأزل عوائق التعلم، وأنشئ فرص تطوير شاملة.",
+  "Initiate, plan, coordinate, monitor and close learning initiatives within agreed scope, time, quality, budget and resources.":"ابدأ مبادرات التعلم وخطط لها ونسقها وراقبها وأغلقها ضمن النطاق والوقت والجودة والميزانية والموارد المتفق عليها.",
+  "Model integrity, protect confidential information, develop lawful accessible learning, and recognize when specialized legal guidance is needed.":"مثّل النزاهة، واحمِ المعلومات السرية، وطوّر تعلماً قانونياً ومتاحاً، واعرف متى تحتاج إلى إرشاد قانوني متخصص.",
+  "Model curiosity, self-direction and reflective learning while supporting growth, career mobility and a learning culture.":"جسّد الفضول والتعلم الموجّه ذاتياً والتأمل، مع دعم النمو والحركة المهنية وثقافة التعلم.",
+  "Apply learning theories, motivation, memory, practice and transfer to workplace learning.":"طبّق نظريات التعلم والدافعية والذاكرة والممارسة ونقل التعلم في بيئة العمل.",
+  "Analyze needs, write measurable outcomes, design experiences and assessment.":"حلّل الاحتياجات، واكتب نتائج قابلة للقياس، وصمّم خبرات تعلم وتقييمات.",
+  "Engage learners, facilitate sessions and manage learning environments.":"أشرك المتعلمين، ويسّر الجلسات، وأدر بيئات التعلم.",
+  "Select and apply learning technologies with accessibility and purpose.":"اختر تقنيات التعلم وطبّقها بما يراعي إمكانية الوصول والغرض.",
+  "Capture, organize, share and sustain organizational knowledge.":"التقط المعرفة التنظيمية ونظّمها وشاركها وحافظ على استدامتها.",
+  "Build career pathways, leadership readiness and development experiences.":"ابنِ مسارات مهنية وجاهزية قيادية وخبرات تطويرية.",
+  "Use structured conversations, feedback and goals to develop performance.":"استخدم حوارات منظمة وتغذية راجعة وأهدافاً لتطوير الأداء.",
+  "Measure learning, behavior, organizational results and improve solutions.":"قِس التعلم والسلوك والنتائج التنظيمية وحسّن الحلول.",
+  "Connect learning strategy to business models, financial results, customers and organizational competitive advantage.":"اربط استراتيجية التعلم بنماذج الأعمال والنتائج المالية والعملاء والميزة التنافسية للمؤسسة.",
+  "Build trusted partnerships, diagnose organizational needs and create evidence-based recommendations for stakeholders.":"ابنِ شراكات موثوقة، وشخّص الاحتياجات التنظيمية، وقدّم توصيات مبنية على الأدلة لأصحاب المصلحة.",
+  "Use systems thinking, organization development and culture interventions to improve engagement, learning and organizational effectiveness.":"استخدم التفكير النظمي والتطوير التنظيمي وتدخلات الثقافة لتحسين المشاركة والتعلم والفاعلية التنظيمية.",
+  "Integrate workforce plans, talent acquisition, career development, succession, performance and rewards with strategic business outcomes.":"ادمج تخطيط القوى العاملة واستقطاب المواهب والتطوير المهني والتعاقب والأداء والمكافآت مع نتائج الأعمال الاستراتيجية.",
+  "Diagnose business performance gaps and design systemic, measurable solutions that go beyond training alone.":"شخّص فجوات أداء الأعمال وصمّم حلولاً نظامية قابلة للقياس تتجاوز التدريب وحده.",
+  "Lead organizational transitions by managing stakeholders, risk, resistance, adoption and reinforcement.":"قد التحولات التنظيمية عبر إدارة أصحاب المصلحة والمخاطر والمقاومة والتبني والتعزيز.",
+  "Use responsible people analytics, statistical interpretation and clear visualization to inform talent decisions.":"استخدم تحليلات الأفراد بمسؤولية والتفسير الإحصائي والعرض الواضح لدعم قرارات المواهب.",
+  "Anticipate disruptions, emerging skills and technology while supporting learning agility and innovation.":"استشرف الاضطرابات والمهارات الناشئة والتقنيات الجديدة مع دعم مرونة التعلم والابتكار."
+ };
+
+ function replaceText(text){
+  let out=String(text);
+  for(const [en,ar] of Object.entries(MODULE_AR))out=out.split(en).join(ar);
+  for(const [en,ar] of Object.entries(INTRO_AR))out=out.split(en).join(ar);
+  for(const [en,ar] of Object.entries(UI_AR))out=out.split(en).join(ar);
+  return out;
+ }
+ function localizeRenderedUI(){
+  if(state.lang!=="ar")return;
+  const root=document.body;if(!root)return;
+  const walker=document.createTreeWalker(root,NodeFilter.SHOW_TEXT);
+  const nodes=[];while(walker.nextNode())nodes.push(walker.currentNode);
+  for(const node of nodes){
+   if(node.parentElement?.closest("script,style"))continue;
+   const next=replaceText(node.nodeValue);
+   if(next!==node.nodeValue)node.nodeValue=next;
+  }
+  const footer=document.querySelector(".footer");
+  if(footer){
+   footer.innerHTML='<strong>تطوير <a href="https://www.linkedin.com/in/hazem-al-amayreh-038aa1a4/" target="_blank" rel="noopener noreferrer" style="color:inherit;text-decoration:underline;text-underline-offset:3px">Hazem Amayreh</a></strong> — المرجع الأساسي: كتاب ATD<br>الأكاديمية · المجالات ١ و٢ و٣ · تعلم تكيفي ذاتي السرعة. معالجة تعليمية مستقلة للمادة العلمية المقدمة من المستخدم. ليست اعتماداً رسمياً من ATD. تتم مزامنة تقدم المتعلم وإجابات التقييم مع حسابه، وتُسجل مدة النشاط أثناء وجوده داخل الأكاديمية لأغراض تحليلات التعلم.';
+  }
+ }
+
  const PREVIOUS_RENDER=render;
  render=function(){
   refreshSessionLanguage();
   document.documentElement.lang=state.lang==="ar"?"ar":"en";
   document.documentElement.dir=state.lang==="ar"?"rtl":"ltr";
   PREVIOUS_RENDER();
+  localizeRenderedUI();
   renderQABadge();
  };
 
