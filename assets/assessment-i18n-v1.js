@@ -179,4 +179,5 @@
   qaEnabled,
   registry
  };
+ render();
 })();
