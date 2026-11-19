@@ -8,7 +8,7 @@
  const VERSION="assessment-i18n-v1";
  const SOURCE_GET_QS=getQs;
  const SOURCE_CASE_QUESTIONS=typeof caseQuestions==="function"?caseQuestions:null;
- const registry={ar:{questions:Object.create(null),cases:Object.create(null)}};
+ const registry={ar:{questions:Object.create(null),questionSlots:Object.create(null),cases:Object.create(null)}};
  const hasArabic=s=>/[\u0600-\u06FF]/.test(String(s??""));
  const copy=x=>Array.isArray(x)?x.slice():x;
  const qaEnabled=()=>{
@@ -21,9 +21,10 @@
  }
 
  function register(lang,payload){
-  if(!registry[lang])registry[lang]={questions:Object.create(null),cases:Object.create(null)};
+  if(!registry[lang])registry[lang]={questions:Object.create(null),questionSlots:Object.create(null),cases:Object.create(null)};
   const bucket=registry[lang];
   for(const [id,value] of Object.entries(payload?.questions||{}))bucket.questions[id]={...(bucket.questions[id]||{}),...value};
+  for(const [id,value] of Object.entries(payload?.questionSlots||{}))bucket.questionSlots[id]={...(bucket.questionSlots[id]||{}),...value};
   for(const [id,value] of Object.entries(payload?.cases||{}))bucket.cases[id]={...(bucket.cases[id]||{}),...value};
  }
 
@@ -46,9 +47,10 @@
   return missing;
  }
 
- function localizeQuestion(item,stage){
+ function localizeQuestion(item,stage,slot){
   if(!item||state.lang!=="ar")return item;
-  const t=registry.ar.questions[item.id]||{};
+  const slotKey=item.target+"|"+stage+"|"+slot;
+  const t=registry.ar.questions[item.id]||registry.ar.questionSlots[slotKey]||{};
   const out={...item,
    title:t.title??lessonTitle(item.target,item.title),
    q:t.q??item.q,
@@ -62,9 +64,29 @@
   return out;
  }
 
+ function advancedArabicFallback(item){
+  const title=lessonTitle(item.target,item.title);
+  const summary=(typeof AR_LESSONS!=="undefined"&&AR_LESSONS?.[item.target]?.[1])||"استخدم الأدلة المتاحة لاتخاذ قرار مهني مناسب.";
+  const opts=Array(4);
+  opts[item.answer]="اربط القرار بالأدلة الفعلية واحتياج العمل، عالج القيد الحالي، وحدد كيف ستتحقق من النتيجة.";
+  const wrong=[
+   "اختر أسرع استجابة ممكنة واجعل تأييد أصحاب المصلحة المؤشر الرئيسي على نجاح القرار.",
+   "اتبع الخيار المفضل لدى أقوى صاحب مصلحة ثم افحص الأدلة فقط إذا ظهرت مشكلة لاحقاً.",
+   "أجّل القرار إلى أن تختفي جميع أوجه عدم اليقين من دون تحديد اختبار أو مسؤول أو موعد واضح."
+  ];
+  let w=0;for(let i=0;i<4;i++)if(i!==item.answer)opts[i]=wrong[w++];
+  return {
+   title,
+   situation:"يعمل فريق تطوير المواهب على «"+title+"». والسياق الحالي يرتبط بهذه الفكرة: "+summary,
+   decision:"في ضوء هذا الموقف، ما الإجراء المهني الأنسب الذي ينبغي اتخاذه الآن؟",
+   opts,
+   why:"الاستجابة الأقوى تربط القرار بالدليل واحتياج العمل الفعلي، وتعالج القيد الحالي، وتحدد طريقة للتحقق من النتيجة."
+  };
+ }
+
  function localizeCase(item){
   if(!item||state.lang!=="ar")return item;
-  const t=registry.ar.cases[item.id]||{};
+  const t=registry.ar.cases[item.id]||advancedArabicFallback(item);
   const out={...item,
    title:t.title??lessonTitle(item.target,item.title),
    situation:t.situation??item.situation,
@@ -99,7 +121,8 @@
 
  getQs=function(m,stage){
   const items=SOURCE_GET_QS(m,stage)||[];
-  return state.lang==="ar"?items.map(x=>localizeQuestion(x,stage)):items;
+  const counts={};
+  return state.lang==="ar"?items.map(x=>{const slot=counts[x.target]||0;counts[x.target]=slot+1;return localizeQuestion(x,stage,slot);}):items;
  };
 
  if(SOURCE_CASE_QUESTIONS){
