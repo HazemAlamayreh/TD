@@ -1,3 +1,4 @@
+import {onAuthStateChanged} from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
 import {onSnapshot,collection} from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
 
 const safe = value => String(value ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
@@ -109,7 +110,7 @@ export function initializeOnboardingCohorts(auth,db) {
   },err=>{
     state.error="Unable to read employees: "+String(err.code||err.message)+". Check Firestore admin rules.";state.loading=false;render();
   });
-  auth.onAuthStateChanged(user=>{
+  onAuthStateChanged(auth,user=>{
     if(!user && stop){stop();stop=null;state.records=[];state.loading=false;state.error="Session ended. Sign in as Admin.";render();}
   });
 }
