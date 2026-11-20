@@ -87,7 +87,7 @@
   $("body").innerHTML=h.join("");
  };
  window.selectAdvancedV26=i=>{if(!sess||sess.submitted)return;sess.selected=i;persist();render();};
- window.submitAdvancedV26=()=>{if(!sess||sess.submitted||sess.selected===null)return;const m=DATA.modules.find(x=>x.id===sess.mid),c=caseQuestions(m)[sess.index],ok=sess.selected===c.answer;sess.points+=ok?1:0;sess.history.push({caseId:c.id,index:sess.index,target:c.target,choice:sess.selected,answer:c.answer,correct:ok});sess.submitted=true;persist();render();};
+ window.submitAdvancedV26=()=>{if(!sess||sess.submitted||sess.selected===null)return;const m=DATA.modules.find(x=>x.id===sess.mid),c=caseQuestions(m)[sess.index],ok=sess.selected===c.answer;sess.points+=ok?1:0;sess.history.push({caseId:c.id,index:sess.index,target:c.target,choice:sess.selected,answer:c.answer,correct:ok});sess.submitted=true;persist();if(sess.index===4){window.nextAdvancedV26();}else{render();}};
  window.nextAdvancedV26=()=>{
   if(!sess?.submitted)return;const m=DATA.modules.find(x=>x.id===sess.mid),cases=caseQuestions(m);
   if(sess.index<4){sess.index++;sess.selected=null;sess.submitted=false;persist();render();return;}
