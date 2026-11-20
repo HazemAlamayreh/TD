@@ -201,17 +201,9 @@
    const badge=button.querySelector(".atdModuleDoneLabel");
    if(done&&!badge){const b=document.createElement("span");b.className="atdModuleDoneLabel";b.textContent=t("✓ Passed","✓ ناجح");button.append(b);}
    else if(!done&&badge)badge.remove();
-   // Authoring status and learner performance are independent.
-   const contentReady=!m.preview&&Array.isArray(m.lessons)&&m.lessons.length>0&&
-     m.lessons.every(l=>Array.isArray(l)&&typeof l[2]==="string"&&l[2].trim().length>=80&&
-       typeof l[3]==="string"&&l[3].trim().length>=25);
+   // Remove legacy content-ready badges. Content approval requires editorial QA.
    const contentBadge=button.querySelector(".atdContentReadyLabel");
-   if(contentReady&&!contentBadge){
-     const b=document.createElement("span");b.className="atdContentReadyLabel";
-     b.textContent=t("✓ Content Completed","✓ المحتوى مكتمل");
-     b.style.cssText="display:inline-block;margin-inline-start:5px;font-size:10px;font-weight:700;color:#17643c;";
-     button.append(b);
-   }else if(!contentReady&&contentBadge)contentBadge.remove();
+   if(contentBadge)contentBadge.remove();
   });
  }
  function enhance(){
