@@ -284,20 +284,32 @@
   for(const [en,ar] of Object.entries(UI_AR))out=out.split(en).join(ar);
   return out;
  }
+ // Scope translation to the academy's newly rendered regions, never the whole document.
+ // Keep the source footer intact to restore it when switching back to English.
+ const footer=document.querySelector(".footer");
+ const englishFooter=footer?footer.innerHTML:"";
+ const arabicFooter='<strong>تطوير <a href="https://www.linkedin.com/in/hazem-al-amayreh-038aa1a4/" target="_blank" rel="noopener noreferrer" style="color:inherit;text-decoration:underline;text-underline-offset:3px">Hazem Amayreh</a></strong> — المرجع الأساسي: كتاب ATD<br>الأكاديمية · المجالات ١ و٢ و٣ · تعلم تكيفي ذاتي السرعة. معالجة تعليمية مستقلة للمادة العلمية المقدمة من المستخدم. ليست اعتماداً رسمياً من ATD. تتم مزامنة تقدم المتعلم وإجابات التقييم مع حسابه، وتُسجل مدة النشاط أثناء وجوده داخل الأكاديمية لأغراض تحليلات التعلم.';
+ let renderedLanguage=null;
  function localizeRenderedUI(){
-  if(state.lang!=="ar")return;
-  const root=document.body;if(!root)return;
-  const walker=document.createTreeWalker(root,NodeFilter.SHOW_TEXT);
-  const nodes=[];while(walker.nextNode())nodes.push(walker.currentNode);
-  for(const node of nodes){
-   if(node.parentElement?.closest("script,style"))continue;
-   const next=replaceText(node.nodeValue);
-   if(next!==node.nodeValue)node.nodeValue=next;
+  const ar=state.lang==="ar";
+  if(ar){
+   for(const selector of ["#sidebar","#top","#body"]){
+    const root=document.querySelector(selector);
+    if(!root)continue;
+    const walker=document.createTreeWalker(root,NodeFilter.SHOW_TEXT);
+    let node;
+    while((node=walker.nextNode())){
+     const text=node.nodeValue;
+     if(!text||!/[A-Za-z]/.test(text))continue;
+     const next=replaceText(text);
+     if(next!==text)node.nodeValue=next;
+    }
+   }
   }
-  const footer=document.querySelector(".footer");
-  if(footer){
-   footer.innerHTML='<strong>تطوير <a href="https://www.linkedin.com/in/hazem-al-amayreh-038aa1a4/" target="_blank" rel="noopener noreferrer" style="color:inherit;text-decoration:underline;text-underline-offset:3px">Hazem Amayreh</a></strong> — المرجع الأساسي: كتاب ATD<br>الأكاديمية · المجالات ١ و٢ و٣ · تعلم تكيفي ذاتي السرعة. معالجة تعليمية مستقلة للمادة العلمية المقدمة من المستخدم. ليست اعتماداً رسمياً من ATD. تتم مزامنة تقدم المتعلم وإجابات التقييم مع حسابه، وتُسجل مدة النشاط أثناء وجوده داخل الأكاديمية لأغراض تحليلات التعلم.';
+  if(footer&&renderedLanguage!==state.lang){
+   footer.innerHTML=ar?arabicFooter:englishFooter;
   }
+  renderedLanguage=state.lang;
  }
 
  const PREVIOUS_RENDER=render;
