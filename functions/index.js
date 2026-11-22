@@ -155,3 +155,6 @@ exports.resetEmployeePassword=onCall({...OPTIONS,secrets:[SMTP_CONFIG],timeoutSe
  catch(err){console.error("Password reset delivery failed",String(err.code||err.message));}
  return generic;
 });
+
+// Central onboarding ingestion shared by independently hosted employee websites.
+Object.assign(exports,require("./onboarding"));
