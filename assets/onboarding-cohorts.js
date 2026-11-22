@@ -1,3 +1,4 @@
+import {getFunctions,httpsCallable} from "https://www.gstatic.com/firebasejs/12.6.0/firebase-functions.js";
 import {onAuthStateChanged} from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
 import {onSnapshot,collection} from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
 
@@ -7,6 +8,8 @@ const monthNames = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct",
 const selected = new Set([1,2,3,4]);
 const state = {records:[], year:2026, dateField:"onboardingStartDate", department:"all", status:"all", search:"", loading:true, error:"", authorized:false};
 let stop = null;
+let assignJourney=null;
+
 
 function dateValue(value) {
   if (!value) return null;
@@ -90,6 +93,7 @@ function render() {
     '<div class="metrics">'+[["Employees",rows.length],["Not started",notStarted],["In progress",started],["Completed",completed],["Unknown status",unknown],["Average known progress",avg]].map(([label,value])=>'<div class="metric"><strong>'+safe(value)+'</strong>'+safe(label)+'</div>').join("")+'</div>'+
     '<div class="scroll"><table><thead><tr><th>Employee</th><th>Department</th><th>Hire date</th><th>Onboarding start</th><th>First login</th><th>Progress</th><th>Status</th><th>Last activity</th></tr></thead><tbody>'+
     (rows.length?rows.map(r=>'<tr><td><b>'+safe(r.name||"Unnamed")+'</b><div class="small muted">'+safe(r.employeeId)+'</div><div class="small muted">'+safe(r.email)+'</div></td><td>'+safe(r.department||"Not recorded")+'</td><td>'+safe(textDate(r.hireDate))+'</td><td>'+safe(textDate(r.onboardingStartDate))+'</td><td>'+safe(textDate(r.firstLoginAt))+'</td><td>'+safe(r.progress===null?"Not recorded":r.progress+"%")+'</td><td>'+safe(statusFor(r).replace("_"," "))+'</td><td>'+safe(textDate(r.lastActivityAt))+'</td></tr>').join(""):'<tr><td colspan="8" class="empty">No employees match this filter, or onboarding start dates have not yet been recorded.</td></tr>')+'</tbody></table></div>'+
+    '<details class="onbSetup"><summary><b>Assign onboarding journey (Admin)</b></summary><p class="muted small">Set required activity IDs for the employee. The list cannot change after onboarding begins.</p><form id="onbAssignForm" class="onbFilters"><label>Employee ID<input id="onbAssignEmployee" required maxlength="40" placeholder="EMP0001"></label><label>Journey ID<input id="onbAssignJourney" required maxlength="100" placeholder="new-hire-2026"></label><label>Required activity IDs (comma-separated)<input id="onbAssignActivities" required placeholder="welcome,policies,security"></label><button type="submit" class="primary">Assign journey</button></form><p id="onbAssignStatus" role="status" class="muted small"></p></details>'+ 
     '<p class="muted small">Progress percentages and statuses come from employee documents; this dashboard does not invent completion events or write employee records. Unknown progress is excluded from the average. Live updates reflect changes in the employees collection.</p>';
   $("onbDateType").onchange=e=>{state.dateField=e.target.value;render();};
   $("onbYear").onchange=e=>{state.year=Number(e.target.value);render();};
@@ -98,9 +102,23 @@ function render() {
   $("onbSearch").oninput=e=>{const p=e.target.selectionStart;state.search=e.target.value;render();$("onbSearch").focus();$("onbSearch").setSelectionRange(p,p);};
   root.querySelectorAll("[data-onb-month]").forEach(el=>el.onchange=e=>{const n=Number(e.target.dataset.onbMonth);e.target.checked?selected.add(n):selected.delete(n);render();});
   $("onbCsv").onclick=()=>exportCSV(rows);
+  $("onbAssignForm").onsubmit=async e=>{
+    e.preventDefault();
+    const el=$("onbAssignStatus"),btn=e.currentTarget.querySelector("button");
+    if(!assignJourney){el.textContent="Firebase Functions client not initialized.";return;}
+    const employeeId=$("onbAssignEmployee").value.trim(),journeyId=$("onbAssignJourney").value.trim();
+    const requiredActivityIds=$("onbAssignActivities").value.split(",").map(x=>x.trim()).filter(Boolean);
+    btn.disabled=true;el.textContent="Assigning…";
+    try {
+      const response=await assignJourney({employeeId,journeyId,requiredActivityIds});
+      el.textContent="Assigned "+response.data.activityCount+" required activities to "+response.data.employeeId+".";
+    } catch(err) {el.textContent="Assignment failed: "+String(err.code||err.message);}
+    finally {btn.disabled=false;}
+  };
 }
 export function initializeOnboardingCohorts(auth,db) {
   if(!$("onboardingCohortRoot"))return;
+  assignJourney=httpsCallable(getFunctions(auth.app,"us-central1"),"assignOnboardingJourney");
   state.authorized=true;
   if(stop)stop();
   state.loading=true;state.error="";render();
