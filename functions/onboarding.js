@@ -3,7 +3,7 @@ const {onCall,HttpsError}=require("firebase-functions/v2/https");
 const {getFirestore,FieldValue}=require("firebase-admin/firestore");
 const db=getFirestore();
 const ORIGIN="https://academy.idevelopmena.com";
-const BASE={region:"us-central1",maxInstances:10};
+const BASE={region:"us-central1",cors:["https://academy.idevelopmena.com","https://dad-new-employee-onboarding.hazem85hh.chatgpt.site",/^http:\/\/localhost:\d+$/],maxInstances:10};
 const ID=/^[A-Za-z0-9][A-Za-z0-9_.-]{1,39}$/;
 const ACTIVITY=/^[a-zA-Z0-9][a-zA-Z0-9_.:-]{0,99}$/;
 const normalizeId=v=>String(v||"").trim().toUpperCase();
@@ -87,5 +87,47 @@ exports.recordOnboardingActivity=onCall(BASE,async req=>{
       lastActivityAt:FieldValue.serverTimestamp(),onboardingUpdatedAt:FieldValue.serverTimestamp()
     },{merge:true});
     return {employeeId,activityId,status,overallProgress,unchanged:false};
+  });
+});
+
+// A resumable browser checkpoint is distinct from validated completion events.
+// An authenticated, linked employee can only load/write their own checkpoint.
+exports.getOnboardingCheckpoint=onCall(BASE,async req=>{
+  if(!req.auth?.uid)throw new HttpsError("unauthenticated","Sign in first.");
+  const employeeId=normalizeId(req.data?.employeeId);
+  if(!ID.test(employeeId))throw new HttpsError("invalid-argument","Employee ID required.");
+  const emp=await db.doc("employees/"+employeeId).get();
+  assertUid(req,emp);
+  const snap=await db.doc("onboardingCheckpoints/"+req.auth.uid).get();
+  if(!snap.exists)return {checkpoint:null,revision:0};
+  const data=snap.data();
+  if(data.employeeId!==employeeId)throw new HttpsError("permission-denied","Checkpoint identity mismatch.");
+  return {checkpoint:data.checkpoint||null,revision:Number(data.revision||0)};
+});
+exports.saveOnboardingCheckpoint=onCall(BASE,async req=>{
+  if(!req.auth?.uid)throw new HttpsError("unauthenticated","Sign in first.");
+  const employeeId=normalizeId(req.data?.employeeId);
+  if(!ID.test(employeeId))throw new HttpsError("invalid-argument","Employee ID required.");
+  const checkpoint=req.data?.checkpoint;
+  if(!checkpoint||typeof checkpoint!=="object"||Array.isArray(checkpoint))
+    throw new HttpsError("invalid-argument","Checkpoint must be an object.");
+  const encoded=JSON.stringify(checkpoint);
+  if(encoded.length>650000)throw new HttpsError("invalid-argument","Checkpoint exceeds 650KB limit.");
+  const allowed=["assessments","practice","passedAt","course","courseProgress","itEmail","itProfiles","lang","screen"];
+  if(Object.keys(checkpoint).some(k=>!allowed.includes(k)))
+    throw new HttpsError("invalid-argument","Unexpected checkpoint fields.");
+  const revision=Number(req.data?.revision);
+  if(!Number.isSafeInteger(revision)||revision<0)
+    throw new HttpsError("invalid-argument","Non-negative revision required.");
+  const employeeRef=db.doc("employees/"+employeeId);
+  const target=db.doc("onboardingCheckpoints/"+req.auth.uid);
+  return db.runTransaction(async tx=>{
+    const employee=await tx.get(employeeRef),existing=await tx.get(target);
+    assertUid(req,employee);
+    const current=existing.exists?Number(existing.get("revision")||0):0;
+    if(current!==revision)throw new HttpsError("aborted","Checkpoint changed on another device. Reload cloud progress before saving.");
+    const next=current+1;
+    tx.set(target,{employeeId,uid:req.auth.uid,checkpoint,revision:next,updatedAt:FieldValue.serverTimestamp()});
+    return {revision:next};
   });
 });
