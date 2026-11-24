@@ -133,12 +133,18 @@ function* records(s){
  // Do not replay the full historical attempt array during routine sync.
  // Existing Firestore history is retained unchanged.
 }
+function compactAttempt(a){
+ if(!a||typeof a!=="object")return a;
+ const keep=["score","missed","answers","ts","questionCount","bankVersion","caseVersion","history","passed","finished"];
+ const out={};for(const k of keep)if(a[k]!==undefined)out[k]=a[k];
+ return out;
+}
 function snapshot(s){
  const fields=["current","view","focus","lastResume","draft","caseDraft","checks","manualReviewed","knowledgeGaps","lessonVisits","caseHistory"];
  const data={};for(const k of fields)if(s[k]!==undefined)data[k]=s[k];
  data.compactDone={...(s.done||{})};
  data.compactMastered={...(s.mastered||{})};
- data.compactAttempts={...(s.attempts||{})};
+ data.compactAttempts=Object.fromEntries(Object.entries(s.attempts||{}).map(([k,v])=>[k,compactAttempt(v)]));
  data.compactVersion=1;
  return data;
 }
@@ -206,7 +212,7 @@ async function restore(uid=user?.uid){
  if(stamp!==null)localStorage.setItem("atdSnapshotTime:"+uid,stamp);
  h.render();
  perf("login-critical restore ("+processed+" records)",start);
- if(!hasCompact)void hydrateAssessmentsInBackground(uid);
+ if(!hasCompact)setTimeout(()=>{if(user?.uid===uid&&initialized)void hydrateAssessmentsInBackground(uid);},2500);
  return true;
 }
 async function hydrateAssessmentsInBackground(uid){
