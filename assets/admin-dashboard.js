@@ -51,12 +51,20 @@ export function initializeAdminDashboard(auth,db){
     const batch=docs.slice(i,i+10);
     const summaries=await Promise.all(batch.map(p=>getDoc(doc(db,"learners",p.id,"sync","current")).catch(()=>null)));
     batch.forEach((p,j)=>{
-     const x=p.data(),snap=summaries[j],summary=snap?.exists()?snap.data():{};
-     const completed=Object.values(summary.compactDone||{}).filter(Boolean).length;
-     const mastered=Object.values(summary.compactMastered||{}).filter(Boolean).length;
-     const attempts=Object.values(summary.compactAttempts||{});
-     const scores=attempts.map(t=>t?.score).filter(v=>typeof v==="number"&&Number.isFinite(v));
-     data.push({uid:p.id,name:x.name||"",email:x.email||"",phone:x.phone||"",completed,mastered,attempts:attempts.length,average:scores.length?Math.round(scores.reduce((a,b)=>a+b,0)/scores.length*100)+"%":"—"});
+     const x=p.data(),snap=summaries[j],summary=snap?.exists()?snap.data():{},modules=Object.values(summary.compactModules||{});
+     let completed,mastered,attemptCount,average="—";
+     if(modules.length){
+      completed=modules.reduce((n,m)=>n+Number(m.reviewed||0),0);
+      mastered=modules.filter(m=>m.status==="mastered"||m.status==="completed").length;
+      attemptCount=modules.reduce((n,m)=>n+(m.diagnostic?1:0)+(m.masteryCheck?1:0)+(m.advanced?1:0),0);
+     }else{
+      completed=Object.values(summary.compactDone||{}).filter(Boolean).length;
+      mastered=Object.values(summary.compactMastered||{}).filter(Boolean).length;
+      const attempts=Object.values(summary.compactAttempts||{});
+      const scores=attempts.map(t=>t?.score).filter(v=>typeof v==="number"&&Number.isFinite(v));
+      attemptCount=attempts.length;average=scores.length?Math.round(scores.reduce((a,b)=>a+b,0)/scores.length*100)+"%":"—";
+     }
+     data.push({uid:p.id,name:x.name||"",email:x.email||"",phone:x.phone||"",completed,mastered,attempts:attemptCount,average});
     });
     await new Promise(resolve=>setTimeout(resolve,0));
    }
