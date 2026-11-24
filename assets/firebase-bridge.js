@@ -1,10 +1,10 @@
 import {initializeApp} from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
 import {getAuth,setPersistence,browserLocalPersistence,onAuthStateChanged,createUserWithEmailAndPassword,signInWithEmailAndPassword,sendPasswordResetEmail,sendEmailVerification,updatePassword,signOut} from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
 import {getFirestore,doc,getDoc,getDocs,setDoc,collection,serverTimestamp,increment,query,orderBy,documentId,limit,startAfter} from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
-import {initializeAdminDashboard} from "./admin-dashboard.js?v=20261110-role-refresh";
+import {initializeAdminDashboard} from "./admin-dashboard.js?v=20261124-on-demand-history-v1";
 import {getFunctions,httpsCallable} from "https://www.gstatic.com/firebasejs/12.6.0/firebase-functions.js";
 const app=initializeApp({apiKey:"AIzaSyBxuLsolggWnoGuTASnnWvz7OwvRdnIxZE",authDomain:"atd-master-talent-development.firebaseapp.com",projectId:"atd-master-talent-development",storageBucket:"atd-master-talent-development.firebasestorage.app",messagingSenderId:"882331359053",appId:"1:882331359053:web:a51c003529af5ae9c90904"});
-const auth=getAuth(app),db=getFirestore(app),functions=getFunctions(app,"us-central1"),resolveEmployeeLogin=httpsCallable(functions,"resolveEmployeeLogin"),resetEmployeePassword=httpsCallable(functions,"resetEmployeePassword"),h=window.ATDHost,readyAuth=setPersistence(auth,browserLocalPersistence);
+const auth=getAuth(app),db=getFirestore(app),functions=getFunctions(app,"us-central1"),resolveEmployeeLogin=httpsCallable(functions,"resolveEmployeeLogin"),resetEmployeePassword=httpsCallable(functions,"resetEmployeePassword"),rebuildCompactProgress=httpsCallable(functions,"rebuildCompactProgress"),h=window.ATDHost,readyAuth=setPersistence(auth,browserLocalPersistence);
 initializeAdminDashboard(auth,db);
 const root=document.createElement("div");document.body.append(root);
 const css=document.createElement("style");
@@ -212,36 +212,28 @@ async function restore(uid=user?.uid){
  if(stamp!==null)localStorage.setItem("atdSnapshotTime:"+uid,stamp);
  h.render();
  perf("login-critical restore ("+processed+" records)",start);
- if(!hasCompact)setTimeout(()=>{if(user?.uid===uid&&initialized)void hydrateAssessmentsInBackground(uid);},2500);
+ if(!hasCompact)requestServerCompactRebuild(uid);
  return true;
 }
-async function hydrateAssessmentsInBackground(uid){
- if(!uid||user?.uid!==uid)return;
- const started=performance.now(),state=h.getState(),latest={...(state.attempts||{})};
- let processed=0;
- try{
-  for await(const docs of restorePages(uid,"assessmentAttempts",10)){
+function requestServerCompactRebuild(uid){
+ // Never block login and never read historical attempts in the browser.
+ setTimeout(async()=>{
+  if(user?.uid!==uid||!initialized)return;
+  try{
+   const result=await rebuildCompactProgress({});
    if(user?.uid!==uid)return;
-   for(const d of docs){
-    const x=d.data();known.add("assessmentAttempts/"+d.id);
-    if(x.assessmentKey){
-     const old=latest[x.assessmentKey];
-     if(!old||String(x.ts||"")>String(old.ts||"")){
-      const {updatedAt,assessmentKey,...attempt}=x;latest[assessmentKey]=attempt;
-     }
-    }
-    processed++;
+   const compact=result.data?.compactAttempts;
+   if(compact&&typeof compact==="object"){
+    const state=h.getState();
+    state.attempts={...(state.attempts||{}),...compact};
+    h.save();h.render();
+    localStorage.setItem("atdSnapshotTime:"+uid,String(result.data?.savedAt||Date.now()));
    }
-   await new Promise(resolve=>setTimeout(resolve,50));
+  }catch(e){
+   // The function may not be deployed yet; login must remain fully usable.
+   console.info("[TD compact rebuild unavailable]",e.code||e.message);
   }
-  if(user?.uid!==uid)return;
-  state.attempts=latest;
-  h.save();h.render();
-  const updated=Date.now();
-  await setDoc(doc(db,"learners",uid,"sync","current"),{...snapshot(state),savedAt:updated},{merge:true});
-  localStorage.setItem("atdSnapshotTime:"+uid,String(updated));
-  perf("background assessment hydration ("+processed+" records)",started);
- }catch(e){console.warn("[TD assessment history hydration]",e.code||e.message);}
+ },3000);
 }
 async function retryRestore(){
  if(!user||busy||restoring)return;
