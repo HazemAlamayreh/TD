@@ -389,7 +389,7 @@ for(const m of DATA.modules){
 }
 function detailedQuestionFeedback(q,selectedIndex){
  const good=q.opts[q.answer],selected=q.opts[selectedIndex];
- const concept=q.title||AR_LESSONS[q.target]?.[0]||'the lesson concept';
+ const concept=q.title||q.target||'the lesson concept';
  const isArabic=state.lang==='ar';
  if(isArabic){
   const name=AR_LESSONS[q.target]?.[0]||concept;
