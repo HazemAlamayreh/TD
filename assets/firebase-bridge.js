@@ -18,7 +18,7 @@ function withDeadline(promise,ms,label){
  const timeout=new Promise((_,reject)=>{timer=setTimeout(()=>reject(new Error(label+" timed out. Retry from your account panel.")),ms);});
  return Promise.race([promise,timeout]).finally(()=>clearTimeout(timer));
 }
-const tr=(en,ar)=>h.getState().lang==="ar"?ar:en;
+const tr=(en,ar)=>en;
 const esc=v=>String(v??"").replace(/[&<>"']/g,x=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[x]));
 function ui(){
  root.innerHTML='<button id="atdAccountButton">'+esc(user?(profile?.name||profile?.email||user.email):tr("My account","حسابي"))+'</button>';
@@ -38,7 +38,7 @@ function ui(){
  }else{
  body='<h3>'+tr(mode==="login"?"Sign in":"Create account",mode==="login"?"تسجيل الدخول":"إنشاء حساب")+'</h3><form id="atdCredentials"><label>'+tr("Work Email","إيميل العمل")+'</label><input id="atdEmail" type="text" autocomplete="username" required placeholder="name@company.com"><label>'+tr("Password","كلمة المرور")+'</label><input type="password" id="atdPassword" minlength="8" required autocomplete="'+(mode==="login"?"current-password":"new-password")+'">'+(mode==="register"?'<label>'+tr("Confirm password","تأكيد كلمة المرور")+'</label><input id="atdConfirm" type="password" required minlength="8" autocomplete="new-password">':'')+'<button type="submit" class="primary">'+tr(mode==="login"?"Sign in":"Create account",mode==="login"?"دخول":"إنشاء حساب")+'</button></form><button id="atdMode">'+tr(mode==="login"?"New learner? Register":"Already have an account? Sign in",mode==="login"?"متدرب جديد؟ إنشاء حساب":"عندك حساب؟ تسجيل الدخول")+'</button><button id="atdReset">'+tr("Forgot password?","نسيت كلمة المرور؟")+'</button>';
  }
- root.insertAdjacentHTML("beforeend",'<div id="atdAccountMask"><section id="atdAccountPanel" dir="'+(h.getState().lang==="ar"?"rtl":"ltr")+'"><button id="atdClose" style="float:right">×</button><h2>ATD Academy Account</h2>'+body+'<p role="status">'+esc(notice)+'</p></section></div>');
+ root.insertAdjacentHTML("beforeend",'<div id="atdAccountMask"><section id="atdAccountPanel" dir="'+"ltr"+'"><button id="atdClose" style="float:right">×</button><h2>ATD Academy Account</h2>'+body+'<p role="status">'+esc(notice)+'</p></section></div>');
  const get=s=>root.querySelector(s);
  get("#atdClose").onclick=()=>{if(user){opened=false;ui();}};if(!user)get("#atdClose").style.display="none";
  if(!user){
