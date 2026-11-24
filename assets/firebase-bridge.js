@@ -149,14 +149,14 @@ function snapshot(s){
  return data;
 }
 const RESTORE_PAGE_SIZE=25;
-async function* restorePages(uid,sub){
+async function* restorePages(uid,sub,pageSize=RESTORE_PAGE_SIZE){
  let last=null,count=0;
  for(;;){
   if(user?.uid!==uid)return;
   const base=collection(db,"learners",uid,sub);
   const pageQuery=last
-   ?query(base,orderBy(documentId()),startAfter(last),limit(RESTORE_PAGE_SIZE))
-   :query(base,orderBy(documentId()),limit(RESTORE_PAGE_SIZE));
+   ?query(base,orderBy(documentId()),startAfter(last),limit(pageSize))
+   :query(base,orderBy(documentId()),limit(pageSize));
   const page=await withDeadline(getDocs(pageQuery),20000,"Cloud "+sub+" page");
   if(user?.uid!==uid)return;
   const docs=page.docs;
@@ -164,7 +164,7 @@ async function* restorePages(uid,sub){
   yield docs;
   count+=docs.length;
   last=docs[docs.length-1];
-  if(docs.length<RESTORE_PAGE_SIZE)return;
+  if(docs.length<pageSize)return;
   // The browser can repaint between each bounded Firestore batch.
   await yieldUI();
  }
@@ -220,7 +220,7 @@ async function hydrateAssessmentsInBackground(uid){
  const started=performance.now(),state=h.getState(),latest={...(state.attempts||{})};
  let processed=0;
  try{
-  for await(const docs of restorePages(uid,"assessmentAttempts")){
+  for await(const docs of restorePages(uid,"assessmentAttempts",10)){
    if(user?.uid!==uid)return;
    for(const d of docs){
     const x=d.data();known.add("assessmentAttempts/"+d.id);
@@ -232,7 +232,7 @@ async function hydrateAssessmentsInBackground(uid){
     }
     processed++;
    }
-   await yieldUI();
+   await new Promise(resolve=>setTimeout(resolve,50));
   }
   if(user?.uid!==uid)return;
   state.attempts=latest;
