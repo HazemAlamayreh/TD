@@ -93,10 +93,10 @@ function ui(){
   get("#atdImportOld").onclick=async()=>{if(!confirm(tr("Import the old guest progress into your account?","هل تريد استيراد تقدم الضيف القديم إلى حسابك؟")))return;await upload(true,h.guestState());await restore();ui();};
  }
 }
-function records(s){
- const out=[],id=v=>String(v).replace(/[^a-zA-Z0-9_.-]/g,"_");
- for(const [k,v] of Object.entries(s.done||{}))if(v){const ev=window.ATDRules?.lessonEvidence?.(k);out.push(["lessonProgress",id(k),{lessonId:k,studied:true,completed:ev?ev.resolved:true,evidenceResolved:ev?ev.resolved:true,evidenceLevel:ev?.level||"legacy-completed"}]);}
- for(const [k,v] of Object.entries(s.mastered||{}))if(v)out.push(["lessonMastery",id(k),{lessonId:k,mastered:true}]);
+function* records(s){
+ const id=v=>String(v).replace(/[^a-zA-Z0-9_.-]/g,"_");
+ for(const [k,v] of Object.entries(s.done||{}))if(v){const ev=window.ATDRules?.lessonEvidence?.(k);yield (["lessonProgress",id(k),{lessonId:k,studied:true,completed:ev?ev.resolved:true,evidenceResolved:ev?ev.resolved:true,evidenceLevel:ev?.level||"legacy-completed"}]);}
+ for(const [k,v] of Object.entries(s.mastered||{}))if(v)yield (["lessonMastery",id(k),{lessonId:k,mastered:true}]);
  for(const [k,v] of Object.entries(s.attempts||{}))if(v?.ts){
   let evidence={};try{
    const [mid,stage]=k.split(":"),m=DATA.modules.find(x=>x.id===mid);
@@ -114,10 +114,10 @@ function records(s){
     }).filter(Boolean);
    }
   }catch(err){console.warn("Assessment evidence:",err);}
-  out.push(["assessmentAttempts",id(k+"_"+v.ts),{assessmentKey:k,...v,...evidence}]);
+  yield (["assessmentAttempts",id(k+"_"+v.ts),{assessmentKey:k,...v,...evidence}]);
  }
- for(const a of s.attemptHistory||[])if(a?.ts&&a.capability&&a.stage){const k=a.capability+":"+a.stage;out.push(["assessmentAttempts",id(k+"_"+a.ts),{assessmentKey:k,...a}]);}
- return out;
+ for(const a of s.attemptHistory||[])if(a?.ts&&a.capability&&a.stage){const k=a.capability+":"+a.stage;yield (["assessmentAttempts",id(k+"_"+a.ts),{assessmentKey:k,...a}]);}
+
 }
 function snapshot(s){
  const fields=["current","view","focus","lastResume","draft","caseDraft","checks","manualReviewed","knowledgeGaps","lessonVisits","caseHistory"];
@@ -187,9 +187,10 @@ async function upload(manual=false,source=null){
  const started=performance.now(),uid=user.uid;
  busy=true;pendingSync=false;let failed=false;
  try{
-  const items=records(source||h.getState());perf("build sync records",started);
-  let index=0;
+  const items=records(source||h.getState());
+  let index=0,scanned=0;
   for(const [sub,id,data] of items){
+   if(++scanned%40===0)await yieldUI();
    if(user?.uid!==uid||!initialized)break;
    const key=sub+"/"+id;
    const ref=doc(db,"learners",uid,sub,id);
