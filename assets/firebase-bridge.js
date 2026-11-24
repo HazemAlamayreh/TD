@@ -10,7 +10,7 @@ const root=document.createElement("div");document.body.append(root);
 const css=document.createElement("style");
 css.textContent="#atdAccountButton{position:fixed;bottom:16px;right:16px;z-index:1000;border:0;border-radius:30px;padding:12px 16px;background:#143d72;color:white;cursor:pointer}#atdAccountMask{position:fixed;inset:0;background:#12233ac9;display:grid;place-items:center;z-index:1300;padding:16px}#atdAccountPanel{background:#fff;color:#152538;width:min(460px,100%);max-height:90vh;overflow:auto;border-radius:14px;padding:25px;font:14px/1.5 system-ui,sans-serif}#atdAccountPanel input{width:100%;box-sizing:border-box;padding:12px;margin:5px 0 12px;border:1px solid #c4cfdd;border-radius:6px}#atdAccountPanel button{padding:10px 14px;margin:5px 3px;border:1px solid #bbcadc;border-radius:7px;cursor:pointer;background:#f4f7fa}#atdAccountPanel button.primary{color:#fff;background:#143d72}";
 document.head.append(css);
-let user=null,profile=null,opened=false,mode="login",notice="",initialized=false,busy=false,syncTimer=null,syncing=false,known=new Set(),loginEpoch=0,restoreFailed=false,pendingSync=false,adminStatus={uid:null,state:"unchecked",message:""};
+let user=null,profile=null,opened=false,mode="login",notice="",initialized=false,busy=false,syncTimer=null,syncing=false,known=new Set(),loginEpoch=0,restoreFailed=false,restoring=false,pendingSync=false,adminStatus={uid:null,state:"unchecked",message:""};
 const perf=(step,t)=>console.info("[TD performance]",step,Math.round(performance.now()-t)+"ms");
 const yieldUI=()=>new Promise(r=>setTimeout(r,0));
 const tr=(en,ar)=>h.getState().lang==="ar"?ar:en;
@@ -164,8 +164,8 @@ async function restore(uid=user?.uid){
  return true;
 }
 async function retryRestore(){
- if(!user||busy)return;
- const uid=user.uid;
+ if(!user||busy||restoring)return;
+ restoring=true;const uid=user.uid;
  notice="Retrying cloud restore…";ui();
  try{
   if(await restore(uid)){
@@ -173,6 +173,7 @@ async function retryRestore(){
    queueUpload(1800);
   }
  }catch(e){restoreFailed=true;notice="Restore failed: "+(e.code||e.message);}
+ finally{restoring=false;}
  ui();
 }
 function queueUpload(delay=1400){
@@ -191,7 +192,7 @@ async function upload(manual=false,source=null){
   for(const [sub,id,data] of items){
    if(user?.uid!==uid||!initialized)break;
    const key=sub+"/"+id;
-   const ref=doc(db,"learners",user.uid,sub,id);
+   const ref=doc(db,"learners",uid,sub,id);
    // Lesson evidence changes as the learner progresses; refresh this derived record even when it already exists.
    if(sub!=="lessonProgress"&&known.has(key))continue;
    if(manual&&(await getDoc(ref)).exists()){known.add(key);continue;}
@@ -199,7 +200,7 @@ async function upload(manual=false,source=null){
    if(++index%20===0)await yieldUI();
   }
   const updated=Date.now();
-  if(!manual&&user?.uid===uid&&initialized){await setDoc(doc(db,"learners",user.uid,"sync","current"),{...snapshot(h.getState()),savedAt:updated});localStorage.setItem("atdSnapshotTime:"+user.uid,String(updated));}
+  if(!manual&&user?.uid===uid&&initialized){await setDoc(doc(db,"learners",uid,"sync","current"),{...snapshot(h.getState()),savedAt:updated});localStorage.setItem("atdSnapshotTime:"+uid,String(updated));}
   notice=tr("Progress synced to cloud.","تمت مزامنة التقدم سحابياً.");
  }catch(e){failed=true;pendingSync=true;notice=tr("Sync needs attention: ","المزامنة تحتاج مراجعة: ")+(e.code||e.message);}
  finally{busy=false;perf("cloud upload",started);if(opened)ui();if(pendingSync&&!failed&&initialized&&user?.uid===uid&&!restoreFailed)queueUpload(1600);}
@@ -230,17 +231,37 @@ document.addEventListener("visibilitychange",()=>{tickActivity();if(document.vis
 window.addEventListener("blur",()=>{tickActivity();flushActivity();});
 window.addEventListener("focus",()=>{lastTick=Date.now();});
 activityTimer=setInterval(()=>{trackPage();flushActivity();},30000);
-window.ATDCloudOnSave=()=>{if(!initialized||!user)return;trackPage();clearTimeout(syncTimer);syncTimer=setTimeout(()=>upload(),900);};
+window.ATDCloudOnSave=()=>{if(!initialized||!user||restoreFailed)return;trackPage();queueUpload(1200);};
 readyAuth.then(()=>onAuthStateChanged(auth,async next=>{
- clearTimeout(syncTimer);tickActivity();if(user)flushActivity();lastTick=Date.now();lastView="";user=next;adminStatus={uid:null,state:"unchecked",message:""};profile=null;initialized=false;busy=false;known.clear();notice="";
- h.useAccount(next?.uid||null);
+ const epoch=++loginEpoch,started=performance.now();
+ clearTimeout(syncTimer);syncTimer=null;
+ tickActivity();if(user)void flushActivity();
+ lastTick=Date.now();lastView="";
+ user=next;adminStatus={uid:null,state:"unchecked",message:""};
+ profile=null;initialized=false;restoreFailed=false;pendingSync=false;known.clear();notice="";
+ h.useAccount(next?.uid||null,{deferRender:!!next});
  if(!next){opened=true;ui();return;}
  opened=false;ui();
  try{
-  const p=await getDoc(doc(db,"learners",next.uid));profile=p.exists()?p.data():{};
+  const p=await getDoc(doc(db,"learners",next.uid));
+  if(loginEpoch!==epoch||user?.uid!==next.uid)return;
+  profile=p.exists()?p.data():{};
   if(!p.exists())await setDoc(doc(db,"learners",next.uid),{email:next.email||"",createdAt:serverTimestamp()},{merge:true});
-  await restore();initialized=true;trackPage();await upload();
- }catch(e){notice=tr("Could not load cloud progress: ","تعذّر تحميل التقدم السحابي: ")+(e.code||e.message);}
- ui();
+  if(loginEpoch!==epoch||user?.uid!==next.uid)return;
+  const restored=await restore(next.uid);
+  if(!restored||loginEpoch!==epoch||user?.uid!==next.uid)return;
+  initialized=true;restoreFailed=false;trackPage();
+  perf("login ready",started);
+  // Let the UI paint before starting what may be a large cloud upload.
+  queueUpload(1800);
+ }catch(e){
+  if(loginEpoch!==epoch||user?.uid!==next.uid)return;
+  restoreFailed=true;initialized=false;
+  notice=tr("Cloud progress could not load. Sync paused; retry from your account panel: ","تعذر تحميل التقدم السحابي. أوقفت المزامنة؛ أعد المحاولة من الحساب: ")+(e.code||e.message);
+  h.render();
+  opened=true;
+  console.warn("[TD cloud restore]",e);
+ }
+ if(loginEpoch===epoch)ui();
 }));
 ui();
