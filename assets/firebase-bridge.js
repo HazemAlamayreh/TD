@@ -130,12 +130,17 @@ function* records(s){
   }catch(err){console.warn("Assessment evidence:",err);}
   yield (["assessmentAttempts",id(k+"_"+v.ts),{assessmentKey:k,...v,...evidence}]);
  }
- for(const a of s.attemptHistory||[])if(a?.ts&&a.capability&&a.stage){const k=a.capability+":"+a.stage;yield (["assessmentAttempts",id(k+"_"+a.ts),{assessmentKey:k,...a}]);}
-
+ // Do not replay the full historical attempt array during routine sync.
+ // Existing Firestore history is retained unchanged.
 }
 function snapshot(s){
  const fields=["current","view","focus","lastResume","draft","caseDraft","checks","manualReviewed","knowledgeGaps","lessonVisits","caseHistory"];
- const data={};for(const k of fields)if(s[k]!==undefined)data[k]=s[k];return data;
+ const data={};for(const k of fields)if(s[k]!==undefined)data[k]=s[k];
+ data.compactDone={...(s.done||{})};
+ data.compactMastered={...(s.mastered||{})};
+ data.compactAttempts={...(s.attempts||{})};
+ data.compactVersion=1;
+ return data;
 }
 const RESTORE_PAGE_SIZE=25;
 async function* restorePages(uid,sub){
@@ -164,52 +169,73 @@ async function restore(uid=user?.uid){
  const snap=await withDeadline(getDoc(doc(db,"learners",uid,"sync","current")),15000,"Cloud snapshot");
  if(user?.uid!==uid)return false;
  const copy={...state,done:{...state.done},mastered:{...state.mastered},attempts:{...state.attempts}};
- let stamp=null;
+ let stamp=null,hasCompact=false;
  if(snap.exists()){
   const x=snap.data(),localStamp=Number(localStorage.getItem("atdSnapshotTime:"+uid)||0);
   if(Number(x.savedAt||0)>localStamp){
-   for(const key of Object.keys(snapshot(x)))copy[key]=x[key];
+   for(const key of Object.keys(snapshot(x)))if(!["compactDone","compactMastered","compactAttempts","compactVersion"].includes(key))copy[key]=x[key];
    stamp=String(x.savedAt);
+  }
+  if(Number(x.compactVersion||0)>=1){
+   copy.done={...copy.done,...(x.compactDone||{})};
+   copy.mastered={...copy.mastered,...(x.compactMastered||{})};
+   copy.attempts={...copy.attempts,...(x.compactAttempts||{})};
+   hasCompact=true;
   }
  }
  const fresh=new Set();
  let processed=0;
- for(const sub of ["lessonProgress","lessonMastery","assessmentAttempts"]){
-  const phase=performance.now();
-  let phaseCount=0;
+ for(const sub of ["lessonProgress","lessonMastery"]){
+  const phase=performance.now();let phaseCount=0;
   for await(const docs of restorePages(uid,sub)){
    if(user?.uid!==uid)return false;
    for(const d of docs){
-    const x=d.data();
-    fresh.add(sub+"/"+d.id);
+    const x=d.data();fresh.add(sub+"/"+d.id);
     if(sub==="lessonProgress"&&(x.studied||x.completed)&&x.lessonId)copy.done[x.lessonId]=true;
     if(sub==="lessonMastery"&&x.mastered&&x.lessonId)copy.mastered[x.lessonId]=true;
-    if(sub==="assessmentAttempts"&&x.assessmentKey){
-     const old=copy.attempts[x.assessmentKey];
-     if(!old||String(x.ts||"")>String(old.ts||"")){
-      const {updatedAt,assessmentKey,...attempt}=x;
-      copy.attempts[x.assessmentKey]=attempt;
-     }
-    }
     processed++;phaseCount++;
    }
-   // Do not commit an incomplete cloud restore. Inform the learner without adding more renders.
-   const status=document.getElementById("atdRestoreLoading");
-   if(status)status.textContent=tr("Restoring saved progress: ","استرجاع التقدم المحفوظ: ")+processed+" records";
    await yieldUI();
   }
-  if(user?.uid!==uid)return false;
   perf("restore "+sub+" ("+phaseCount+" records)",phase);
  }
  if(user?.uid!==uid)return false;
- // Apply only after all pages for all collections succeeded. No partial cloud snapshots.
  Object.assign(state,copy);
  known.clear();for(const key of fresh)known.add(key);
  h.save();
  if(stamp!==null)localStorage.setItem("atdSnapshotTime:"+uid,stamp);
  h.render();
- perf("restore and render ("+processed+" records)",start);
+ perf("login-critical restore ("+processed+" records)",start);
+ if(!hasCompact)void hydrateAssessmentsInBackground(uid);
  return true;
+}
+async function hydrateAssessmentsInBackground(uid){
+ if(!uid||user?.uid!==uid)return;
+ const started=performance.now(),state=h.getState(),latest={...(state.attempts||{})};
+ let processed=0;
+ try{
+  for await(const docs of restorePages(uid,"assessmentAttempts")){
+   if(user?.uid!==uid)return;
+   for(const d of docs){
+    const x=d.data();known.add("assessmentAttempts/"+d.id);
+    if(x.assessmentKey){
+     const old=latest[x.assessmentKey];
+     if(!old||String(x.ts||"")>String(old.ts||"")){
+      const {updatedAt,assessmentKey,...attempt}=x;latest[assessmentKey]=attempt;
+     }
+    }
+    processed++;
+   }
+   await yieldUI();
+  }
+  if(user?.uid!==uid)return;
+  state.attempts=latest;
+  h.save();h.render();
+  const updated=Date.now();
+  await setDoc(doc(db,"learners",uid,"sync","current"),{...snapshot(state),savedAt:updated},{merge:true});
+  localStorage.setItem("atdSnapshotTime:"+uid,String(updated));
+  perf("background assessment hydration ("+processed+" records)",started);
+ }catch(e){console.warn("[TD assessment history hydration]",e.code||e.message);}
 }
 async function retryRestore(){
  if(!user||busy||restoring)return;
@@ -307,8 +333,7 @@ readyAuth.then(()=>onAuthStateChanged(auth,async next=>{
   if(!restored||loginEpoch!==epoch||user?.uid!==next.uid)return;
   initialized=true;restoreFailed=false;trackPage();
   perf("login ready",started);
-  // Let the UI paint before starting what may be a large cloud upload.
-  queueUpload(1800);
+  // Login is complete. Normal edits sync later through ATDCloudOnSave.
  }catch(e){
   if(loginEpoch!==epoch||user?.uid!==next.uid)return;
   restoreFailed=true;initialized=false;
