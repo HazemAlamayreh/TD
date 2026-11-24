@@ -214,14 +214,16 @@ async function upload(manual=false,source=null){
    const ref=doc(db,"learners",uid,sub,id);
    // Lesson evidence changes as the learner progresses; refresh this derived record even when it already exists.
    if(sub!=="lessonProgress"&&known.has(key))continue;
-   if(manual&&(await getDoc(ref)).exists()){known.add(key);continue;}
-   await setDoc(ref,{...data,updatedAt:serverTimestamp()},{merge:true});known.add(key);
+   if(manual){const existing=await getDoc(ref);if(user?.uid!==uid||!initialized)break;if(existing.exists()){known.add(key);continue;}}
+   await setDoc(ref,{...data,updatedAt:serverTimestamp()},{merge:true});
+   if(user?.uid!==uid||!initialized)break;
+   known.add(key);
    if(++index%20===0)await yieldUI();
   }
   const updated=Date.now();
   if(!manual&&user?.uid===uid&&initialized){await setDoc(doc(db,"learners",uid,"sync","current"),{...snapshot(h.getState()),savedAt:updated});localStorage.setItem("atdSnapshotTime:"+uid,String(updated));}
-  syncFailed=false;notice=tr("Progress synced to cloud.","تمت مزامنة التقدم سحابياً.");
- }catch(e){failed=true;pendingSync=true;syncFailed=true;notice=tr("Sync needs attention: ","المزامنة تحتاج مراجعة: ")+(e.code||e.message);}
+  if(user?.uid===uid){syncFailed=false;notice=tr("Progress synced to cloud.","تمت مزامنة التقدم سحابياً.");}
+ }catch(e){failed=true;if(user?.uid===uid){pendingSync=true;syncFailed=true;notice=tr("Sync needs attention: ","المزامنة تحتاج مراجعة: ")+(e.code||e.message);}}
  finally{busy=false;perf("cloud upload",started);if(opened)ui();if(pendingSync&&!failed&&initialized&&user?.uid===uid&&!restoreFailed)queueUpload(1600);}
 }
 // Usage tracking begins only after an authenticated learner's cloud restore.
