@@ -5,11 +5,11 @@ Scope: **TD Academy login/progress sync only**, not DAD Orientation, not Admin P
 ## Changes
 
 - Defer the first signed-in academy render until cloud restore is complete, instead of rendering at account switch and again after restore.
-- Read the Firestore snapshot and three progress subcollections together, then merge them into a staged copy. Apply changes only after every read completes, and only if the signed-in UID is unchanged.
+- Read the Firestore snapshot, then paginate the three progress subcollections in batches of 25 documents, yielding to the browser between batches. Stage all records and apply changes only after every page has completed successfully and the signed-in UID is unchanged.
 - Yield to the browser after every 75 progress records during restore; use a lazy record generator and yield periodically while uploading.
 - Allow the first paint before automatic upload. Coalesce saves while a synchronization is running instead of overlapping them.
 - Add console performance diagnostics prefixed `[TD performance]`, for login readiness, restoration, and cloud sync preparation/duration.
-- Show a progress indicator while restoring; use 15-second account lookup and 25-second cloud restoration deadlines. An error pauses cloud writes and opens the signed-in account dialog with **Retry restore**.
+- Show a progress indicator while restoring; use 15-second account/snapshot lookup and 20-second per-page restoration deadlines. An error pauses cloud writes and opens the signed-in account dialog with **Retry restore**.
 - Provide a manual **Retry sync** button for failed outgoing uploads. Keep user data intact; do not clear `localStorage` or delete Firestore documents.
 - Ignore results from a previous UID so an old upload cannot pollute the next account's known-record cache.
 - Version the Firebase bridge script in `index.html` to avoid old cached code.
@@ -19,6 +19,8 @@ Scope: **TD Academy login/progress sync only**, not DAD Orientation, not Admin P
 - JavaScript syntax parsing passed.
 - Static regression checks passed for one-render restore, session ownership, performance logs, deferred upload, retry UI, and safeguards.
 - Mocked restore outcomes passed for: successful local + cloud merge, permission-denied read (no partial state application), and UID change during restore (cancel merge).
+- New paginated restoration tests passed for a 52-record collection spanning multiple pages, a failure on page 2, and an account switch during page 2. In both interrupted cases, local progress was unchanged and no partial render occurred.
+- This is a likely performance risk from code review, not a verified Chrome root cause. Live browser performance must still be measured.
 
 **NOT YET VERIFIED:** production Chrome execution, real Firebase reads/writes, cross-browser persistence, performance timings under large learner accounts, and exact behavior with the user's problematic Chrome profile.
 
