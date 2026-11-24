@@ -1,6 +1,6 @@
 import {initializeApp} from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
 import {getAuth,setPersistence,browserLocalPersistence,onAuthStateChanged,createUserWithEmailAndPassword,signInWithEmailAndPassword,sendPasswordResetEmail,sendEmailVerification,updatePassword,signOut} from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
-import {getFirestore,doc,getDoc,getDocs,setDoc,collection,serverTimestamp,increment} from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
+import {getFirestore,doc,getDoc,getDocs,setDoc,collection,serverTimestamp,increment,query,orderBy,documentId,limit,startAfter} from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
 import {initializeAdminDashboard} from "./admin-dashboard.js?v=20261110-role-refresh";
 import {getFunctions,httpsCallable} from "https://www.gstatic.com/firebasejs/12.6.0/firebase-functions.js";
 const app=initializeApp({apiKey:"AIzaSyBxuLsolggWnoGuTASnnWvz7OwvRdnIxZE",authDomain:"atd-master-talent-development.firebaseapp.com",projectId:"atd-master-talent-development",storageBucket:"atd-master-talent-development.firebasestorage.app",messagingSenderId:"882331359053",appId:"1:882331359053:web:a51c003529af5ae9c90904"});
@@ -137,13 +137,31 @@ function snapshot(s){
  const fields=["current","view","focus","lastResume","draft","caseDraft","checks","manualReviewed","knowledgeGaps","lessonVisits","caseHistory"];
  const data={};for(const k of fields)if(s[k]!==undefined)data[k]=s[k];return data;
 }
+const RESTORE_PAGE_SIZE=25;
+async function* restorePages(uid,sub){
+ let last=null,count=0;
+ for(;;){
+  if(user?.uid!==uid)return;
+  const base=collection(db,"learners",uid,sub);
+  const pageQuery=last
+   ?query(base,orderBy(documentId()),startAfter(last),limit(RESTORE_PAGE_SIZE))
+   :query(base,orderBy(documentId()),limit(RESTORE_PAGE_SIZE));
+  const page=await withDeadline(getDocs(pageQuery),20000,"Cloud "+sub+" page");
+  if(user?.uid!==uid)return;
+  const docs=page.docs;
+  if(!docs.length)return;
+  yield docs;
+  count+=docs.length;
+  last=docs[docs.length-1];
+  if(docs.length<RESTORE_PAGE_SIZE)return;
+  // The browser can repaint between each bounded Firestore batch.
+  await yieldUI();
+ }
+}
 async function restore(uid=user?.uid){
  if(!uid||user?.uid!==uid)return false;
- const t=performance.now(),state=h.getState();
- const [snap,...subs]=await withDeadline(Promise.all([
-  getDoc(doc(db,"learners",uid,"sync","current")),
-  ...["lessonProgress","lessonMastery","assessmentAttempts"].map(sub=>getDocs(collection(db,"learners",uid,sub)))
- ]),25000,"Cloud restore");
+ const start=performance.now(),state=h.getState();
+ const snap=await withDeadline(getDoc(doc(db,"learners",uid,"sync","current")),15000,"Cloud snapshot");
  if(user?.uid!==uid)return false;
  const copy={...state,done:{...state.done},mastered:{...state.mastered},attempts:{...state.attempts}};
  let stamp=null;
@@ -154,27 +172,43 @@ async function restore(uid=user?.uid){
    stamp=String(x.savedAt);
   }
  }
- const fresh=new Set(),names=["lessonProgress","lessonMastery","assessmentAttempts"];
- let count=0;
- for(let i=0;i<subs.length;i++)for(const d of subs[i].docs){
-  const sub=names[i],x=d.data();fresh.add(sub+"/"+d.id);
-  if(sub==="lessonProgress"&&(x.studied||x.completed)&&x.lessonId)copy.done[x.lessonId]=true;
-  if(sub==="lessonMastery"&&x.mastered&&x.lessonId)copy.mastered[x.lessonId]=true;
-  if(sub==="assessmentAttempts"&&x.assessmentKey){
-   const old=copy.attempts[x.assessmentKey];
-   if(!old||String(x.ts||"")>String(old.ts||"")){
-    const {updatedAt,assessmentKey,...attempt}=x;copy.attempts[x.assessmentKey]=attempt;
+ const fresh=new Set();
+ let processed=0;
+ for(const sub of ["lessonProgress","lessonMastery","assessmentAttempts"]){
+  const phase=performance.now();
+  let phaseCount=0;
+  for await(const docs of restorePages(uid,sub)){
+   if(user?.uid!==uid)return false;
+   for(const d of docs){
+    const x=d.data();
+    fresh.add(sub+"/"+d.id);
+    if(sub==="lessonProgress"&&(x.studied||x.completed)&&x.lessonId)copy.done[x.lessonId]=true;
+    if(sub==="lessonMastery"&&x.mastered&&x.lessonId)copy.mastered[x.lessonId]=true;
+    if(sub==="assessmentAttempts"&&x.assessmentKey){
+     const old=copy.attempts[x.assessmentKey];
+     if(!old||String(x.ts||"")>String(old.ts||"")){
+      const {updatedAt,assessmentKey,...attempt}=x;
+      copy.attempts[x.assessmentKey]=attempt;
+     }
+    }
+    processed++;phaseCount++;
    }
+   // Do not commit an incomplete cloud restore. Inform the learner without adding more renders.
+   const status=document.getElementById("atdRestoreLoading");
+   if(status)status.textContent=tr("Restoring saved progress: ","استرجاع التقدم المحفوظ: ")+processed+" records";
+   await yieldUI();
   }
-  if(++count%75===0){await yieldUI();if(user?.uid!==uid)return false;}
+  if(user?.uid!==uid)return false;
+  perf("restore "+sub+" ("+phaseCount+" records)",phase);
  }
  if(user?.uid!==uid)return false;
+ // Apply only after all pages for all collections succeeded. No partial cloud snapshots.
  Object.assign(state,copy);
  known.clear();for(const key of fresh)known.add(key);
  h.save();
  if(stamp!==null)localStorage.setItem("atdSnapshotTime:"+uid,stamp);
  h.render();
- perf("restore and render",t);
+ perf("restore and render ("+processed+" records)",start);
  return true;
 }
 async function retryRestore(){
