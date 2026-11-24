@@ -99,7 +99,11 @@ view=function(name){
  save();render();
 };
 selectModule=async function(id){
- if(window.ATDLoadModuleDetail&&!(await window.ATDLoadModuleDetail(id)))return;
+ const m=DATA.modules.find(x=>x.id===id),summary=m?window.ATDModuleSummaryFor?.(m):null;
+ if(summary?.status!=='not-started'&&window.ATDLoadModuleDetail){
+  // Detail failure must never trap the learner on the main screen.
+  await window.ATDLoadModuleDetail(id);
+ }
  state.current=id;state.focus=null;view('diagnostic');
 };
 const JOURNEY_RESUME=resumeLearning;
