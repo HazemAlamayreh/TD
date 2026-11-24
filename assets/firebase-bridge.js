@@ -13,11 +13,24 @@ document.head.append(css);
 let user=null,profile=null,opened=false,mode="login",notice="",initialized=false,busy=false,syncTimer=null,syncing=false,known=new Set(),loginEpoch=0,restoreFailed=false,restoring=false,pendingSync=false,adminStatus={uid:null,state:"unchecked",message:""};
 const perf=(step,t)=>console.info("[TD performance]",step,Math.round(performance.now()-t)+"ms");
 const yieldUI=()=>new Promise(r=>setTimeout(r,0));
+function withDeadline(promise,ms,label){
+ let timer;
+ const timeout=new Promise((_,reject)=>{timer=setTimeout(()=>reject(new Error(label+" timed out. Retry from your account panel.")),ms);});
+ return Promise.race([promise,timeout]).finally(()=>clearTimeout(timer));
+}
 const tr=(en,ar)=>h.getState().lang==="ar"?ar:en;
 const esc=v=>String(v??"").replace(/[&<>"']/g,x=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[x]));
 function ui(){
  root.innerHTML='<button id="atdAccountButton">'+esc(user?(profile?.name||profile?.email||user.email):tr("My account","حسابي"))+'</button>';
  root.querySelector("#atdAccountButton").onclick=()=>{opened=true;ui();};
+ if(user&&!initialized&&!restoreFailed){
+  const loading=document.createElement("div");
+  loading.id="atdRestoreLoading";
+  loading.setAttribute("role","status");
+  loading.style.cssText="position:fixed;top:12px;right:12px;z-index:999;background:#fff;color:#153352;border:1px solid #c3d1df;border-radius:10px;padding:11px 15px;box-shadow:0 2px 12px #0002;font:13px system-ui";
+  loading.textContent=tr("Restoring saved learning progress…","جاري استرجاع التقدم المحفوظ…");
+  root.appendChild(loading);
+ }
  if(!opened)return;
  let body;
  if(user){
@@ -126,10 +139,10 @@ function snapshot(s){
 async function restore(uid=user?.uid){
  if(!uid||user?.uid!==uid)return false;
  const t=performance.now(),state=h.getState();
- const [snap,...subs]=await Promise.all([
+ const [snap,...subs]=await withDeadline(Promise.all([
   getDoc(doc(db,"learners",uid,"sync","current")),
   ...["lessonProgress","lessonMastery","assessmentAttempts"].map(sub=>getDocs(collection(db,"learners",uid,sub)))
- ]);
+ ]),25000,"Cloud restore");
  if(user?.uid!==uid)return false;
  const copy={...state,done:{...state.done},mastered:{...state.mastered},attempts:{...state.attempts}};
  let stamp=null;
@@ -244,7 +257,7 @@ readyAuth.then(()=>onAuthStateChanged(auth,async next=>{
  if(!next){opened=true;ui();return;}
  opened=false;ui();
  try{
-  const p=await getDoc(doc(db,"learners",next.uid));
+  const p=await withDeadline(getDoc(doc(db,"learners",next.uid)),15000,"Account lookup");
   if(loginEpoch!==epoch||user?.uid!==next.uid)return;
   profile=p.exists()?p.data():{};
   if(!p.exists())await setDoc(doc(db,"learners",next.uid),{email:next.email||"",createdAt:serverTimestamp()},{merge:true});
