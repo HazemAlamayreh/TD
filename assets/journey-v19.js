@@ -97,11 +97,14 @@ view=function(name){
   state.lastResume={mid:mod().id,stage:name,focus:state.focus};
  save();render();
 };
-selectModule=function(id){state.current=id;state.focus=null;view('diagnostic');};
+selectModule=async function(id){
+ if(window.ATDLoadModuleDetail&&!(await window.ATDLoadModuleDetail(id)))return;
+ state.current=id;state.focus=null;view('diagnostic');
+};
 const JOURNEY_RESUME=resumeLearning;
-resumeLearning=function(){
+resumeLearning=async function(){
  if(state.lastResume?.stage==='dashboard')state.lastResume.stage='diagnostic';
- JOURNEY_RESUME();
+ await JOURNEY_RESUME();
 };
 const JOURNEY_RENDER=render;
 render=function(){
@@ -112,8 +115,8 @@ render=function(){
   const area=$('body');if(!area)return;
   const existing=document.getElementById('courseCompletionSummary');if(existing)existing.remove();
   const count=DATA.modules.reduce((n,m)=>n+m.lessons.length,0);
-  const completed=DATA.modules.reduce((n,m)=>n+m.lessons.filter(l=>!!state.done[l[0]]).length,0);
-  const mastered=DATA.modules.reduce((n,m)=>n+m.lessons.filter(l=>!!state.mastered[l[0]]).length,0);
+  const completed=DATA.modules.reduce((n,m)=>n+(window.ATDModuleSummaryFor?.(m)?.reviewed||0),0);
+  const mastered=DATA.modules.reduce((n,m)=>n+(['mastered','completed'].includes(window.ATDModuleSummaryFor?.(m)?.status)?m.lessons.length:0),0);
   const block=document.createElement('div');block.id='courseCompletionSummary';block.className='panel';
   block.innerHTML='<h2>'+msg('Course learning evidence','مؤشرات تعلم الكورس')+'</h2><div class="dashMetrics"><div class="dashMetric"><div class="skillTag">'+msg('COMPLETED','المكتمل')+'</div><strong>'+completed+'/'+count+'</strong></div><div class="dashMetric"><div class="skillTag">'+msg('MASTERED','المتقن')+'</div><strong>'+mastered+'/'+count+'</strong></div></div><p class="muted">'+msg('Completed means studied or passed an in-lesson check. Mastered means both corresponding Mastery Check questions were answered correctly.','مكتمل يعني تمت دراسة الدرس أو اجتياز أسئلته التدريبية. متقن يعني الإجابة الصحيحة على سؤالي الدرس في اختبار الإتقان.')+'</p>';
   area.insertBefore(block,area.firstChild.nextSibling);
@@ -584,8 +587,8 @@ render=function(){
   const id=button.querySelector('b')?.textContent?.trim().match(/^\d+\.\d+/)?.[0];
   const m=DATA.modules.find(x=>x.id===id);
   if(!m||!m.lessons.length)return;
-  const done=m.lessons.every(l=>!!state.done[l[0]]);
-  button.classList.toggle('atdModuleCompleted',done);
+  const summary=window.ATDModuleSummaryFor?.(m),done=summary?.status==='completed'||summary?.status==='mastered';
+  button.classList.toggle('atdModuleCompleted',!!done);
   if(done&&!button.querySelector('.atdModuleDoneLabel')){
    const label=document.createElement('span');label.className='atdModuleDoneLabel';
    label.textContent=msg('✓ Completed','✓ مكتمل');button.append(label);
