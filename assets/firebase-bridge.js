@@ -10,7 +10,7 @@ const root=document.createElement("div");document.body.append(root);
 const css=document.createElement("style");
 css.textContent="#atdAccountButton{position:fixed;bottom:16px;right:16px;z-index:1000;border:0;border-radius:30px;padding:12px 16px;background:#143d72;color:white;cursor:pointer}#atdAccountMask{position:fixed;inset:0;background:#12233ac9;display:grid;place-items:center;z-index:1300;padding:16px}#atdAccountPanel{background:#fff;color:#152538;width:min(460px,100%);max-height:90vh;overflow:auto;border-radius:14px;padding:25px;font:14px/1.5 system-ui,sans-serif}#atdAccountPanel input{width:100%;box-sizing:border-box;padding:12px;margin:5px 0 12px;border:1px solid #c4cfdd;border-radius:6px}#atdAccountPanel button{padding:10px 14px;margin:5px 3px;border:1px solid #bbcadc;border-radius:7px;cursor:pointer;background:#f4f7fa}#atdAccountPanel button.primary{color:#fff;background:#143d72}";
 document.head.append(css);
-let user=null,profile=null,opened=false,mode="login",notice="",initialized=false,busy=false,syncTimer=null,syncing=false,known=new Set(),loginEpoch=0,restoreFailed=false,restoring=false,pendingSync=false,adminStatus={uid:null,state:"unchecked",message:""};
+let user=null,profile=null,opened=false,mode="login",notice="",initialized=false,busy=false,syncTimer=null,syncing=false,known=new Set(),loginEpoch=0,restoreFailed=false,restoring=false,pendingSync=false,syncFailed=false,adminStatus={uid:null,state:"unchecked",message:""};
 const perf=(step,t)=>console.info("[TD performance]",step,Math.round(performance.now()-t)+"ms");
 const yieldUI=()=>new Promise(r=>setTimeout(r,0));
 function withDeadline(promise,ms,label){
@@ -34,7 +34,7 @@ function ui(){
  if(!opened)return;
  let body;
  if(user){
- body='<p>'+esc(profile?.email||user.email)+'</p><div style="padding:12px;margin:10px 0;background:#f1f6fc;border:1px solid #d5e2f0;border-radius:10px"><b>'+tr("Administrator access","صلاحية المدير")+'</b><p style="font-size:12px;word-break:break-all;margin:6px 0">'+tr("Your account UID: ","معرّف حسابك UID: ")+'<code>'+esc(user.uid)+'</code></p><button type="button" id="atdCheckAdminRole">'+tr("Check my Admin permission","فحص صلاحية Admin")+'</button><p style="font-size:12px;margin:6px 0 0">'+(adminStatus.uid===user.uid?esc(adminStatus.message):tr("Status not checked. Click Check my Admin permission.","لم يتم فحص الصلاحية بعد. اضغط زر فحص صلاحية Admin."))+'</p>'+(adminStatus.uid===user.uid&&adminStatus.state==="active"?'<a href="./admin.html" style="display:block;margin:8px 0;font-weight:bold;color:#12623d">'+tr("Open Admin Dashboard","افتح لوحة المدير")+'</a>':'')+'</div><label>'+tr("Name","الاسم")+'</label><input id="atdProfileName" value="'+esc(profile?.name)+'"><label>'+tr("Phone (optional)","الهاتف (اختياري)")+'</label><input id="atdProfilePhone" value="'+esc(profile?.phone)+'"><button id="atdSaveProfile">'+tr("Save profile","حفظ البيانات")+'</button>'+(user.email&&!user.emailVerified&&!user.email.toLowerCase().endsWith("@employee-login.academy.idevelopmena.com")?'<div style="margin-top:8px;padding:8px;background:#fff6e8;border-radius:6px"><p>'+tr("Verify your work email before an administrator can link your Employee ID to this existing account.","وثّق إيميل العمل حتى يتمكن المدير من ربط الرقم الوظيفي بنفس الحساب القديم.")+'</p><button type="button" id="atdVerifyEmail">'+tr("Send verification email","إرسال رابط توثيق الإيميل")+'</button></div>':'')+'<h3>'+tr("Set or change password","تعيين أو تغيير كلمة المرور")+'</h3><p>'+tr("Former Magic Link learners can set a password while signed in, keeping the same progress.","المتدرب الذي استخدم رابط الإيميل سابقاً يستطيع تعيين كلمة مرور من حسابه الحالي دون فقدان التقدم.")+'</p><form id="atdPasswordForm"><input type="password" id="atdNewPassword" required minlength="8" autocomplete="new-password" placeholder="'+tr("New password (8+ characters)","كلمة مرور جديدة (8 أحرف أو أكثر)")+'"><button type="submit">'+tr("Save password","حفظ كلمة المرور")+'</button></form><button id="atdImportOld">'+tr("Import older browser progress","استيراد التقدم القديم")+'</button>'+(restoreFailed?'<p role="alert" style="padding:10px;background:#fff3df">Cloud restore failed; sync is paused. <button id="atdRetryRestore">Retry restore</button></p>':'')+'<button id="atdLogout">'+tr("Sign out","تسجيل الخروج")+'</button>';
+ body='<p>'+esc(profile?.email||user.email)+'</p><div style="padding:12px;margin:10px 0;background:#f1f6fc;border:1px solid #d5e2f0;border-radius:10px"><b>'+tr("Administrator access","صلاحية المدير")+'</b><p style="font-size:12px;word-break:break-all;margin:6px 0">'+tr("Your account UID: ","معرّف حسابك UID: ")+'<code>'+esc(user.uid)+'</code></p><button type="button" id="atdCheckAdminRole">'+tr("Check my Admin permission","فحص صلاحية Admin")+'</button><p style="font-size:12px;margin:6px 0 0">'+(adminStatus.uid===user.uid?esc(adminStatus.message):tr("Status not checked. Click Check my Admin permission.","لم يتم فحص الصلاحية بعد. اضغط زر فحص صلاحية Admin."))+'</p>'+(adminStatus.uid===user.uid&&adminStatus.state==="active"?'<a href="./admin.html" style="display:block;margin:8px 0;font-weight:bold;color:#12623d">'+tr("Open Admin Dashboard","افتح لوحة المدير")+'</a>':'')+'</div><label>'+tr("Name","الاسم")+'</label><input id="atdProfileName" value="'+esc(profile?.name)+'"><label>'+tr("Phone (optional)","الهاتف (اختياري)")+'</label><input id="atdProfilePhone" value="'+esc(profile?.phone)+'"><button id="atdSaveProfile">'+tr("Save profile","حفظ البيانات")+'</button>'+(user.email&&!user.emailVerified&&!user.email.toLowerCase().endsWith("@employee-login.academy.idevelopmena.com")?'<div style="margin-top:8px;padding:8px;background:#fff6e8;border-radius:6px"><p>'+tr("Verify your work email before an administrator can link your Employee ID to this existing account.","وثّق إيميل العمل حتى يتمكن المدير من ربط الرقم الوظيفي بنفس الحساب القديم.")+'</p><button type="button" id="atdVerifyEmail">'+tr("Send verification email","إرسال رابط توثيق الإيميل")+'</button></div>':'')+'<h3>'+tr("Set or change password","تعيين أو تغيير كلمة المرور")+'</h3><p>'+tr("Former Magic Link learners can set a password while signed in, keeping the same progress.","المتدرب الذي استخدم رابط الإيميل سابقاً يستطيع تعيين كلمة مرور من حسابه الحالي دون فقدان التقدم.")+'</p><form id="atdPasswordForm"><input type="password" id="atdNewPassword" required minlength="8" autocomplete="new-password" placeholder="'+tr("New password (8+ characters)","كلمة مرور جديدة (8 أحرف أو أكثر)")+'"><button type="submit">'+tr("Save password","حفظ كلمة المرور")+'</button></form><button id="atdImportOld">'+tr("Import older browser progress","استيراد التقدم القديم")+'</button>'+(restoreFailed?'<p role="alert" style="padding:10px;background:#fff3df">Cloud restore failed; sync is paused. <button id="atdRetryRestore">Retry restore</button></p>':'')+''+(syncFailed?'<p style="padding:9px;background:#fff3df">Cloud sync needs attention. <button id="atdRetrySync">Retry sync</button></p>':'')+'<button id="atdLogout">'+tr("Sign out","تسجيل الخروج")+'</button>';
  }else{
  body='<h3>'+tr(mode==="login"?"Sign in":"Create account",mode==="login"?"تسجيل الدخول":"إنشاء حساب")+'</h3><form id="atdCredentials"><label>'+tr("Work Email","إيميل العمل")+'</label><input id="atdEmail" type="text" autocomplete="username" required placeholder="name@company.com"><label>'+tr("Password","كلمة المرور")+'</label><input type="password" id="atdPassword" minlength="8" required autocomplete="'+(mode==="login"?"current-password":"new-password")+'">'+(mode==="register"?'<label>'+tr("Confirm password","تأكيد كلمة المرور")+'</label><input id="atdConfirm" type="password" required minlength="8" autocomplete="new-password">':'')+'<button type="submit" class="primary">'+tr(mode==="login"?"Sign in":"Create account",mode==="login"?"دخول":"إنشاء حساب")+'</button></form><button id="atdMode">'+tr(mode==="login"?"New learner? Register":"Already have an account? Sign in",mode==="login"?"متدرب جديد؟ إنشاء حساب":"عندك حساب؟ تسجيل الدخول")+'</button><button id="atdReset">'+tr("Forgot password?","نسيت كلمة المرور؟")+'</button>';
  }
@@ -100,6 +100,7 @@ function ui(){
    catch(err){notice=err.code||err.message;}ui();
   };
   if(get("#atdRetryRestore"))get("#atdRetryRestore").onclick=()=>retryRestore();
+  if(get("#atdRetrySync"))get("#atdRetrySync").onclick=()=>{syncFailed=false;queueUpload(100);ui();};
   get("#atdLogout").onclick=()=>signOut(auth);
   get("#atdSaveProfile").onclick=async()=>{try{profile={name:get("#atdProfileName").value.trim(),phone:get("#atdProfilePhone").value.trim()};if(!profile.name)throw Error("Name required");await setDoc(doc(db,"learners",user.uid),{...profile,email:user.email,updatedAt:serverTimestamp()},{merge:true});notice=tr("Profile saved.","تم الحفظ.");}catch(x){notice=x.code||x.message;}ui();};
   get("#atdPasswordForm").onsubmit=async e=>{e.preventDefault();try{await updatePassword(auth.currentUser,get("#atdNewPassword").value);notice=tr("Password saved; use it on any browser.","تم حفظ كلمة المرور ويمكن استخدامها على أي متصفح.");}catch(x){notice=x.code||x.message;}ui();};
@@ -181,6 +182,10 @@ async function retryRestore(){
  restoring=true;const uid=user.uid;
  notice="Retrying cloud restore…";ui();
  try{
+  const p=await withDeadline(getDoc(doc(db,"learners",uid)),15000,"Account lookup");
+  if(user?.uid!==uid)return;
+  profile=p.exists()?p.data():{};
+  if(!p.exists())await setDoc(doc(db,"learners",uid),{email:user.email||"",createdAt:serverTimestamp()},{merge:true});
   if(await restore(uid)){
    restoreFailed=false;initialized=true;notice="Cloud progress restored.";
    queueUpload(1800);
@@ -215,8 +220,8 @@ async function upload(manual=false,source=null){
   }
   const updated=Date.now();
   if(!manual&&user?.uid===uid&&initialized){await setDoc(doc(db,"learners",uid,"sync","current"),{...snapshot(h.getState()),savedAt:updated});localStorage.setItem("atdSnapshotTime:"+uid,String(updated));}
-  notice=tr("Progress synced to cloud.","تمت مزامنة التقدم سحابياً.");
- }catch(e){failed=true;pendingSync=true;notice=tr("Sync needs attention: ","المزامنة تحتاج مراجعة: ")+(e.code||e.message);}
+  syncFailed=false;notice=tr("Progress synced to cloud.","تمت مزامنة التقدم سحابياً.");
+ }catch(e){failed=true;pendingSync=true;syncFailed=true;notice=tr("Sync needs attention: ","المزامنة تحتاج مراجعة: ")+(e.code||e.message);}
  finally{busy=false;perf("cloud upload",started);if(opened)ui();if(pendingSync&&!failed&&initialized&&user?.uid===uid&&!restoreFailed)queueUpload(1600);}
 }
 // Usage tracking begins only after an authenticated learner's cloud restore.
@@ -252,7 +257,7 @@ readyAuth.then(()=>onAuthStateChanged(auth,async next=>{
  tickActivity();if(user)void flushActivity();
  lastTick=Date.now();lastView="";
  user=next;adminStatus={uid:null,state:"unchecked",message:""};
- profile=null;initialized=false;restoreFailed=false;pendingSync=false;known.clear();notice="";
+ profile=null;initialized=false;restoreFailed=false;pendingSync=false;syncFailed=false;known.clear();notice="";
  h.useAccount(next?.uid||null,{deferRender:!!next});
  if(!next){opened=true;ui();return;}
  opened=false;ui();
