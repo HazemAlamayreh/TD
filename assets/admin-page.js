@@ -1,3 +1,4 @@
+import {initializeOnboardingCohorts} from "./onboarding-cohorts.js?v=20261120";
 import {initializeEmployeeManagement} from "./admin-employees.js?v=20261110-adaptive-v30b";
 import {analyzeLearnerSkills,cohortSkillSummary,skillDefinitions} from "./skill-analytics.js?v=20261110-skills-v1";
 import {initializeApp} from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
@@ -216,6 +217,6 @@ onAuthStateChanged(auth,async user=>{
  if(!user){access("Administrator sign-in required","Sign in at ATD Academy, then return to this page.");return;}
  try{const p=await getDoc(doc(db,"admins",user.uid));if(auth.currentUser?.uid!==user.uid)return;
   if(!p.exists()||p.data().active!==true){access("Administrator access not enabled","This signed-in account does not have an active admins/{uid} record.");return;}
-  $("access").classList.add("hidden");$("dashboard").classList.remove("hidden");initializeEmployeeManagement(auth);load();
+  $("access").classList.add("hidden");$("dashboard").classList.remove("hidden");initializeEmployeeManagement(auth);initializeOnboardingCohorts(auth,db);load();
  }catch(e){access("Unable to verify admin access",String(e.code||e.message));}
 });
