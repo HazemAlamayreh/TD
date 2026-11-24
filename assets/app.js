@@ -39,7 +39,8 @@ window.ATDModuleSummaryFor=moduleSummaryFor;
 const mod=()=>DATA.modules.find(m=>m.id===state.current)||DATA.modules[0];
 function lessonFor(id){for(const m of DATA.modules){let l=m.lessons.find(x=>x[0]===id);if(l)return {m,l}}return null}
 async function selectModule(id){
- if(window.ATDLoadModuleDetail)await window.ATDLoadModuleDetail(id);
+ const m=DATA.modules.find(x=>x.id===id),summary=m?moduleSummaryFor(m):null;
+ if(summary?.status!=='not-started'&&window.ATDLoadModuleDetail)await window.ATDLoadModuleDetail(id);
  state.current=id;state.focus=null;view('dashboard');
 };function view(name){state.view=name;sess=null;save();render()};function resetTest(){sess=null;render()};
 function getQs(m,stage){if(stage==='advanced')return (DATA.advanced[m.id]||[]).map((x,i)=>({id:m.id+'-adv-'+i,target:m.lessons[i%m.lessons.length]?.[0],title:'Applied scenario',q:x[0],opts:x[1],answer:x[2],why:x[3]}));
