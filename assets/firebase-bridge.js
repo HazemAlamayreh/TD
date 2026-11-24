@@ -1,7 +1,7 @@
 import {initializeApp} from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
 import {getAuth,setPersistence,browserLocalPersistence,onAuthStateChanged,createUserWithEmailAndPassword,signInWithEmailAndPassword,sendPasswordResetEmail,sendEmailVerification,updatePassword,signOut} from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
 import {getFirestore,doc,getDoc,getDocs,setDoc,collection,serverTimestamp,increment,query,orderBy,documentId,limit,startAfter} from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
-import {initializeAdminDashboard} from "./admin-dashboard.js?v=20261110-role-refresh";
+import {initializeAdminDashboard} from "./admin-dashboard.js?v=20261124-on-demand-history-v1";
 import {getFunctions,httpsCallable} from "https://www.gstatic.com/firebasejs/12.6.0/firebase-functions.js";
 const app=initializeApp({apiKey:"AIzaSyBxuLsolggWnoGuTASnnWvz7OwvRdnIxZE",authDomain:"atd-master-talent-development.firebaseapp.com",projectId:"atd-master-talent-development",storageBucket:"atd-master-talent-development.firebasestorage.app",messagingSenderId:"882331359053",appId:"1:882331359053:web:a51c003529af5ae9c90904"});
 const auth=getAuth(app),db=getFirestore(app),functions=getFunctions(app,"us-central1"),resolveEmployeeLogin=httpsCallable(functions,"resolveEmployeeLogin"),resetEmployeePassword=httpsCallable(functions,"resetEmployeePassword"),rebuildCompactProgress=httpsCallable(functions,"rebuildCompactProgress"),h=window.ATDHost,readyAuth=setPersistence(auth,browserLocalPersistence);
