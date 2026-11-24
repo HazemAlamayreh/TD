@@ -5,7 +5,7 @@ window.ATDHost={
  save:()=>save(),
  render:()=>render(),
  guestState:()=>{try{return JSON.parse(localStorage.getItem(KEY)||'{}')}catch{return {}}},
- useAccount:(uid)=>{
+ useAccount:(uid,options={})=>{
   const lang=state.lang||'en';
   ACTIVE_KEY=uid?KEY+':account:'+uid:KEY;
   let next={};try{next=JSON.parse(localStorage.getItem(ACTIVE_KEY)||'{}')||{}}catch{}
@@ -15,7 +15,10 @@ window.ATDHost={
    manualReviewed:{},autoReviewed:{},studiedLessons:{},lessonProof:{},
    mastered:{},knowledgeGaps:{},caseHistory:{},legacyAttempts:{}
   },next);
-  state.lang=lang;save();render();
+  state.lang=lang;
+  // Cloud restore renders once after account data has been merged.
+  // The regular save must still preserve account-local progress.
+  save();if(!options.deferRender)render();
  }
 };
-</script><script type="module" src="assets/firebase-bridge.js?v=20261116-assessment-split-v32"></script></body></html>
+</script><script type="module" src="assets/firebase-bridge.js?v=20261124-login-stability-v1"></script></body></html>
