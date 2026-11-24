@@ -1,6 +1,6 @@
 import {initializeApp} from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
 import {getAuth,setPersistence,browserLocalPersistence,onAuthStateChanged,createUserWithEmailAndPassword,signInWithEmailAndPassword,sendPasswordResetEmail,sendEmailVerification,updatePassword,signOut} from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
-import {getFirestore,doc,getDoc,getDocs,setDoc,collection,serverTimestamp,increment} from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
+import {getFirestore,doc,getDoc,getDocs,setDoc,collection,serverTimestamp,increment,query,orderBy,documentId,limit,startAfter} from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
 import {initializeAdminDashboard} from "./admin-dashboard.js?v=20261110-role-refresh";
 import {getFunctions,httpsCallable} from "https://www.gstatic.com/firebasejs/12.6.0/firebase-functions.js";
 const app=initializeApp({apiKey:"AIzaSyBxuLsolggWnoGuTASnnWvz7OwvRdnIxZE",authDomain:"atd-master-talent-development.firebaseapp.com",projectId:"atd-master-talent-development",storageBucket:"atd-master-talent-development.firebasestorage.app",messagingSenderId:"882331359053",appId:"1:882331359053:web:a51c003529af5ae9c90904"});
@@ -10,20 +10,35 @@ const root=document.createElement("div");document.body.append(root);
 const css=document.createElement("style");
 css.textContent="#atdAccountButton{position:fixed;bottom:16px;right:16px;z-index:1000;border:0;border-radius:30px;padding:12px 16px;background:#143d72;color:white;cursor:pointer}#atdAccountMask{position:fixed;inset:0;background:#12233ac9;display:grid;place-items:center;z-index:1300;padding:16px}#atdAccountPanel{background:#fff;color:#152538;width:min(460px,100%);max-height:90vh;overflow:auto;border-radius:14px;padding:25px;font:14px/1.5 system-ui,sans-serif}#atdAccountPanel input{width:100%;box-sizing:border-box;padding:12px;margin:5px 0 12px;border:1px solid #c4cfdd;border-radius:6px}#atdAccountPanel button{padding:10px 14px;margin:5px 3px;border:1px solid #bbcadc;border-radius:7px;cursor:pointer;background:#f4f7fa}#atdAccountPanel button.primary{color:#fff;background:#143d72}";
 document.head.append(css);
-let user=null,profile=null,opened=false,mode="login",notice="",initialized=false,busy=false,syncTimer=null,syncing=false,known=new Set(),adminStatus={uid:null,state:"unchecked",message:""};
-const tr=(en,ar)=>h.getState().lang==="ar"?ar:en;
+let user=null,profile=null,opened=false,mode="login",notice="",initialized=false,busy=false,syncTimer=null,syncing=false,known=new Set(),loginEpoch=0,restoreFailed=false,restoring=false,pendingSync=false,syncFailed=false,adminStatus={uid:null,state:"unchecked",message:""};
+const perf=(step,t)=>console.info("[TD performance]",step,Math.round(performance.now()-t)+"ms");
+const yieldUI=()=>new Promise(r=>setTimeout(r,0));
+function withDeadline(promise,ms,label){
+ let timer;
+ const timeout=new Promise((_,reject)=>{timer=setTimeout(()=>reject(new Error(label+" timed out. Retry from your account panel.")),ms);});
+ return Promise.race([promise,timeout]).finally(()=>clearTimeout(timer));
+}
+const tr=(en,ar)=>en;
 const esc=v=>String(v??"").replace(/[&<>"']/g,x=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[x]));
 function ui(){
  root.innerHTML='<button id="atdAccountButton">'+esc(user?(profile?.name||profile?.email||user.email):tr("My account","حسابي"))+'</button>';
  root.querySelector("#atdAccountButton").onclick=()=>{opened=true;ui();};
+ if(user&&!initialized&&!restoreFailed){
+  const loading=document.createElement("div");
+  loading.id="atdRestoreLoading";
+  loading.setAttribute("role","status");
+  loading.style.cssText="position:fixed;top:12px;right:12px;z-index:999;background:#fff;color:#153352;border:1px solid #c3d1df;border-radius:10px;padding:11px 15px;box-shadow:0 2px 12px #0002;font:13px system-ui";
+  loading.textContent=tr("Restoring saved learning progress…","جاري استرجاع التقدم المحفوظ…");
+  root.appendChild(loading);
+ }
  if(!opened)return;
  let body;
  if(user){
- body='<p>'+esc(profile?.email||user.email)+'</p><div style="padding:12px;margin:10px 0;background:#f1f6fc;border:1px solid #d5e2f0;border-radius:10px"><b>'+tr("Administrator access","صلاحية المدير")+'</b><p style="font-size:12px;word-break:break-all;margin:6px 0">'+tr("Your account UID: ","معرّف حسابك UID: ")+'<code>'+esc(user.uid)+'</code></p><button type="button" id="atdCheckAdminRole">'+tr("Check my Admin permission","فحص صلاحية Admin")+'</button><p style="font-size:12px;margin:6px 0 0">'+(adminStatus.uid===user.uid?esc(adminStatus.message):tr("Status not checked. Click Check my Admin permission.","لم يتم فحص الصلاحية بعد. اضغط زر فحص صلاحية Admin."))+'</p>'+(adminStatus.uid===user.uid&&adminStatus.state==="active"?'<a href="./admin.html" style="display:block;margin:8px 0;font-weight:bold;color:#12623d">'+tr("Open Admin Dashboard","افتح لوحة المدير")+'</a>':'')+'</div><label>'+tr("Name","الاسم")+'</label><input id="atdProfileName" value="'+esc(profile?.name)+'"><label>'+tr("Phone (optional)","الهاتف (اختياري)")+'</label><input id="atdProfilePhone" value="'+esc(profile?.phone)+'"><button id="atdSaveProfile">'+tr("Save profile","حفظ البيانات")+'</button>'+(user.email&&!user.emailVerified&&!user.email.toLowerCase().endsWith("@employee-login.academy.idevelopmena.com")?'<div style="margin-top:8px;padding:8px;background:#fff6e8;border-radius:6px"><p>'+tr("Verify your work email before an administrator can link your Employee ID to this existing account.","وثّق إيميل العمل حتى يتمكن المدير من ربط الرقم الوظيفي بنفس الحساب القديم.")+'</p><button type="button" id="atdVerifyEmail">'+tr("Send verification email","إرسال رابط توثيق الإيميل")+'</button></div>':'')+'<h3>'+tr("Set or change password","تعيين أو تغيير كلمة المرور")+'</h3><p>'+tr("Former Magic Link learners can set a password while signed in, keeping the same progress.","المتدرب الذي استخدم رابط الإيميل سابقاً يستطيع تعيين كلمة مرور من حسابه الحالي دون فقدان التقدم.")+'</p><form id="atdPasswordForm"><input type="password" id="atdNewPassword" required minlength="8" autocomplete="new-password" placeholder="'+tr("New password (8+ characters)","كلمة مرور جديدة (8 أحرف أو أكثر)")+'"><button type="submit">'+tr("Save password","حفظ كلمة المرور")+'</button></form><button id="atdImportOld">'+tr("Import older browser progress","استيراد التقدم القديم")+'</button><button id="atdLogout">'+tr("Sign out","تسجيل الخروج")+'</button>';
+ body='<p>'+esc(profile?.email||user.email)+'</p><div style="padding:12px;margin:10px 0;background:#f1f6fc;border:1px solid #d5e2f0;border-radius:10px"><b>'+tr("Administrator access","صلاحية المدير")+'</b><p style="font-size:12px;word-break:break-all;margin:6px 0">'+tr("Your account UID: ","معرّف حسابك UID: ")+'<code>'+esc(user.uid)+'</code></p><button type="button" id="atdCheckAdminRole">'+tr("Check my Admin permission","فحص صلاحية Admin")+'</button><p style="font-size:12px;margin:6px 0 0">'+(adminStatus.uid===user.uid?esc(adminStatus.message):tr("Status not checked. Click Check my Admin permission.","لم يتم فحص الصلاحية بعد. اضغط زر فحص صلاحية Admin."))+'</p>'+(adminStatus.uid===user.uid&&adminStatus.state==="active"?'<a href="./admin.html" style="display:block;margin:8px 0;font-weight:bold;color:#12623d">'+tr("Open Admin Dashboard","افتح لوحة المدير")+'</a>':'')+'</div><label>'+tr("Name","الاسم")+'</label><input id="atdProfileName" value="'+esc(profile?.name)+'"><label>'+tr("Phone (optional)","الهاتف (اختياري)")+'</label><input id="atdProfilePhone" value="'+esc(profile?.phone)+'"><button id="atdSaveProfile">'+tr("Save profile","حفظ البيانات")+'</button>'+(user.email&&!user.emailVerified&&!user.email.toLowerCase().endsWith("@employee-login.academy.idevelopmena.com")?'<div style="margin-top:8px;padding:8px;background:#fff6e8;border-radius:6px"><p>'+tr("Verify your work email before an administrator can link your Employee ID to this existing account.","وثّق إيميل العمل حتى يتمكن المدير من ربط الرقم الوظيفي بنفس الحساب القديم.")+'</p><button type="button" id="atdVerifyEmail">'+tr("Send verification email","إرسال رابط توثيق الإيميل")+'</button></div>':'')+'<h3>'+tr("Set or change password","تعيين أو تغيير كلمة المرور")+'</h3><p>'+tr("Former Magic Link learners can set a password while signed in, keeping the same progress.","المتدرب الذي استخدم رابط الإيميل سابقاً يستطيع تعيين كلمة مرور من حسابه الحالي دون فقدان التقدم.")+'</p><form id="atdPasswordForm"><input type="password" id="atdNewPassword" required minlength="8" autocomplete="new-password" placeholder="'+tr("New password (8+ characters)","كلمة مرور جديدة (8 أحرف أو أكثر)")+'"><button type="submit">'+tr("Save password","حفظ كلمة المرور")+'</button></form><button id="atdImportOld">'+tr("Import older browser progress","استيراد التقدم القديم")+'</button>'+(restoreFailed?'<p role="alert" style="padding:10px;background:#fff3df">'+tr("Cloud restore failed; sync is paused.","فشل استرجاع التقدم؛ المزامنة متوقفة.")+' <button id="atdRetryRestore">'+tr("Retry restore","إعادة الاسترجاع")+'</button></p>':'')+(syncFailed?'<p style="padding:9px;background:#fff3df">'+tr("Cloud sync needs attention.","مزامنة التقدم تحتاج مراجعة.")+' <button id="atdRetrySync">'+tr("Retry sync","إعادة المزامنة")+'</button></p>':'')+'<button id="atdLogout">'+tr("Sign out","تسجيل الخروج")+'</button>';
  }else{
  body='<h3>'+tr(mode==="login"?"Sign in":"Create account",mode==="login"?"تسجيل الدخول":"إنشاء حساب")+'</h3><form id="atdCredentials"><label>'+tr("Work Email","إيميل العمل")+'</label><input id="atdEmail" type="text" autocomplete="username" required placeholder="name@company.com"><label>'+tr("Password","كلمة المرور")+'</label><input type="password" id="atdPassword" minlength="8" required autocomplete="'+(mode==="login"?"current-password":"new-password")+'">'+(mode==="register"?'<label>'+tr("Confirm password","تأكيد كلمة المرور")+'</label><input id="atdConfirm" type="password" required minlength="8" autocomplete="new-password">':'')+'<button type="submit" class="primary">'+tr(mode==="login"?"Sign in":"Create account",mode==="login"?"دخول":"إنشاء حساب")+'</button></form><button id="atdMode">'+tr(mode==="login"?"New learner? Register":"Already have an account? Sign in",mode==="login"?"متدرب جديد؟ إنشاء حساب":"عندك حساب؟ تسجيل الدخول")+'</button><button id="atdReset">'+tr("Forgot password?","نسيت كلمة المرور؟")+'</button>';
  }
- root.insertAdjacentHTML("beforeend",'<div id="atdAccountMask"><section id="atdAccountPanel" dir="'+(h.getState().lang==="ar"?"rtl":"ltr")+'"><button id="atdClose" style="float:right">×</button><h2>ATD Academy Account</h2>'+body+'<p role="status">'+esc(notice)+'</p></section></div>');
+ root.insertAdjacentHTML("beforeend",'<div id="atdAccountMask"><section id="atdAccountPanel" dir="'+"ltr"+'"><button id="atdClose" style="float:right">×</button><h2>ATD Academy Account</h2>'+body+'<p role="status">'+esc(notice)+'</p></section></div>');
  const get=s=>root.querySelector(s);
  get("#atdClose").onclick=()=>{if(user){opened=false;ui();}};if(!user)get("#atdClose").style.display="none";
  if(!user){
@@ -84,16 +99,18 @@ function ui(){
    try{await sendEmailVerification(auth.currentUser);notice=tr("Verification email sent. Open it, verify, then ask Admin to re-import your Employee ID.","تم إرسال رابط توثيق الإيميل. افتحه ثم اطلب من المدير إعادة استيراد رقمك الوظيفي.");}
    catch(err){notice=err.code||err.message;}ui();
   };
+  if(get("#atdRetryRestore"))get("#atdRetryRestore").onclick=()=>retryRestore();
+  if(get("#atdRetrySync"))get("#atdRetrySync").onclick=()=>{syncFailed=false;queueUpload(100);ui();};
   get("#atdLogout").onclick=()=>signOut(auth);
   get("#atdSaveProfile").onclick=async()=>{try{profile={name:get("#atdProfileName").value.trim(),phone:get("#atdProfilePhone").value.trim()};if(!profile.name)throw Error("Name required");await setDoc(doc(db,"learners",user.uid),{...profile,email:user.email,updatedAt:serverTimestamp()},{merge:true});notice=tr("Profile saved.","تم الحفظ.");}catch(x){notice=x.code||x.message;}ui();};
   get("#atdPasswordForm").onsubmit=async e=>{e.preventDefault();try{await updatePassword(auth.currentUser,get("#atdNewPassword").value);notice=tr("Password saved; use it on any browser.","تم حفظ كلمة المرور ويمكن استخدامها على أي متصفح.");}catch(x){notice=x.code||x.message;}ui();};
   get("#atdImportOld").onclick=async()=>{if(!confirm(tr("Import the old guest progress into your account?","هل تريد استيراد تقدم الضيف القديم إلى حسابك؟")))return;await upload(true,h.guestState());await restore();ui();};
  }
 }
-function records(s){
- const out=[],id=v=>String(v).replace(/[^a-zA-Z0-9_.-]/g,"_");
- for(const [k,v] of Object.entries(s.done||{}))if(v){const ev=window.ATDRules?.lessonEvidence?.(k);out.push(["lessonProgress",id(k),{lessonId:k,studied:true,completed:ev?ev.resolved:true,evidenceResolved:ev?ev.resolved:true,evidenceLevel:ev?.level||"legacy-completed"}]);}
- for(const [k,v] of Object.entries(s.mastered||{}))if(v)out.push(["lessonMastery",id(k),{lessonId:k,mastered:true}]);
+function* records(s){
+ const id=v=>String(v).replace(/[^a-zA-Z0-9_.-]/g,"_");
+ for(const [k,v] of Object.entries(s.done||{}))if(v){const ev=window.ATDRules?.lessonEvidence?.(k);yield (["lessonProgress",id(k),{lessonId:k,studied:true,completed:ev?ev.resolved:true,evidenceResolved:ev?ev.resolved:true,evidenceLevel:ev?.level||"legacy-completed"}]);}
+ for(const [k,v] of Object.entries(s.mastered||{}))if(v)yield (["lessonMastery",id(k),{lessonId:k,mastered:true}]);
  for(const [k,v] of Object.entries(s.attempts||{}))if(v?.ts){
   let evidence={};try{
    const [mid,stage]=k.split(":"),m=DATA.modules.find(x=>x.id===mid);
@@ -111,54 +128,137 @@ function records(s){
     }).filter(Boolean);
    }
   }catch(err){console.warn("Assessment evidence:",err);}
-  out.push(["assessmentAttempts",id(k+"_"+v.ts),{assessmentKey:k,...v,...evidence}]);
+  yield (["assessmentAttempts",id(k+"_"+v.ts),{assessmentKey:k,...v,...evidence}]);
  }
- for(const a of s.attemptHistory||[])if(a?.ts&&a.capability&&a.stage){const k=a.capability+":"+a.stage;out.push(["assessmentAttempts",id(k+"_"+a.ts),{assessmentKey:k,...a}]);}
- return out;
+ for(const a of s.attemptHistory||[])if(a?.ts&&a.capability&&a.stage){const k=a.capability+":"+a.stage;yield (["assessmentAttempts",id(k+"_"+a.ts),{assessmentKey:k,...a}]);}
+
 }
 function snapshot(s){
  const fields=["current","view","focus","lastResume","draft","caseDraft","checks","manualReviewed","knowledgeGaps","lessonVisits","caseHistory"];
  const data={};for(const k of fields)if(s[k]!==undefined)data[k]=s[k];return data;
 }
-async function restore(){
- if(!user)return;
- const uid=user.uid,s=h.getState();
- const snap=await getDoc(doc(db,"learners",uid,"sync","current"));
+const RESTORE_PAGE_SIZE=25;
+async function* restorePages(uid,sub){
+ let last=null,count=0;
+ for(;;){
+  if(user?.uid!==uid)return;
+  const base=collection(db,"learners",uid,sub);
+  const pageQuery=last
+   ?query(base,orderBy(documentId()),startAfter(last),limit(RESTORE_PAGE_SIZE))
+   :query(base,orderBy(documentId()),limit(RESTORE_PAGE_SIZE));
+  const page=await withDeadline(getDocs(pageQuery),20000,"Cloud "+sub+" page");
+  if(user?.uid!==uid)return;
+  const docs=page.docs;
+  if(!docs.length)return;
+  yield docs;
+  count+=docs.length;
+  last=docs[docs.length-1];
+  if(docs.length<RESTORE_PAGE_SIZE)return;
+  // The browser can repaint between each bounded Firestore batch.
+  await yieldUI();
+ }
+}
+async function restore(uid=user?.uid){
+ if(!uid||user?.uid!==uid)return false;
+ const start=performance.now(),state=h.getState();
+ const snap=await withDeadline(getDoc(doc(db,"learners",uid,"sync","current")),15000,"Cloud snapshot");
+ if(user?.uid!==uid)return false;
+ const copy={...state,done:{...state.done},mastered:{...state.mastered},attempts:{...state.attempts}};
+ let stamp=null;
  if(snap.exists()){
   const x=snap.data(),localStamp=Number(localStorage.getItem("atdSnapshotTime:"+uid)||0);
   if(Number(x.savedAt||0)>localStamp){
-   for(const k of Object.keys(snapshot(x)))s[k]=x[k];
-   localStorage.setItem("atdSnapshotTime:"+uid,String(x.savedAt));
+   for(const key of Object.keys(snapshot(x)))copy[key]=x[key];
+   stamp=String(x.savedAt);
   }
  }
+ const fresh=new Set();
+ let processed=0;
  for(const sub of ["lessonProgress","lessonMastery","assessmentAttempts"]){
-  const docs=await getDocs(collection(db,"learners",uid,sub));
-  for(const d of docs.docs){
-   known.add(sub+"/"+d.id);const a=d.data();
-   if(sub==="lessonProgress"&&(a.studied||a.completed))s.done[a.lessonId]=true;
-   if(sub==="lessonMastery"&&a.mastered)s.mastered[a.lessonId]=true;
-   if(sub==="assessmentAttempts"&&a.assessmentKey){const old=s.attempts[a.assessmentKey];if(!old||String(a.ts||"")>String(old.ts||"")){const {updatedAt,assessmentKey,...attempt}=a;s.attempts[a.assessmentKey]=attempt;}}
+  const phase=performance.now();
+  let phaseCount=0;
+  for await(const docs of restorePages(uid,sub)){
+   if(user?.uid!==uid)return false;
+   for(const d of docs){
+    const x=d.data();
+    fresh.add(sub+"/"+d.id);
+    if(sub==="lessonProgress"&&(x.studied||x.completed)&&x.lessonId)copy.done[x.lessonId]=true;
+    if(sub==="lessonMastery"&&x.mastered&&x.lessonId)copy.mastered[x.lessonId]=true;
+    if(sub==="assessmentAttempts"&&x.assessmentKey){
+     const old=copy.attempts[x.assessmentKey];
+     if(!old||String(x.ts||"")>String(old.ts||"")){
+      const {updatedAt,assessmentKey,...attempt}=x;
+      copy.attempts[x.assessmentKey]=attempt;
+     }
+    }
+    processed++;phaseCount++;
+   }
+   // Do not commit an incomplete cloud restore. Inform the learner without adding more renders.
+   const status=document.getElementById("atdRestoreLoading");
+   if(status)status.textContent=tr("Restoring saved progress: ","استرجاع التقدم المحفوظ: ")+processed+" records";
+   await yieldUI();
   }
+  if(user?.uid!==uid)return false;
+  perf("restore "+sub+" ("+phaseCount+" records)",phase);
  }
- h.save();h.render();
+ if(user?.uid!==uid)return false;
+ // Apply only after all pages for all collections succeeded. No partial cloud snapshots.
+ Object.assign(state,copy);
+ known.clear();for(const key of fresh)known.add(key);
+ h.save();
+ if(stamp!==null)localStorage.setItem("atdSnapshotTime:"+uid,stamp);
+ h.render();
+ perf("restore and render ("+processed+" records)",start);
+ return true;
+}
+async function retryRestore(){
+ if(!user||busy||restoring)return;
+ restoring=true;const uid=user.uid;
+ notice="Retrying cloud restore…";ui();
+ try{
+  const p=await withDeadline(getDoc(doc(db,"learners",uid)),15000,"Account lookup");
+  if(user?.uid!==uid)return;
+  profile=p.exists()?p.data():{};
+  if(!p.exists())await setDoc(doc(db,"learners",uid),{email:user.email||"",createdAt:serverTimestamp()},{merge:true});
+  if(await restore(uid)){
+   restoreFailed=false;initialized=true;notice="Cloud progress restored.";
+   queueUpload(1800);
+  }
+ }catch(e){restoreFailed=true;notice="Restore failed: "+(e.code||e.message);}
+ finally{restoring=false;}
+ ui();
+}
+function queueUpload(delay=1400){
+ if(!initialized||!user||restoreFailed)return;
+ pendingSync=true;clearTimeout(syncTimer);
+ syncTimer=setTimeout(()=>{syncTimer=null;upload();},delay);
 }
 async function upload(manual=false,source=null){
- if(!initialized||!user||busy)return;
- busy=true;
+ if(!initialized||!user||restoreFailed)return;
+ if(busy){pendingSync=true;return;}
+ const started=performance.now(),uid=user.uid;
+ busy=true;pendingSync=false;let failed=false;
  try{
-  for(const [sub,id,data] of records(source||h.getState())){
+  const items=records(source||h.getState());
+  let index=0,scanned=0;
+  for(const [sub,id,data] of items){
+   if(++scanned%40===0)await yieldUI();
+   if(user?.uid!==uid||!initialized)break;
    const key=sub+"/"+id;
-   const ref=doc(db,"learners",user.uid,sub,id);
+   const ref=doc(db,"learners",uid,sub,id);
    // Lesson evidence changes as the learner progresses; refresh this derived record even when it already exists.
    if(sub!=="lessonProgress"&&known.has(key))continue;
-   if(manual&&(await getDoc(ref)).exists()){known.add(key);continue;}
-   await setDoc(ref,{...data,updatedAt:serverTimestamp()},{merge:true});known.add(key);
+   if(manual){const existing=await getDoc(ref);if(user?.uid!==uid||!initialized)break;if(existing.exists()){known.add(key);continue;}}
+   await setDoc(ref,{...data,updatedAt:serverTimestamp()},{merge:true});
+   if(user?.uid!==uid||!initialized)break;
+   known.add(key);
+   if(++index%20===0)await yieldUI();
   }
   const updated=Date.now();
-  if(!manual){await setDoc(doc(db,"learners",user.uid,"sync","current"),{...snapshot(h.getState()),savedAt:updated});localStorage.setItem("atdSnapshotTime:"+user.uid,String(updated));}
-  notice=tr("Progress synced to cloud.","تمت مزامنة التقدم سحابياً.");
- }catch(e){notice=tr("Sync needs attention: ","المزامنة تحتاج مراجعة: ")+(e.code||e.message);}
- finally{busy=false;if(opened)ui();}
+  if(!manual&&user?.uid===uid&&initialized){await setDoc(doc(db,"learners",uid,"sync","current"),{...snapshot(h.getState()),savedAt:updated});localStorage.setItem("atdSnapshotTime:"+uid,String(updated));}
+  if(user?.uid===uid){syncFailed=false;notice=tr("Progress synced to cloud.","تمت مزامنة التقدم سحابياً.");}
+ }catch(e){failed=true;if(user?.uid===uid){pendingSync=true;syncFailed=true;notice=tr("Sync needs attention: ","المزامنة تحتاج مراجعة: ")+(e.code||e.message);}}
+ finally{busy=false;perf("cloud upload",started);if(opened)ui();if(pendingSync&&!failed&&initialized&&user?.uid===uid&&!restoreFailed)queueUpload(1600);}
 }
 // Usage tracking begins only after an authenticated learner's cloud restore.
 // Foreground time is an approximation, not a proctored or validated study duration.
@@ -186,17 +286,37 @@ document.addEventListener("visibilitychange",()=>{tickActivity();if(document.vis
 window.addEventListener("blur",()=>{tickActivity();flushActivity();});
 window.addEventListener("focus",()=>{lastTick=Date.now();});
 activityTimer=setInterval(()=>{trackPage();flushActivity();},30000);
-window.ATDCloudOnSave=()=>{if(!initialized||!user)return;trackPage();clearTimeout(syncTimer);syncTimer=setTimeout(()=>upload(),900);};
+window.ATDCloudOnSave=()=>{if(!initialized||!user||restoreFailed)return;trackPage();queueUpload(1200);};
 readyAuth.then(()=>onAuthStateChanged(auth,async next=>{
- clearTimeout(syncTimer);tickActivity();if(user)flushActivity();lastTick=Date.now();lastView="";user=next;adminStatus={uid:null,state:"unchecked",message:""};profile=null;initialized=false;busy=false;known.clear();notice="";
- h.useAccount(next?.uid||null);
+ const epoch=++loginEpoch,started=performance.now();
+ clearTimeout(syncTimer);syncTimer=null;
+ tickActivity();if(user)void flushActivity();
+ lastTick=Date.now();lastView="";
+ user=next;adminStatus={uid:null,state:"unchecked",message:""};
+ profile=null;initialized=false;restoreFailed=false;pendingSync=false;syncFailed=false;known.clear();notice="";
+ h.useAccount(next?.uid||null,{deferRender:!!next});
  if(!next){opened=true;ui();return;}
  opened=false;ui();
  try{
-  const p=await getDoc(doc(db,"learners",next.uid));profile=p.exists()?p.data():{};
+  const p=await withDeadline(getDoc(doc(db,"learners",next.uid)),15000,"Account lookup");
+  if(loginEpoch!==epoch||user?.uid!==next.uid)return;
+  profile=p.exists()?p.data():{};
   if(!p.exists())await setDoc(doc(db,"learners",next.uid),{email:next.email||"",createdAt:serverTimestamp()},{merge:true});
-  await restore();initialized=true;trackPage();await upload();
- }catch(e){notice=tr("Could not load cloud progress: ","تعذّر تحميل التقدم السحابي: ")+(e.code||e.message);}
- ui();
+  if(loginEpoch!==epoch||user?.uid!==next.uid)return;
+  const restored=await restore(next.uid);
+  if(!restored||loginEpoch!==epoch||user?.uid!==next.uid)return;
+  initialized=true;restoreFailed=false;trackPage();
+  perf("login ready",started);
+  // Let the UI paint before starting what may be a large cloud upload.
+  queueUpload(1800);
+ }catch(e){
+  if(loginEpoch!==epoch||user?.uid!==next.uid)return;
+  restoreFailed=true;initialized=false;
+  notice=tr("Cloud progress could not load. Sync paused; retry from your account panel: ","تعذر تحميل التقدم السحابي. أوقفت المزامنة؛ أعد المحاولة من الحساب: ")+(e.code||e.message);
+  h.render();
+  opened=true;
+  console.warn("[TD cloud restore]",e);
+ }
+ if(loginEpoch===epoch)ui();
 }));
 ui();

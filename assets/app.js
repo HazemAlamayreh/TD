@@ -61,7 +61,7 @@ state.attempts[`${sess.mid}:${sess.stage}`]={score,missed:wrong.map(q=>q.id),ans
 function resultScreen(m,stage){let a=state.attempts[m.id+':'+stage],qs=sess.qs;let pass=a.score>=.8;let wrong=a.missed.length;
 $('body').innerHTML=`<div class="panel qBox"><span class="pill">${stage.toUpperCase()} · COMPLETED</span><h1>${stage==='diagnostic'?'Your capability diagnostic profile':stage==='mastery'?'Mastery check results':'Scenario practice results'}</h1><div class="score">${Math.round(a.score*100)}%</div><p>${qs.length-wrong} correct out of ${qs.length} questions · ${wrong} topic(s) for review.</p>${stage==='diagnostic'?'<div class="stageInstructions">Correctly answered lessons are automatically marked <b>✓ Reviewed</b> in <b>3. Full Material</b>. If a lesson has multiple diagnostic questions, all must be answered correctly. Open Full Material to see the updated status.</div>':''}<div class="stageInstructions">${stage==='diagnostic'?'Baseline results are for learning guidance. Your responses are shown below with the best answer and rationale. A diagnostic score does not certify professional capability.':pass?'You met the proposed 80% learning threshold.':'Review the topics below and take a fresh mastery check.'}</div><div class="actionBar"><button class="btn primary" onclick="view('review')">My personalized review →</button>${!m.preview?'<button class="btn" onclick="view(\'material\')">Open full material</button>':''}<button class="btn" onclick="resetTest()">Retake assessment</button></div><h2 style="margin-top:25px">Answer review</h2>${qs.map((q,i)=>`<div class="lesson"><div class="row"><div class="skillTag">QUESTION ${i+1} · ${esc(q.target||q.id)}</div><span class="${a.answers[i]===q.answer?'good':'warn'}">${a.answers[i]===q.answer?'✓ Correct':'Needs review'}</span></div><h3>${esc(q.q)}</h3><p class="small"><b>Your answer:</b> ${esc('ABCD'[a.answers[i]]||'—')}. ${esc(q.opts[a.answers[i]]||'—')}</p><p class="small"><b>Best answer:</b> ${'ABCD'[q.answer]}. ${esc(q.opts[q.answer])}</p><div class="feedback">${esc(q.why)}</div>${!m.preview&&lessonFor(q.target)?`<button class="btn" onclick="openLesson('${q.target}')">Study related lesson</button>`:''}</div>`).join('')}</div>`}
 /* Adaptive Academy experience upgrade. Existing DATA and persistence key remain unchanged. */
-state.lang??='en';state.attemptHistory??=[];state.checks??={};state.bookmark??={};state.lessonVisits??={};state.manualReviewed??={};state.lastResume??=null;
+state.lang='en'; // English-only interface; never mutate learning assessments or progress.state.attemptHistory??=[];state.checks??={};state.bookmark??={};state.lessonVisits??={};state.manualReviewed??={};state.lastResume??=null;
 const BASE_CHOOSE=originalChoose,BASE_NEXT=originalNextQuestion;
 const msg=(en,ar)=>state.lang==='ar'?ar:en;
 const pct=x=>Math.round(100*x);
@@ -84,7 +84,7 @@ const canAdvanced=m=>window.ATDRules?window.ATDRules.canAdvanced(m):((state.atte
 const resumeLabel=()=>{let x=state.lastResume;return x&&DATA.modules.find(m=>m.id===x.mid)?`${x.mid} · ${x.stage}${x.pos!=null?' · Q'+(x.pos+1):''}`:null;};
 const colorScore=s=>s>=.8?'good':s>=.5?'warn':'bad';
 const appChart=(vals)=>`<div class="domainBars">${vals.map(x=>`<div class="domainBarRow"><span>${esc(x.label)}</span><div class="domainBarTrack"><div style="width:${Math.max(0,Math.min(100,x.val))}%"></div></div><strong>${x.val}%</strong></div>`).join('')}</div>`;
-function switchLanguage(){state.lang=state.lang==='ar'?'en':'ar';save();render()}
+function switchLanguage(){state.lang='en';document.documentElement.lang='en';document.documentElement.dir='ltr';}
 function resumeLearning(){let r=state.lastResume;if(!r||!DATA.modules.find(m=>m.id===r.mid)){view('home');return;}state.current=r.mid;state.focus=r.focus||null;state.view=r.stage||'dashboard';sess=null;save();render()}
 function markLesson(id){state.done[id]=true;state.manualReviewed[id]=true;state.lessonVisits[id]=Date.now();save();render()}
 function quickCheck(id,answer){let ref=lessonFor(id);if(!ref)return;const l=ref.l;state.checks[id]={answer,correct:answer===l[6],ts:new Date().toISOString()};save();render()}
@@ -124,25 +124,14 @@ function localizeDynamic(){if(state.lang!=='ar')return;
  const mappings={'Diagnostic Exam':'التقييم التشخيصي','My personalized review':'مراجعتي الشخصية','Targeted gap analysis':'تحليل فجوات التعلم','Mastery Check':'اختبار الإتقان','Advanced Scenarios':'السيناريوهات المتقدمة','Question ':'السؤال ','Next question →':'السؤال التالي ←','Submit assessment':'إرسال التقييم','← Previous':'السابق','Start diagnostic →':'ابدأ التقييم','Retake diagnostic':'إعادة التقييم','Open full material →':'فتح المحتوى الكامل','Your capability diagnostic profile':'ملف التقييم التشخيصي','Mastery check results':'نتائج الإتقان','Scenario practice results':'نتائج السيناريوهات','Answer review':'مراجعة الإجابات','Your answer:':'إجابتك:','Best answer:':'أفضل إجابة:','Needs review':'بحاجة لمراجعة','Correct':'صحيح','Study related lesson':'دراسة الدرس المرتبط','Retake assessment':'إعادة التقييم','Open full material':'فتح المحتوى الكامل'};
  document.querySelectorAll('#body h1,#body h2,#body button,#body .pill,#body .small b').forEach(el=>{if(el.children.length===0){let t=el.textContent.trim(),v=mappings[t];if(v)el.textContent=v;else if(t.startsWith('Question ')&&/^Question \d+ \/ \d+$/.test(t))el.textContent=t.replace('Question ','السؤال ');}});
 }
-function render(){EARLIER_RENDER();localizeDynamic();const bar=document.querySelector('#top .tabs');if(bar){const active=bar.querySelector('.tab.active');if(active){const left=active.offsetLeft-bar.offsetLeft;const right=left+active.offsetWidth;if(left<bar.scrollLeft)bar.scrollLeft=left;else if(right>bar.scrollLeft+bar.clientWidth)bar.scrollLeft=right-bar.clientWidth+8;}}document.body.classList.toggle('arabicUI',state.lang==='ar');const txt=state.lang==='ar'?'اللغة: عربي / English':'Language: English / عربي';let btn=document.getElementById('languageFloat');if(!btn){btn=document.createElement('button');btn.id='languageFloat';btn.className='languageFloat';btn.onclick=switchLanguage;document.body.appendChild(btn)}btn.textContent=txt}
+function render(){EARLIER_RENDER();localizeDynamic();const bar=document.querySelector('#top .tabs');if(bar){const active=bar.querySelector('.tab.active');if(active){const left=active.offsetLeft-bar.offsetLeft;const right=left+active.offsetWidth;if(left<bar.scrollLeft)bar.scrollLeft=left;else if(right>bar.scrollLeft+bar.clientWidth)bar.scrollLeft=right-bar.clientWidth+8;}}document.body.classList.toggle('arabicUI',state.lang==='ar');const btn=document.getElementById('languageFloat');if(btn)btn.remove();}
 
 
 /* Human-authored Arabic learning renditions. English originals are retained for switching and detailed source reference. */
 const AR_CAPABILITIES={"1.1":"التواصل","1.2":"الذكاء العاطفي واتخاذ القرار","1.3":"التعاون والقيادة","1.4":"الوعي الثقافي والشمول","1.5":"إدارة المشاريع","1.6":"الالتزام والسلوك الأخلاقي","1.7":"التعلم مدى الحياة","2.1":"علوم التعلم","2.2":"التصميم التعليمي","2.3":"تقديم التدريب والتيسير","2.4":"تطبيق التكنولوجيا","2.5":"إدارة المعرفة","2.6":"التطوير المهني والقيادي","2.7":"Coaching","2.8":"تقييم الأثر","3.1":"فهم الأعمال","3.2":"الاستشارة والشراكة مع الأعمال","3.3":"التطوير التنظيمي والثقافة","3.4":"استراتيجية المواهب وإدارتها","3.5":"تحسين الأداء","3.6":"إدارة التغيير","3.7":"البيانات والتحليلات","3.8":"الاستعداد للمستقبل"};
 const ORIGINAL_LESSONS=DATA.modules.map(m=>({m,n:m.name,intro:m.intro,ls:m.lessons.map(l=>({l,title:l[1],body:l[2],activity:l[3]}))}));
-function synchronizeCourseLocale(){
-  const ar=state.lang==='ar';
-  for(const m of ORIGINAL_LESSONS){
-    m.m.name=ar?(AR_CAPABILITIES[m.m.id]||m.n):m.n;
-    m.m.intro=ar?('تتناول هذه القدرة المهنية «'+m.m.name+'» وتوضح كيفية تطبيق مفاهيمها في سياق Talent Development ونتائج العمل.'):m.intro;
-    for(const z of m.ls){
-      const a=AR_LESSONS[z.l[0]];
-      z.l[1]=ar&&a?a[0]:z.title;
-      z.l[2]=ar&&a?a[1]:z.body;
-      z.l[3]=ar&&a?('نشاط تطبيقي: اختر موقفاً حقيقياً من عملك، واشرح كيف ستستخدم '+a[0]+'، وحدد دليلاً قابلاً للملاحظة على نجاح التطبيق.'):z.activity;
-    }
-  }
-}
+// English-only release: leave original lesson objects untouched while rendering.
+function synchronizeCourseLocale(){state.lang='en';}
 const RENDER_PRE_AR_PATCH=render;
 render=function(){
  synchronizeCourseLocale();
@@ -400,7 +389,7 @@ for(const m of DATA.modules){
 }
 function detailedQuestionFeedback(q,selectedIndex){
  const good=q.opts[q.answer],selected=q.opts[selectedIndex];
- const concept=q.title||AR_LESSONS[q.target]?.[0]||'the lesson concept';
+ const concept=q.title||q.target||'the lesson concept';
  const isArabic=state.lang==='ar';
  if(isArabic){
   const name=AR_LESSONS[q.target]?.[0]||concept;
