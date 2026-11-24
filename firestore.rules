@@ -50,7 +50,9 @@ service cloud.firestore {
         allow delete: if false;
       }
       match /sync/{id} {
-        allow get, list: if isOwner(uid);
+        // Compact current-state summaries may be read by active admins for reporting.
+        // Historical assessment evidence remains on-demand in assessmentAttempts.
+        allow get, list: if isOwner(uid) || isAdmin();
         allow create, update: if isOwner(uid);
         allow delete: if false;
       }
