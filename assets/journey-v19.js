@@ -60,17 +60,18 @@ getQs=function(m,stage){
 function jumpToDomain(d){state.domainDashboard=String(d);state.view='domain-dashboard';sess=null;save();render();}
 function domainDashboardScreen(){
  const d=state.domainDashboard||'1',ms=DATA.modules.filter(m=>domain(m.id)===d);
- const ls=ms.flatMap(m=>m.lessons),done=ls.filter(l=>state.done[l[0]]).length,master=ls.filter(l=>state.mastered[l[0]]).length;
- const dAttempts=ms.filter(m=>state.attempts[m.id+':diagnostic']).length;
- const mAttempts=ms.filter(m=>state.attempts[m.id+':mastery']).length;
- const aAttempts=ms.filter(m=>state.attempts[m.id+':advanced']).length;
- $('body').innerHTML='<div class="dashHero dashUpgrade"><h1>'+msg('Domain '+d+' Dashboard','لوحة تحليلات المجال '+d)+'</h1><p>'+msg('A domain-level view of completion, demonstrated mastery and assessments.','ملخص مستوى المجال: إكمال الدروس، والإتقان المثبت، والتقييمات.')+'</p></div>'+
- '<div class="dashMetrics"><div class="dashMetric"><div class="skillTag">'+msg('LESSONS COMPLETED','الدروس المكتملة')+'</div><strong>'+done+'/'+ls.length+'</strong></div><div class="dashMetric"><div class="skillTag">'+msg('LESSONS MASTERED','الدروس المتقنة')+'</div><strong>'+master+'/'+ls.length+'</strong></div><div class="dashMetric"><div class="skillTag">'+msg('DIAGNOSTICS','الاختبارات التشخيصية')+'</div><strong>'+dAttempts+'/'+ms.length+'</strong></div><div class="dashMetric"><div class="skillTag">'+msg('MASTERY ASSESSMENTS','اختبارات الإتقان')+'</div><strong>'+mAttempts+'/'+ms.length+'</strong></div></div>'+
- '<div class="panel"><h2>'+msg('Capability-level progress','التقدم حسب القدرة')+'</h2><div class="analyticsTableWrap"><table class="analyticsTable"><thead><tr><th>'+msg('Capability','القدرة')+'</th><th>Completed</th><th>Mastered</th><th>Diagnostic</th><th>Mastery</th><th>Advanced</th><th></th></tr></thead><tbody>'+
- ms.map(m=>{const dc=m.lessons.filter(l=>state.done[l[0]]).length,mc=m.lessons.filter(l=>state.mastered[l[0]]).length;
- const da=state.attempts[m.id+':diagnostic'],ma=state.attempts[m.id+':mastery'],aa=state.attempts[m.id+':advanced'];
- return '<tr><td>'+esc(m.id+' '+m.name)+'</td><td>'+dc+'/'+m.lessons.length+'</td><td>'+mc+'/'+m.lessons.length+'</td><td>'+(da?Math.round(100*da.score)+'%':'—')+'</td><td>'+(ma?Math.round(100*ma.score)+'%':'—')+'</td><td>'+(aa?Math.round(100*aa.score)+'%':'—')+'</td><td><button class="btn mini" onclick="selectModule(\''+m.id+'\')">'+msg('Open','فتح')+'</button></td></tr>'}).join('')+
- '</tbody></table></div><p class="small muted">'+msg('Advanced case attempts in this domain: ','عدد محاولات الحالات المتقدمة في المجال: ')+aAttempts+'</p></div>';
+ const rows=ms.map(m=>({m,s:window.ATDModuleSummaryFor?.(m)||{status:'not-started',reviewed:0,total:m.lessons.length}}));
+ const reviewed=rows.reduce((n,x)=>n+(x.s.reviewed||0),0),units=rows.reduce((n,x)=>n+(x.s.total||0),0);
+ const mastered=rows.filter(x=>x.s.status==='mastered').length,completed=rows.filter(x=>x.s.status==='completed').length;
+ const diagnostics=rows.filter(x=>x.s.diagnostic).length;
+ $('body').innerHTML='<div class="dashHero dashUpgrade"><h1>Domain '+d+' Dashboard</h1><p>Course-level status only. Detailed learning records load when a capability is opened.</p></div>'+
+ '<div class="dashMetrics"><div class="dashMetric"><div class="skillTag">REVIEWED</div><strong>'+reviewed+'/'+units+'</strong></div>'+
+ '<div class="dashMetric"><div class="skillTag">MASTERED</div><strong>'+mastered+'/'+ms.length+'</strong></div>'+
+ '<div class="dashMetric"><div class="skillTag">COMPLETED</div><strong>'+completed+'/'+ms.length+'</strong></div>'+
+ '<div class="dashMetric"><div class="skillTag">DIAGNOSTIC DONE</div><strong>'+diagnostics+'/'+ms.length+'</strong></div></div>'+
+ '<div class="panel"><h2>Capability-level progress</h2><div class="analyticsTableWrap"><table class="analyticsTable"><thead><tr><th>Capability</th><th>Status</th><th>Reviewed</th><th>Diagnostic</th><th>Full Material</th><th>Mastery Check</th><th>Advanced</th><th></th></tr></thead><tbody>'+
+ rows.map(({m,s})=>'<tr><td>'+esc(m.id+' '+m.name)+'</td><td><strong>'+(s.status==='completed'?'Completed':s.status==='mastered'?'Mastered':s.status==='in-progress'?'In progress':'Not started')+'</strong></td><td>'+s.reviewed+'/'+s.total+'</td><td>'+(s.diagnostic?'✓':'—')+'</td><td>'+(s.material?'✓':'—')+'</td><td>'+(s.masteryCheck?'✓':'—')+'</td><td>'+(s.advanced?'✓':'—')+'</td><td><button class="btn mini" onclick="selectModule(\''+m.id+'\')">Open</button></td></tr>').join('')+
+ '</tbody></table></div></div>';
 }
 const JOURNEY_HEADER=header;
 header=function(){
@@ -114,11 +115,11 @@ render=function(){
  if(state.view==='home'||state.view==='analytics'){
   const area=$('body');if(!area)return;
   const existing=document.getElementById('courseCompletionSummary');if(existing)existing.remove();
-  const count=DATA.modules.reduce((n,m)=>n+m.lessons.length,0);
-  const completed=DATA.modules.reduce((n,m)=>n+(window.ATDModuleSummaryFor?.(m)?.reviewed||0),0);
-  const mastered=DATA.modules.reduce((n,m)=>n+(['mastered','completed'].includes(window.ATDModuleSummaryFor?.(m)?.status)?m.lessons.length:0),0);
+  const count=DATA.modules.length;
+  const mastered=DATA.modules.filter(m=>window.ATDModuleSummaryFor?.(m)?.status==='mastered').length;
+  const completed=DATA.modules.filter(m=>window.ATDModuleSummaryFor?.(m)?.status==='completed').length;
   const block=document.createElement('div');block.id='courseCompletionSummary';block.className='panel';
-  block.innerHTML='<h2>'+msg('Course learning evidence','مؤشرات تعلم الكورس')+'</h2><div class="dashMetrics"><div class="dashMetric"><div class="skillTag">'+msg('COMPLETED','المكتمل')+'</div><strong>'+completed+'/'+count+'</strong></div><div class="dashMetric"><div class="skillTag">'+msg('MASTERED','المتقن')+'</div><strong>'+mastered+'/'+count+'</strong></div></div><p class="muted">'+msg('Completed means studied or passed an in-lesson check. Mastered means both corresponding Mastery Check questions were answered correctly.','مكتمل يعني تمت دراسة الدرس أو اجتياز أسئلته التدريبية. متقن يعني الإجابة الصحيحة على سؤالي الدرس في اختبار الإتقان.')+'</p>';
+  block.innerHTML='<h2>Course status summary</h2><div class="dashMetrics"><div class="dashMetric"><div class="skillTag">MASTERED</div><strong>'+mastered+'/'+count+'</strong></div><div class="dashMetric"><div class="skillTag">COMPLETED</div><strong>'+completed+'/'+count+'</strong></div></div><p class="muted">Mastered = Diagnostic Exam completed + Full Material completed. Completed = Mastery Check completed + Advanced Scenario completed.</p>';
   area.insertBefore(block,area.firstChild.nextSibling);
  }
 };
