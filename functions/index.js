@@ -187,7 +187,7 @@ exports.rebuildCompactProgress=onCall({...OPTIONS,timeoutSeconds:120,memory:"512
  if(!uid)throw new HttpsError("unauthenticated","Sign in to rebuild learning progress.");
  const syncRef=db.doc("learners/"+uid+"/sync/current"),existing=await syncRef.get();
  if(existing.exists&&Number(existing.get("compactVersion")||0)>=1){
-  return {alreadyBuilt:true,compactAttempts:existing.get("compactAttempts")||{},savedAt:Number(existing.get("savedAt")||Date.now())};
+  return {alreadyBuilt:true,compactDone:existing.get("compactDone")||{},compactMastered:existing.get("compactMastered")||{},compactAttempts:existing.get("compactAttempts")||{},savedAt:Number(existing.get("savedAt")||Date.now())};
  }
  const [doneSnap,masterySnap,assessmentResult]=await Promise.all([
   db.collection("learners").doc(uid).collection("lessonProgress").get(),
@@ -202,6 +202,6 @@ exports.rebuildCompactProgress=onCall({...OPTIONS,timeoutSeconds:120,memory:"512
   compactDone,compactMastered,compactAttempts:assessmentResult.latest,compactVersion:1,
   compactBuiltAt:FieldValue.serverTimestamp(),compactHistoricalRecordsProcessed:assessmentResult.processed,savedAt
  },{merge:true});
- return {alreadyBuilt:false,compactAttempts:assessmentResult.latest,savedAt,processed:assessmentResult.processed};
+ return {alreadyBuilt:false,compactDone,compactMastered,compactAttempts:assessmentResult.latest,savedAt,processed:assessmentResult.processed};
 });
 

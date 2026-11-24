@@ -162,10 +162,9 @@
  }
  function enhanceHome(){
   const root=document.getElementById("body");if(!root)return;
-  const profiles=window.ATDRules?.profileAll?.()||[];
-  const resolved=profiles.reduce((n,p)=>n+p.lessons.filter(x=>x.resolved).length,0);
+  const resolved=DATA.modules.reduce((n,m)=>n+(window.ATDModuleSummaryFor?.(m)?.reviewed||0),0);
   const metrics=root.querySelectorAll(".homeMetric");
-  if(metrics[3]){const strong=metrics[3].querySelector("strong"),span=metrics[3].querySelector("span");if(strong)strong.textContent=resolved;if(span)span.textContent=t("Evidence-resolved units","وحدات أغلقت بالدليل");}
+  if(metrics[3]){const strong=metrics[3].querySelector("strong"),span=metrics[3].querySelector("span");if(strong)strong.textContent=resolved;if(span)span.textContent=t("Reviewed units","الوحدات المراجعة");}
  }
  function enhanceReview(m){
   const root=document.getElementById("body");if(!root||root.querySelector(".adaptiveReviewSummary"))return;
@@ -196,7 +195,7 @@
  function enhanceSidebar(){
   document.querySelectorAll("#sidebar .sideBtn").forEach(button=>{
    const id=button.querySelector("b")?.textContent?.trim().match(/^\d+\.\d+/)?.[0],m=DATA.modules.find(x=>x.id===id);if(!m)return;
-   const done=window.ATDRules?.moduleStatus(m).completed;
+   const summary=window.ATDModuleSummaryFor?.(m),done=summary?.status==="completed"||summary?.status==="mastered";
    button.classList.toggle("atdModuleCompleted",!!done);
    const badge=button.querySelector(".atdModuleDoneLabel");
    if(done&&!badge){const b=document.createElement("span");b.className="atdModuleDoneLabel";b.textContent=t("✓ Passed","✓ ناجح");button.append(b);}

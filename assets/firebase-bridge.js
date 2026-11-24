@@ -1,7 +1,7 @@
 import {initializeApp} from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
 import {getAuth,setPersistence,browserLocalPersistence,onAuthStateChanged,createUserWithEmailAndPassword,signInWithEmailAndPassword,sendPasswordResetEmail,sendEmailVerification,updatePassword,signOut} from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
-import {getFirestore,doc,getDoc,getDocs,setDoc,collection,serverTimestamp,increment,query,orderBy,documentId,limit,startAfter} from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
-import {initializeAdminDashboard} from "./admin-dashboard.js?v=20261124-on-demand-history-v1";
+import {getFirestore,doc,getDoc,getDocs,setDoc,collection,serverTimestamp,increment,query,orderBy,documentId,limit,startAfter,startAt,endAt,limitToLast} from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
+import {initializeAdminDashboard} from "./admin-dashboard.js?v=20261124-course-summary-v2";
 import {getFunctions,httpsCallable} from "https://www.gstatic.com/firebasejs/12.6.0/firebase-functions.js";
 const app=initializeApp({apiKey:"AIzaSyBxuLsolggWnoGuTASnnWvz7OwvRdnIxZE",authDomain:"atd-master-talent-development.firebaseapp.com",projectId:"atd-master-talent-development",storageBucket:"atd-master-talent-development.firebasestorage.app",messagingSenderId:"882331359053",appId:"1:882331359053:web:a51c003529af5ae9c90904"});
 const auth=getAuth(app),db=getFirestore(app),functions=getFunctions(app,"us-central1"),resolveEmployeeLogin=httpsCallable(functions,"resolveEmployeeLogin"),resetEmployeePassword=httpsCallable(functions,"resetEmployeePassword"),rebuildCompactProgress=httpsCallable(functions,"rebuildCompactProgress"),h=window.ATDHost,readyAuth=setPersistence(auth,browserLocalPersistence);
@@ -28,7 +28,7 @@ function ui(){
   loading.id="atdRestoreLoading";
   loading.setAttribute("role","status");
   loading.style.cssText="position:fixed;top:12px;right:12px;z-index:999;background:#fff;color:#153352;border:1px solid #c3d1df;border-radius:10px;padding:11px 15px;box-shadow:0 2px 12px #0002;font:13px system-ui";
-  loading.textContent=tr("Restoring saved learning progress…","جاري استرجاع التقدم المحفوظ…");
+  loading.textContent="Loading course summary…";
   root.appendChild(loading);
  }
  if(!opened)return;
@@ -133,106 +133,120 @@ function* records(s){
  // Do not replay the full historical attempt array during routine sync.
  // Existing Firestore history is retained unchanged.
 }
-function compactAttempt(a){
- if(!a||typeof a!=="object")return a;
- const keep=["score","missed","answers","ts","questionCount","bankVersion","caseVersion","history","passed","finished"];
- const out={};for(const k of keep)if(a[k]!==undefined)out[k]=a[k];
+function compactModulesFromLegacy(x){
+ const done=x?.compactDone||{},attempts=x?.compactAttempts||{},out={};
+ for(const m of DATA.modules){
+  const total=m.lessons.length,reviewed=m.lessons.filter(l=>!!done[l[0]]).length;
+  const diagnostic=!!attempts[m.id+":diagnostic"],masteryCheck=!!attempts[m.id+":mastery"],advanced=!!attempts[m.id+":advanced"];
+  const material=total>0&&reviewed===total;
+  const status=masteryCheck&&advanced?"completed":diagnostic&&material?"mastered":diagnostic||reviewed||masteryCheck||advanced?"in-progress":"not-started";
+  out[m.id]={status,reviewed,total,diagnostic,material,masteryCheck,advanced};
+ }
+ return out;
+}
+function compactModulesFromState(){
+ const out={};
+ for(const m of DATA.modules){
+  const x=window.ATDModuleSummaryFor?.(m);
+  if(x)out[m.id]={status:x.status,reviewed:x.reviewed,total:x.total,diagnostic:!!x.diagnostic,material:!!x.material,masteryCheck:!!x.masteryCheck,advanced:!!x.advanced};
+ }
  return out;
 }
 function snapshot(s){
- const fields=["current","view","focus","lastResume","draft","caseDraft","checks","manualReviewed","knowledgeGaps","lessonVisits","caseHistory"];
+ const fields=["current","lastResume","draft","caseDraft","bookmark"];
  const data={};for(const k of fields)if(s[k]!==undefined)data[k]=s[k];
- data.compactDone={...(s.done||{})};
- data.compactMastered={...(s.mastered||{})};
- data.compactAttempts=Object.fromEntries(Object.entries(s.attempts||{}).map(([k,v])=>[k,compactAttempt(v)]));
- data.compactVersion=1;
+ data.compactModules=compactModulesFromState();
+ data.compactVersion=2;
  return data;
 }
-const RESTORE_PAGE_SIZE=25;
-async function* restorePages(uid,sub,pageSize=RESTORE_PAGE_SIZE){
- let last=null,count=0;
- for(;;){
-  if(user?.uid!==uid)return;
-  const base=collection(db,"learners",uid,sub);
-  const pageQuery=last
-   ?query(base,orderBy(documentId()),startAfter(last),limit(pageSize))
-   :query(base,orderBy(documentId()),limit(pageSize));
-  const page=await withDeadline(getDocs(pageQuery),20000,"Cloud "+sub+" page");
-  if(user?.uid!==uid)return;
-  const docs=page.docs;
-  if(!docs.length)return;
-  yield docs;
-  count+=docs.length;
-  last=docs[docs.length-1];
-  if(docs.length<pageSize)return;
-  // The browser can repaint between each bounded Firestore batch.
-  await yieldUI();
+const safeRecordId=v=>String(v).replace(/[^a-zA-Z0-9_.-]/g,"_");
+async function latestAttempt(uid,key){
+ const prefix=safeRecordId(key+"_"),base=collection(db,"learners",uid,"assessmentAttempts");
+ const q=query(base,orderBy(documentId()),startAt(prefix),endAt(prefix+"\uf8ff"),limitToLast(1));
+ const snap=await withDeadline(getDocs(q),15000,"Capability assessment lookup");
+ if(!snap.docs.length)return null;
+ const x=snap.docs[snap.docs.length-1].data(),{updatedAt,assessmentKey,...attempt}=x;
+ return attempt;
+}
+async function loadModuleDetail(mid){
+ if(!user||restoreFailed)return false;
+ const uid=user.uid,state=h.getState(),m=DATA.modules.find(x=>x.id===mid);
+ if(!m)return false;
+ state.moduleDetailsLoaded??={};
+ if(state.moduleDetailsLoaded[mid])return true;
+ const started=performance.now();
+ try{
+  const lessonReads=m.lessons.flatMap(l=>[
+   getDoc(doc(db,"learners",uid,"lessonProgress",l[0])),
+   getDoc(doc(db,"learners",uid,"lessonMastery",l[0]))
+  ]);
+  const [lessonDocs,attempts]=await Promise.all([
+   withDeadline(Promise.all(lessonReads),15000,"Capability lesson lookup"),
+   Promise.all(["diagnostic","mastery","advanced"].map(stage=>latestAttempt(uid,mid+":"+stage)))
+  ]);
+  if(user?.uid!==uid)return false;
+  m.lessons.forEach((l,i)=>{
+   const progress=lessonDocs[i*2],mastery=lessonDocs[i*2+1];
+   if(progress?.exists()&&(progress.data().studied||progress.data().completed))state.done[l[0]]=true;else delete state.done[l[0]];
+   if(mastery?.exists()&&mastery.data().mastered)state.mastered[l[0]]=true;else delete state.mastered[l[0]];
+  });
+  ["diagnostic","mastery","advanced"].forEach((stage,i)=>{
+   const key=mid+":"+stage;
+   if(attempts[i])state.attempts[key]=attempts[i];else delete state.attempts[key];
+  });
+  state.moduleDetailsLoaded[mid]=true;
+  const summary=window.ATDModuleSummaryFor?.(m);
+  if(summary){state.moduleSummary??={};state.moduleSummary[mid]={...summary};}
+  perf("capability detail "+mid,started);
+  return true;
+ }catch(e){
+  notice="Unable to load "+mid+" details: "+(e.code||e.message);
+  console.warn("[TD capability detail]",mid,e);
+  if(opened)ui();
+  return false;
  }
 }
+window.ATDLoadModuleDetail=loadModuleDetail;
 async function restore(uid=user?.uid){
  if(!uid||user?.uid!==uid)return false;
  const start=performance.now(),state=h.getState();
- const snap=await withDeadline(getDoc(doc(db,"learners",uid,"sync","current")),15000,"Cloud snapshot");
+ const snap=await withDeadline(getDoc(doc(db,"learners",uid,"sync","current")),15000,"Course summary");
  if(user?.uid!==uid)return false;
- const copy={...state,done:{...state.done},mastered:{...state.mastered},attempts:{...state.attempts}};
- let stamp=null,hasCompact=false;
+ const copy={...state,done:{},mastered:{},attempts:{},moduleDetailsLoaded:{},moduleSummary:{...(state.moduleSummary||{})},view:"home",focus:null};
+ let stamp=null,hasSummary=false;
  if(snap.exists()){
-  const x=snap.data(),localStamp=Number(localStorage.getItem("atdSnapshotTime:"+uid)||0);
-  if(Number(x.savedAt||0)>localStamp){
-   for(const key of Object.keys(snapshot(x)))if(!["compactDone","compactMastered","compactAttempts","compactVersion"].includes(key))copy[key]=x[key];
-   stamp=String(x.savedAt);
+  const x=snap.data();
+  for(const key of ["current","lastResume","draft","caseDraft","bookmark"])if(x[key]!==undefined)copy[key]=x[key];
+  if(x.compactModules&&typeof x.compactModules==="object"){
+   copy.moduleSummary={...copy.moduleSummary,...x.compactModules};hasSummary=Object.keys(x.compactModules).length>0;
+  }else if(Number(x.compactVersion||0)>=1){
+   const legacy=compactModulesFromLegacy(x);
+   copy.moduleSummary={...copy.moduleSummary,...legacy};hasSummary=Object.keys(legacy).length>0;
   }
-  if(Number(x.compactVersion||0)>=1){
-   copy.done={...copy.done,...(x.compactDone||{})};
-   copy.mastered={...copy.mastered,...(x.compactMastered||{})};
-   copy.attempts={...copy.attempts,...(x.compactAttempts||{})};
-   hasCompact=true;
-  }
- }
- const fresh=new Set();
- let processed=0;
- for(const sub of ["lessonProgress","lessonMastery"]){
-  const phase=performance.now();let phaseCount=0;
-  for await(const docs of restorePages(uid,sub)){
-   if(user?.uid!==uid)return false;
-   for(const d of docs){
-    const x=d.data();fresh.add(sub+"/"+d.id);
-    if(sub==="lessonProgress"&&(x.studied||x.completed)&&x.lessonId)copy.done[x.lessonId]=true;
-    if(sub==="lessonMastery"&&x.mastered&&x.lessonId)copy.mastered[x.lessonId]=true;
-    processed++;phaseCount++;
-   }
-   await yieldUI();
-  }
-  perf("restore "+sub+" ("+phaseCount+" records)",phase);
+  stamp=String(x.savedAt||"");
  }
  if(user?.uid!==uid)return false;
  Object.assign(state,copy);
- known.clear();for(const key of fresh)known.add(key);
  h.save();
- if(stamp!==null)localStorage.setItem("atdSnapshotTime:"+uid,stamp);
+ if(stamp)localStorage.setItem("atdSnapshotTime:"+uid,stamp);
  h.render();
- perf("login-critical restore ("+processed+" records)",start);
- if(!hasCompact)requestServerCompactRebuild(uid);
+ perf("course-summary login",start);
+ if(!hasSummary)requestServerCompactRebuild(uid);
  return true;
 }
 function requestServerCompactRebuild(uid){
- // Never block login and never read historical attempts in the browser.
  setTimeout(async()=>{
   if(user?.uid!==uid||!initialized)return;
   try{
    const result=await rebuildCompactProgress({});
    if(user?.uid!==uid)return;
-   const compact=result.data?.compactAttempts;
-   if(compact&&typeof compact==="object"){
-    const state=h.getState();
-    state.attempts={...(state.attempts||{}),...compact};
+   const data=result.data||{},summary=data.compactModules||compactModulesFromLegacy(data);
+   if(summary&&Object.keys(summary).length){
+    const state=h.getState();state.moduleSummary={...(state.moduleSummary||{}),...summary};
     h.save();h.render();
-    localStorage.setItem("atdSnapshotTime:"+uid,String(result.data?.savedAt||Date.now()));
+    localStorage.setItem("atdSnapshotTime:"+uid,String(data.savedAt||Date.now()));
    }
-  }catch(e){
-   // The function may not be deployed yet; login must remain fully usable.
-   console.info("[TD compact rebuild unavailable]",e.code||e.message);
-  }
+  }catch(e){console.info("[TD compact rebuild unavailable]",e.code||e.message);}
  },3000);
 }
 async function retryRestore(){
@@ -245,8 +259,7 @@ async function retryRestore(){
   profile=p.exists()?p.data():{};
   if(!p.exists())await setDoc(doc(db,"learners",uid),{email:user.email||"",createdAt:serverTimestamp()},{merge:true});
   if(await restore(uid)){
-   restoreFailed=false;initialized=true;notice="Cloud progress restored.";
-   queueUpload(1800);
+   restoreFailed=false;initialized=true;notice="Course summary restored.";
   }
  }catch(e){restoreFailed=true;notice="Restore failed: "+(e.code||e.message);}
  finally{restoring=false;}
