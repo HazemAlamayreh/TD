@@ -7,7 +7,7 @@ const {onCall,HttpsError}=require("firebase-functions/v2/https");
 const {defineSecret}=require("firebase-functions/params");
 const {initializeApp}=require("firebase-admin/app");
 const {getAuth}=require("firebase-admin/auth");
-const {getFirestore,FieldValue,Timestamp}=require("firebase-admin/firestore");
+const {getFirestore,FieldValue,Timestamp,FieldPath}=require("firebase-admin/firestore");
 const nodemailer=require("nodemailer");
 const crypto=require("node:crypto");
 initializeApp();
@@ -155,3 +155,53 @@ exports.resetEmployeePassword=onCall({...OPTIONS,secrets:[SMTP_CONFIG],timeoutSe
  catch(err){console.error("Password reset delivery failed",String(err.code||err.message));}
  return generic;
 });
+
+function compactAssessmentAttempt(a){
+ if(!a||typeof a!=="object")return {};
+ const keep=["score","missed","answers","ts","questionCount","bankVersion","caseVersion","history","passed","finished"];
+ const out={};for(const k of keep)if(a[k]!==undefined)out[k]=a[k];
+ return out;
+}
+async function latestAssessmentAttempts(uid){
+ const col=db.collection("learners").doc(uid).collection("assessmentAttempts");
+ const latest={};let last=null,processed=0;
+ for(;;){
+  let q=col.orderBy(FieldPath.documentId()).limit(250);
+  if(last)q=q.startAfter(last);
+  const snap=await q.get();
+  if(snap.empty)break;
+  for(const d of snap.docs){
+   const x=d.data(),key=x.assessmentKey;
+   if(!key)continue;
+   const current=latest[key];
+   if(!current||String(x.ts||"")>String(current.ts||""))latest[key]=compactAssessmentAttempt(x);
+   processed++;
+  }
+  last=snap.docs[snap.docs.length-1];
+  if(snap.size<250)break;
+ }
+ return {latest,processed};
+}
+exports.rebuildCompactProgress=onCall({...OPTIONS,timeoutSeconds:120,memory:"512MiB",maxInstances:5},async request=>{
+ const uid=request.auth?.uid;
+ if(!uid)throw new HttpsError("unauthenticated","Sign in to rebuild learning progress.");
+ const syncRef=db.doc("learners/"+uid+"/sync/current"),existing=await syncRef.get();
+ if(existing.exists&&Number(existing.get("compactVersion")||0)>=1){
+  return {alreadyBuilt:true,compactAttempts:existing.get("compactAttempts")||{},savedAt:Number(existing.get("savedAt")||Date.now())};
+ }
+ const [doneSnap,masterySnap,assessmentResult]=await Promise.all([
+  db.collection("learners").doc(uid).collection("lessonProgress").get(),
+  db.collection("learners").doc(uid).collection("lessonMastery").get(),
+  latestAssessmentAttempts(uid)
+ ]);
+ const compactDone={},compactMastered={};
+ for(const d of doneSnap.docs){const x=d.data();if(x.lessonId&&(x.studied||x.completed))compactDone[x.lessonId]=true;}
+ for(const d of masterySnap.docs){const x=d.data();if(x.lessonId&&x.mastered)compactMastered[x.lessonId]=true;}
+ const savedAt=Date.now();
+ await syncRef.set({
+  compactDone,compactMastered,compactAttempts:assessmentResult.latest,compactVersion:1,
+  compactBuiltAt:FieldValue.serverTimestamp(),compactHistoricalRecordsProcessed:assessmentResult.processed,savedAt
+ },{merge:true});
+ return {alreadyBuilt:false,compactAttempts:assessmentResult.latest,savedAt,processed:assessmentResult.processed};
+});
+
